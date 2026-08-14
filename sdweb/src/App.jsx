@@ -1,122 +1,208 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from "react";
+import LandingPage from "./pages_alfa/landingpage";
+import Login from "./pages_alfa/login";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [page, setPage] = useState("home");
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div>
+      <style>{`
+        :root {
+          --text-color: #000;
+          --primary-orange: rgb(238, 169, 41);
+          --card-bg: #f6e9cc;
+          --cream-bg: #fbf3e3;
+        }
 
-      <div className="ticks"></div>
+        * {
+          box-sizing: border-box;
+        }
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        html, body, #root {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          min-height: 100vh;
+        }
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        body {
+          font-family: Arial, sans-serif;
+          color: var(--text-color);
+        }
+
+        h1, h2, h3, p, label, a, span {
+          color: var(--text-color);
+          font-weight: bold;
+        }
+
+        /* Navbar */
+
+        .navbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 20px 40px;
+        }
+
+        .brand-logo {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 800;
+        }
+
+        .brand-logo img {
+          width: 28px;
+          height: 28px;
+        }
+
+        .nav-links a {
+          text-decoration: none;
+          margin: 0 5px;
+          padding: 8px 14px;
+          border-radius: 6px;
+        }
+
+        .nav-links a:hover {
+          background-color: rgb(248, 185, 69);
+        }
+
+        .nav-right {
+          display: flex;
+          gap: 12px;
+        }
+
+        /* Buttons */
+
+        .btn-primary {
+          background-color: var(--primary-orange);
+          border: none;
+          padding: 10px 20px;
+          border-radius: 5px;
+          font-weight: bold;
+          cursor: pointer;
+        }
+
+        .btn-primary:hover {
+          background-color: rgb(242, 241, 239);
+          border: 1px solid orange;
+        }
+
+        /* Hero */
+
+        .hero {
+          text-align: center;
+          padding: 50px 20px 40px;
+          background-image:
+            linear-gradient(
+              rgba(251,243,227,0.6),
+              rgba(251,243,227,0.6)
+            ),
+            url("/images/flood.jpeg");
+          background-size: cover;
+          background-position: center;
+        }
+
+        .hero h1 {
+          font-size: 40px;
+        }
+        .hero .btn-primary {
+  margin-top: 20px;
 }
 
-export default App
+        /* Features */
+
+        .features {
+          text-align: center;
+          padding: 20px 20px 50px;
+        }
+
+        .features h2 {
+          font-size: 30px;
+        }
+
+        .card-container {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 25px;
+          max-width: 1300px;
+          margin: 25px auto;
+        }
+
+        .card {
+          background-color: var(--card-bg);
+          padding: 20px;
+          border-radius: 14px;
+          text-align: left;
+          min-height: 130px;
+        }
+
+        .card:hover {
+          background-color: var(--primary-orange);
+        }
+
+        .icon-box {
+          width: 38px;
+          height: 38px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: rgb(241, 220, 160);
+          border-radius: 10px;
+          font-size: 20px;
+        }
+
+        /* Login */
+
+        .login-wrapper {
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-color: var(--cream-bg);
+        }
+
+        .login-card {
+          width: 420px;
+          padding: 40px;
+          background-color: white;
+          border-radius: 20px;
+          text-align: center;
+        }
+
+        .input-box {
+          display: flex;
+          align-items: center;
+          padding: 12px 15px;
+          margin-bottom: 20px;
+          border: 1px solid #f1dca0;
+          border-radius: 10px;
+          background-color: var(--cream-bg);
+        }
+
+        .input-box input {
+          flex: 1;
+          border: none;
+          outline: none;
+          background: transparent;
+          font-weight: bold;
+        }
+
+        .submit-login-btn {
+          width: 100%;
+          padding: 14px;
+          background-color: orange;
+          border: none;
+          border-radius: 10px;
+          font-weight: bold;
+          cursor: pointer;
+        }
+
+      `}</style>
+
+      {page === "home" && <LandingPage goTo={setPage} />}
+      {page === "login" && <Login goTo={setPage} />}
+    </div>
+  );
+}
