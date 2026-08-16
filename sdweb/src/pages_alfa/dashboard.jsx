@@ -22,6 +22,8 @@ export default function Dashboard({ goTo }) {
   return (
     <div className="dashboard-layout">
       <style>{css}</style>
+      //ekhane jebhabe likhsi....goto dashboard...shebhabe likhbo ...got to profile...go to disater center
+      //je .jsx file e kaj korbo....
 
       <Sidebar goTo={goTo} current="dashboard" />
 
