@@ -1,191 +1,209 @@
-import {useState} from "react";
-import {sidebar, Topbar} from "./sidebar";
-const helpTypes=[
-    {key:"Food",icon:"fa-bowl-food"},
-    {key:"Shelter",icon:"fa-house"},
-    {key:"Medical",icon:"fa-kit-medical"},
-    {key:"Water",icon:"fa-droplet"},
+import { useState } from "react";
+import { Sidebar, Topbar } from "../pages_alfa/sidebar";
+
+const helpTypes = [
+  { key: "Food", icon: "fa-bowl-food" },
+  { key: "Shelter", icon: "fa-house" },
+  { key: "Medical", icon: "fa-kit-medical" },
+  { key: "Water", icon: "fa-droplet" },
 ];
-export default function RequestHelp({goTo}){
-    const [formData,setFormData]=useState({
-        type:"Food",
-        iteams:"",
-        quantity:"",
-        urgency:"Medium",
-        location:"",
-        contact:"",
-        notes:"",
-    });
-    const [error,setError]=useState("");
-    const [submitted,setSubmitted]=useState(false);
-    function handleChange(e){
-        const {name,value}=e.target;
-        setFormData((prev)=>({
-            ...prev,
-            [name]:value,
-        }));
-    }
-    function handleTypeSelect(typeKey){
-        setFormData((prev)=>({...prev,type:typeKey}));
-    }
-    function handleSubmit(e){
-        e.preventDefault();
-        if(!formData.iteams.trim() || !formData.location.trim() || !formData.contact.trim()){
-            setError("Must fillup Items,Location and Contact Number. ");
-            return;
-        }
-        setError("");
-        console.log("Request submitted:",formData);
-        setSubmitted(true);
-        setTimeout(()=>{
-            goTo("dashBoard");
-        },2500);
-    }
-    return (
-        <div className="request-help-laayout">
-            <style>{css}</style>
-            <Sidebar goTo={goTo} current="requestHelp"/>
-            <div className="main-content">
-                <Topbar
-                title="Request Help"
-                subtitle="Fill up the form below"
-                />
-                {submitted?(
-                    <div className="Success-Card">
-                        <i className="fa-solid fa-circle-check"></i>
-                        <h3>Request submitted!</h3>
-                        <p>Redirecting your to dashboard...</p>
-                    </div>
-                ):(
-                    <form className="form-card" onSubmit={handleSubmit}>
-                        <div classNmae="field-group">
-                            <label>Type of Help</label>
-                            <div className="type-grid">
-                                {helpTypes.map((t)=>(
-                                    <div
-                                    key={t.key}
-                                    className={`type-card ${formData.type===t.key?"active":""}`}
-                                    onClick={() =>handleTypeSelect(t.key)}
-                                    >
-                                        <i classNamw={`fa-solid ${t.icon}`}></i>
-                                        <span>{t.key}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="field-group">
-                            <label>Iteams needed</label>
-                            <div className="input-box">
-                                <input
-                                tupe="text"
-                                name="items"
-                                placeholder="e.g. Rice ,Dal, Oil, Salt"
-                                value={formData.items}
-                                onChange={handleChange}
-                                />
 
+export default function RequestHelp({ goTo }) {
+  const [formData, setFormData] = useState({
+    type: "Food",
+    items: "",
+    quantity: "",
+    urgency: "Medium",
+    location: "",
+    contact: "",
+    notes: "",
+  });
+  const [error, setError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-                            </div>
-                        </div>
-                        <div className="field-row">
-                            <div className="field-group">
-                                <label>Quantity/People affected</label>
-                                <div className="input-box">
-                                    <input
-                                    type="text"
-                                    name="quantity"
-                                    placeholder="e.g. 4 iteams or almosot 6 people "
-                                    value={formData.quantity}
-                                    onChange={handleChange}
-                                    />
-                                </div>
-                            </div>
-                            <div className="field-group">
-                                <label>Urgency</label>
-                                <div className="input-box">
-                                    <select name="urgency" value={formData.urgency} onChange={handleChange}>
-                                        <option value="High">High</option>
-                                        <option value="Low">Low</option>
-                                        <option value="Medium">Medium</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="field-group">
-                            <label>Locaiton</label>
-                            <div className="input-box">
-                                <i className="fa-solid fa-location-dot"></i>
-                                <input
-                                type="text"
-                                name="location"
-                                placegolder="Village/Upazila/District"
-                                value={formData.location}
-                                onChange={handleChange}
-                                />
-                            </div>
-                        </div>
-                        <div className="field-group">
-                            <label>Contact Number</label>
-                            <div className="input-box">
-                                <i className="fa-solid fa-phone"></i>
-                                <input
-                                type="text"
-                                placeholder="019XXXXXXXX"
-                                value={formData.contact}
-                                onChange={handleChange}
-                                />
-                            </div>
-                        </div>
-                         <div className="field-group">
-                             <label>Additional notes(optional)</label>
-                                <div className="input-box textareaa-box">
-                                    <textarea
-                                    name="notes"
-                                    placeholder="Anything else NGO should know..."
-                                    value={formData.notes}
-                                    onChange={handleChange}
-                                    ></textarea>
-                                </div>
-                        </div>
-                                {error && <p className="error-text">{error}</p>}
-                                <button type="submit" className="submit-button">
-                                    <i className="fa-solid fa-paper-plane"></i> Submit request
-                                </button>
-                    </form>
-                )
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
 
-                }
-                  
+  function handleTypeSelect(typeKey) {
+    setFormData((prev) => ({ ...prev, type: typeKey }));
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (
+      !formData.items.trim() ||
+      !formData.location.trim() ||
+      !formData.contact.trim()
+    ) {
+      setError("Must fillup Items, Location and Contact Number.");
+      return;
+    }
+    setError("");
+    console.log("Request submitted:", formData);
+    setSubmitted(true);
+    setTimeout(() => {
+      goTo("dashboard");
+    }, 2500);
+  }
+
+  return (
+    <div className="request-help-layout">
+      <style>{css}</style>
+      <Sidebar goTo={goTo} current="requestHelp" />
+      <div className="main-content">
+        <Topbar title="Request Help" subtitle="Fill up the form below" />
+        {submitted ? (
+          <div className="success-card">
+            <i className="fa-solid fa-circle-check"></i>
+            <h3>Request submitted!</h3>
+            <p>Redirecting you to dashboard...</p>
+          </div>
+        ) : (
+          <form className="form-card" onSubmit={handleSubmit}>
+            <div className="field-group">
+              <label>Type of Help</label>
+              <div className="type-grid">
+                {helpTypes.map((t) => (
+                  <div
+                    key={t.key}
+                    className={`type-card ${
+                      formData.type === t.key ? "active" : ""
+                    }`}
+                    onClick={() => handleTypeSelect(t.key)}
+                  >
+                    <i className={`fa-solid ${t.icon}`}></i>
+                    <span>{t.key}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-        </div>
-    );
+            <div className="field-group">
+              <label>Items needed</label>
+              <div className="input-box">
+                <input
+                  type="text"
+                  name="items"
+                  placeholder="e.g. Rice, Dal, Oil, Salt"
+                  value={formData.items}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="field-row">
+              <div className="field-group">
+                <label>Quantity/People affected</label>
+                <div className="input-box">
+                  <input
+                    type="text"
+                    name="quantity"
+                    placeholder="e.g. 4 items or almost 6 people"
+                    value={formData.quantity}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              <div className="field-group">
+                <label>Urgency</label>
+                <div className="input-box">
+                  <select
+                    name="urgency"
+                    value={formData.urgency}
+                    onChange={handleChange}
+                  >
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="field-group">
+              <label>Location</label>
+              <div className="input-box">
+                <i className="fa-solid fa-location-dot"></i>
+                <input
+                  type="text"
+                  name="location"
+                  placeholder="Village/Upazila/District"
+                  value={formData.location}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="field-group">
+              <label>Contact Number</label>
+              <div className="input-box">
+                <i className="fa-solid fa-phone"></i>
+                <input
+                  type="text"
+                  name="contact"
+                  placeholder="019XXXXXXXX"
+                  value={formData.contact}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="field-group">
+              <label>Additional notes (optional)</label>
+              <div className="input-box textarea-box">
+                <textarea
+                  name="notes"
+                  placeholder="Anything else NGO should know..."
+                  value={formData.notes}
+                  onChange={handleChange}
+                ></textarea>
+              </div>
+            </div>
+
+            {error && <p className="error-text">{error}</p>}
+            <button type="submit" className="submit-btn">
+              <i className="fa-solid fa-paper-plane"></i> Submit request
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
 }
-const css=`
+
+const css = `
 .request-help-layout {
     display:flex;
-min-height:100vh;
-background:var(--cream-bg);
+    width:100%;
+    min-height:100vh;
+    background:var(--cream-bg);
 }
-.main-Content{
+.main-content{
     flex: 1;
+    width:100%;
     padding:24px 35px;
+    overflow-x:hidden;
 }
-.form_card{
+.form-card{
     background:white;
     border:1px solid #eee3d0;
     border-radius:14px;
     padding:24px 28px;
-    max_width:640px;
+    max-width:640px;
 }
-    .field-group{
-    margin-bottom:18px; 
-    }
-    .field_row{
+.field-group{
+    margin-bottom:18px;
+}
+.field-row{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:14px;
-    }
+}
 
 .field-group label {
   display: block;
@@ -315,6 +333,4 @@ background:var(--cream-bg);
   font-size: 13px;
   color: #555;
 }
-
-
 `;
