@@ -4,6 +4,7 @@ import Login from "./pages_alfa/login";
 import Dashboard from "./pages_alfa/Dashboard";
 import Logout from "./pages_alfa/logout";
 import RequestHelp from "./pages_mehreen/RequestHelp";
+
 export default function App() {
   const [page, setPage] = useState("home");
   const [cameFrom, setCameFrom] = useState("dashboard");
@@ -17,8 +18,7 @@ export default function App() {
   };
 
   return (
-    <div>
-      //common jinish shob jaygay eki color font use hobe....just call kora hobe
+     <div style={{ width: "100%", minHeight: "100vh" }}>
       <style>{`
         :root {
           --text-color: #000;
@@ -55,27 +55,18 @@ export default function App() {
         }
       `}</style>
 
-      //ekhan theke page e jay...ek page theke arek page..
-      //home to login...login to dashboard..
-
       {page === "home" && <LandingPage goTo={goTo} />}
-      {page === "login" && <Login goTo={goTo} />}  //ekhane login page theke...age by defalt dashboard e jabe
+      {page === "login" && <Login goTo={goTo} />}
 
-      
-      //then side bar e click kore request help,disaster center,profile e jabe....
-
-      {[
-        "dashboard",
-        "requestHelp",
-        "disasterCenter",
-        "profile",
-        
-      ].includes(page) && <Dashboard goTo={goTo} />}
+      {/* FIX: "requestHelp" removed from this array — it was rendering
+          Dashboard AND RequestHelp at the same time, causing the
+          duplicated sidebar / stacked layout bug. */}
+      {["dashboard", "disasterCenter", "profile"].includes(page) && (
+        <Dashboard goTo={goTo} />
+      )}
       {page === "requestHelp" && <RequestHelp goTo={goTo} />}
 
-      {page === "logout" && (
-        <Logout goTo={goTo} cameFrom={cameFrom} />
-      )}
+      {page === "logout" && <Logout goTo={goTo} cameFrom={cameFrom} />}
     </div>
   );
 }

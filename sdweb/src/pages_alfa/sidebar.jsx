@@ -27,7 +27,7 @@ export function Sidebar({ goTo, current }) {
             className={`sidebar-item ${item.key === "logout" ? "logout" : ""} ${
               current === item.key ? "active" : ""
             }`}
-            //ekhane on click korle...request help e jabe...
+           
             onClick={() => goTo(item.key)}
           >
             <i className={`fa-solid ${item.icon}`}></i>
