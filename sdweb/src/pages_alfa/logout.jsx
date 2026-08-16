@@ -7,7 +7,7 @@ export default function Logout({ goTo, cameFrom }) {
         <div className="logout-card">
           <h2>Do you want to log out?</h2>
 
-          <div className="logout-actions">
+          <div className= "logout-actions">
             <button
               className="logout-yes"
               onClick={() => goTo("home")}
