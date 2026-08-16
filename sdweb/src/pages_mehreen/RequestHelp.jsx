@@ -1,0 +1,320 @@
+import {useState} from "react";
+import {sidebar, Topbar} from "./sidebar";
+const helpTypes=[
+    {key:"Food",icon:"fa-bowl-food"},
+    {key:"Shelter",icon:"fa-house"},
+    {key:"Medical",icon:"fa-kit-medical"},
+    {key:"Water",icon:"fa-droplet"},
+];
+export default function RequestHelp({goTo}){
+    const [formData,setFormData]=useState({
+        type:"Food",
+        iteams:"",
+        quantity:"",
+        urgency:"Medium",
+        location:"",
+        contact:"",
+        notes:"",
+    });
+    const [error,setError]=useState("");
+    const [submitted,setSubmitted]=useState(false);
+    function handleChange(e){
+        const {name,value}=e.target;
+        setFormData((prev)=>({
+            ...prev,
+            [name]:value,
+        }));
+    }
+    function handleTypeSelect(typeKey){
+        setFormData((prev)=>({...prev,type:typeKey}));
+    }
+    function handleSubmit(e){
+        e.preventDefault();
+        if(!formData.iteams.trim() || !formData.location.trim() || !formData.contact.trim()){
+            setError("Must fillup Items,Location and Contact Number. ");
+            return;
+        }
+        setError("");
+        console.log("Request submitted:",formData);
+        setSubmitted(true);
+        setTimeout(()=>{
+            goTo("dashBoard");
+        },2500);
+    }
+    return (
+        <div className="request-help-laayout">
+            <style>{css}</style>
+            <Sidebar goTo={goTo} current="requestHelp"/>
+            <div className="main-content">
+                <Topbar
+                title="Request Help"
+                subtitle="Fill up the form below"
+                />
+                {submitted?(
+                    <div className="Success-Card">
+                        <i className="fa-solid fa-circle-check"></i>
+                        <h3>Request submitted!</h3>
+                        <p>Redirecting your to dashboard...</p>
+                    </div>
+                ):(
+                    <form className="form-card" onSubmit={handleSubmit}>
+                        <div classNmae="field-group">
+                            <label>Type of Help</label>
+                            <div className="type-grid">
+                                {helpTypes.map((t)=>(
+                                    <div
+                                    key={t.key}
+                                    className={`type-card ${formData.type===t.key?"active":""}`}
+                                    onClick={() =>handleTypeSelect(t.key)}
+                                    >
+                                        <i classNamw={`fa-solid ${t.icon}`}></i>
+                                        <span>{t.key}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="field-group">
+                            <label>Iteams needed</label>
+                            <div className="input-box">
+                                <input
+                                tupe="text"
+                                name="items"
+                                placeholder="e.g. Rice ,Dal, Oil, Salt"
+                                value={formData.items}
+                                onChange={handleChange}
+                                />
+
+
+                            </div>
+                        </div>
+                        <div className="field-row">
+                            <div className="field-group">
+                                <label>Quantity/People affected</label>
+                                <div className="input-box">
+                                    <input
+                                    type="text"
+                                    name="quantity"
+                                    placeholder="e.g. 4 iteams or almosot 6 people "
+                                    value={formData.quantity}
+                                    onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+                            <div className="field-group">
+                                <label>Urgency</label>
+                                <div className="input-box">
+                                    <select name="urgency" value={formData.urgency} onChange={handleChange}>
+                                        <option value="High">High</option>
+                                        <option value="Low">Low</option>
+                                        <option value="Medium">Medium</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="field-group">
+                            <label>Locaiton</label>
+                            <div className="input-box">
+                                <i className="fa-solid fa-location-dot"></i>
+                                <input
+                                type="text"
+                                name="location"
+                                placegolder="Village/Upazila/District"
+                                value={formData.location}
+                                onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                        <div className="field-group">
+                            <label>Contact Number</label>
+                            <div className="input-box">
+                                <i className="fa-solid fa-phone"></i>
+                                <input
+                                type="text"
+                                placeholder="019XXXXXXXX"
+                                value={formData.contact}
+                                onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                         <div className="field-group">
+                             <label>Additional notes(optional)</label>
+                                <div className="input-box textareaa-box">
+                                    <textarea
+                                    name="notes"
+                                    placeholder="Anything else NGO should know..."
+                                    value={formData.notes}
+                                    onChange={handleChange}
+                                    ></textarea>
+                                </div>
+                        </div>
+                                {error && <p className="error-text">{error}</p>}
+                                <button type="submit" className="submit-button">
+                                    <i className="fa-solid fa-paper-plane"></i> Submit request
+                                </button>
+                    </form>
+                )
+
+                }
+                  
+            </div>
+
+        </div>
+    );
+}
+const css=`
+.request-help-layout {
+    display:flex;
+min-height:100vh;
+background:var(--cream-bg);
+}
+.main-Content{
+    flex: 1;
+    padding:24px 35px;
+}
+.form_card{
+    background:white;
+    border:1px solid #eee3d0;
+    border-radius:14px;
+    padding:24px 28px;
+    max_width:640px;
+}
+    .field-group{
+    margin-bottom:18px; 
+    }
+    .field_row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    }
+
+.field-group label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.type-card {
+  border: 1px solid #eee3d0;
+  border-radius: 10px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  color: #888;
+}
+
+.type-card i {
+  font-size: 18px;
+}
+
+.type-card span {
+  display: block;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.type-card:hover {
+  border-color: var(--primary-orange);
+}
+
+.type-card.active {
+  background: #fdf1e3;
+  border-color: var(--primary-orange);
+  color: black;
+}
+
+.input-box {
+  display: flex;
+  align-items: center;
+  padding: 11px 14px;
+  border: 1px solid #f1dca0;
+  border-radius: 10px;
+  background: var(--cream-bg);
+  gap: 8px;
+}
+
+.input-box i {
+  color: #888;
+  font-size: 14px;
+}
+
+.input-box input,
+.input-box select {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  width: 100%;
+}
+
+.textarea-box {
+  align-items: flex-start;
+}
+
+.input-box textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  min-height: 60px;
+  resize: none;
+}
+
+.error-text {
+  color: #d94b4b;
+  font-size: 13px;
+  margin: 0 0 14px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 13px;
+  background: var(--primary-orange);
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background: rgb(242, 241, 239);
+  border: 1px solid orange;
+}
+
+.success-card {
+  background: white;
+  border: 1px solid #eee3d0;
+  border-radius: 14px;
+  padding: 60px 30px;
+  max-width: 640px;
+  text-align: center;
+}
+
+.success-card i {
+  font-size: 46px;
+  color: #4caf7d;
+  margin-bottom: 14px;
+}
+
+.success-card h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.success-card p {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+}
+
+
+`;

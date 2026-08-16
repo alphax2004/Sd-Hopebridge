@@ -3,7 +3,7 @@ import LandingPage from "./pages_alfa/landingpage";
 import Login from "./pages_alfa/login";
 import Dashboard from "./pages_alfa/Dashboard";
 import Logout from "./pages_alfa/logout";
-
+import RequestHelp from "./pages_mehreen/RequestHelp";
 export default function App() {
   const [page, setPage] = useState("home");
   const [cameFrom, setCameFrom] = useState("dashboard");
@@ -18,6 +18,7 @@ export default function App() {
 
   return (
     <div>
+      //common jinish shob jaygay eki color font use hobe....just call kora hobe
       <style>{`
         :root {
           --text-color: #000;
@@ -54,8 +55,14 @@ export default function App() {
         }
       `}</style>
 
+      //ekhan theke page e jay...ek page theke arek page..
+      //home to login...login to dashboard..
+
       {page === "home" && <LandingPage goTo={goTo} />}
-      {page === "login" && <Login goTo={goTo} />}
+      {page === "login" && <Login goTo={goTo} />}  //ekhane login page theke...age by defalt dashboard e jabe
+
+      
+      //then side bar e click kore request help,disaster center,profile e jabe....
 
       {[
         "dashboard",
@@ -64,6 +71,7 @@ export default function App() {
         "profile",
         
       ].includes(page) && <Dashboard goTo={goTo} />}
+      {page === "requestHelp" && <RequestHelp goTo={goTo} />}
 
       {page === "logout" && (
         <Logout goTo={goTo} cameFrom={cameFrom} />
