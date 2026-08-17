@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sidebar, Topbar } from "../pages_alfa/sidebar";
+import { Sidebar, Topbar } from "./sidebar";
 
 const helpTypes = [
   { key: "Food", icon: "fa-bowl-food" },
@@ -18,6 +18,7 @@ export default function RequestHelp({ goTo }) {
     contact: "",
     notes: "",
   });
+
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -35,17 +36,16 @@ export default function RequestHelp({ goTo }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (
-      !formData.items.trim() ||
-      !formData.location.trim() ||
-      !formData.contact.trim()
-    ) {
-      setError("Must fillup Items, Location and Contact Number.");
+
+    if (!formData.items.trim() || !formData.location.trim() || !formData.contact.trim()) {
+      setError("Items, Location, r Contact number - egulo must fill up korte hobe.");
       return;
     }
+
     setError("");
     console.log("Request submitted:", formData);
     setSubmitted(true);
+
     setTimeout(() => {
       goTo("dashboard");
     }, 2500);
@@ -54,26 +54,30 @@ export default function RequestHelp({ goTo }) {
   return (
     <div className="request-help-layout">
       <style>{css}</style>
+
       <Sidebar goTo={goTo} current="requestHelp" />
+
       <div className="main-content">
-        <Topbar title="Request Help" subtitle="Fill up the form below" />
+        <Topbar
+          title="Request Help"
+          subtitle="Fill out the form below - we'll route it to nearby NGOs."
+        />
+
         {submitted ? (
           <div className="success-card">
             <i className="fa-solid fa-circle-check"></i>
             <h3>Request submitted!</h3>
-            <p>Redirecting you to dashboard...</p>
+            <p>Redirecting you to the dashboard...</p>
           </div>
         ) : (
           <form className="form-card" onSubmit={handleSubmit}>
             <div className="field-group">
-              <label>Type of Help</label>
+              <label>Type of help</label>
               <div className="type-grid">
                 {helpTypes.map((t) => (
                   <div
                     key={t.key}
-                    className={`type-card ${
-                      formData.type === t.key ? "active" : ""
-                    }`}
+                    className={`type-card ${formData.type === t.key ? "active" : ""}`}
                     onClick={() => handleTypeSelect(t.key)}
                   >
                     <i className={`fa-solid ${t.icon}`}></i>
@@ -98,25 +102,22 @@ export default function RequestHelp({ goTo }) {
 
             <div className="field-row">
               <div className="field-group">
-                <label>Quantity/People affected</label>
+                <label>Quantity / people affected</label>
                 <div className="input-box">
                   <input
                     type="text"
                     name="quantity"
-                    placeholder="e.g. 4 items or almost 6 people"
+                    placeholder="e.g. 4 items or 6 people"
                     value={formData.quantity}
                     onChange={handleChange}
                   />
                 </div>
               </div>
+
               <div className="field-group">
                 <label>Urgency</label>
                 <div className="input-box">
-                  <select
-                    name="urgency"
-                    value={formData.urgency}
-                    onChange={handleChange}
-                  >
+                  <select name="urgency" value={formData.urgency} onChange={handleChange}>
                     <option value="High">High</option>
                     <option value="Medium">Medium</option>
                     <option value="Low">Low</option>
@@ -132,7 +133,7 @@ export default function RequestHelp({ goTo }) {
                 <input
                   type="text"
                   name="location"
-                  placeholder="Village/Upazila/District"
+                  placeholder="Village / Upazila / District"
                   value={formData.location}
                   onChange={handleChange}
                 />
@@ -140,13 +141,13 @@ export default function RequestHelp({ goTo }) {
             </div>
 
             <div className="field-group">
-              <label>Contact Number</label>
+              <label>Contact number</label>
               <div className="input-box">
                 <i className="fa-solid fa-phone"></i>
                 <input
                   type="text"
                   name="contact"
-                  placeholder="019XXXXXXXX"
+                  placeholder="01XXXXXXXXX"
                   value={formData.contact}
                   onChange={handleChange}
                 />
@@ -158,7 +159,7 @@ export default function RequestHelp({ goTo }) {
               <div className="input-box textarea-box">
                 <textarea
                   name="notes"
-                  placeholder="Anything else NGO should know..."
+                  placeholder="Anything else NGOs should know..."
                   value={formData.notes}
                   onChange={handleChange}
                 ></textarea>
@@ -166,6 +167,7 @@ export default function RequestHelp({ goTo }) {
             </div>
 
             {error && <p className="error-text">{error}</p>}
+
             <button type="submit" className="submit-btn">
               <i className="fa-solid fa-paper-plane"></i> Submit request
             </button>
@@ -178,31 +180,32 @@ export default function RequestHelp({ goTo }) {
 
 const css = `
 .request-help-layout {
-    display:flex;
-    width:100%;
-    min-height:100vh;
-    background:var(--cream-bg);
+  display: flex;
+  min-height: 100vh;
+  background: var(--cream-bg);
 }
-.main-content{
-    flex: 1;
-    width:100%;
-    padding:24px 35px;
-    overflow-x:hidden;
+
+.main-content {
+  flex: 1;
+  padding: 24px 35px;
 }
-.form-card{
-    background:white;
-    border:1px solid #eee3d0;
-    border-radius:14px;
-    padding:24px 28px;
-    max-width:640px;
+
+.form-card {
+  background: white;
+  border: 1px solid #eee3d0;
+  border-radius: 14px;
+  padding: 24px 28px;
+  max-width: 640px;
 }
-.field-group{
-    margin-bottom:18px;
+
+.field-group {
+  margin-bottom: 18px;
 }
-.field-row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:14px;
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
 }
 
 .field-group label {
@@ -270,6 +273,7 @@ const css = `
   font-family: Arial, sans-serif;
   font-size: 13px;
   width: 100%;
+  
 }
 
 .textarea-box {
