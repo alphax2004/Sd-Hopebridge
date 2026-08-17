@@ -3,7 +3,8 @@ import LandingPage from "./pages_alfa/landingpage";
 import Login from "./pages_alfa/login";
 import Dashboard from "./pages_alfa/Dashboard";
 import Logout from "./pages_alfa/logout";
-import RequestHelp from "./pages_mehreen/RequestHelp";
+import RequestHelp from "./pages_alfa/RequestHelp";
+import Profile from "./pages_alfa/Profile";
 
 export default function App() {
   const [page, setPage] = useState("home");
@@ -61,9 +62,10 @@ export default function App() {
       {/* FIX: "requestHelp" removed from this array — it was rendering
           Dashboard AND RequestHelp at the same time, causing the
           duplicated sidebar / stacked layout bug. */}
-      {["dashboard", "disasterCenter", "profile"].includes(page) && (
+      {["dashboard", "disasterCenter"].includes(page) && (
         <Dashboard goTo={goTo} />
       )}
+      {page === "profile" && <Profile goTo={goTo} />}
       {page === "requestHelp" && <RequestHelp goTo={goTo} />}
 
       {page === "logout" && <Logout goTo={goTo} cameFrom={cameFrom} />}
