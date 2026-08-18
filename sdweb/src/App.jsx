@@ -5,6 +5,7 @@ import Dashboard from "./pages_alfa/Dashboard";
 import Logout from "./pages_alfa/logout";
 import RequestHelp from "./pages_alfa/RequestHelp";
 import Profile from "./pages_alfa/Profile";
+import DisasterCenter from "./pages_alfa/DisasterCenter";
 
 export default function App() {
   const [page, setPage] = useState("home");
@@ -60,17 +61,10 @@ export default function App() {
 
       {page === "home" && <LandingPage goTo={goTo} />}
       {page === "login" && <Login goTo={goTo} />}
-
-      {/* FIX: "requestHelp" removed from this array — it was rendering
-          Dashboard AND RequestHelp at the same time, causing the
-          duplicated sidebar / stacked layout bug. */}
-      {["dashboard", "disasterCenter"].includes(page) && (
-        <Dashboard goTo={goTo} />
-      )}
-      
       {page === "requestHelp" && <RequestHelp goTo={goTo} />}
       {page === "profile" && <Profile goTo={goTo} />}
-
+      {page === "dashboard" && <Dashboard goTo={goTo} />}
+      {page === "disasterCenter" && <DisasterCenter goTo={goTo} />}
       {page === "logout" && <Logout goTo={goTo} cameFrom={cameFrom} />}
     </div>
   );
