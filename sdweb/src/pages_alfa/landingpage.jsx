@@ -141,7 +141,10 @@ export default function LandingPage({ goTo }) {
             Login
           </button>
 
-          <button className="btn-primary">
+          <button
+              className="btn-primary"
+              onClick={() => goTo("register")}
+          >
             Register
           </button>
         </div>
