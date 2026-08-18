@@ -44,7 +44,7 @@ export function Topbar({ title, subtitle }) {
     <div className="topbar">
       <style>{topbarCss}</style>
 
-      <div>
+      <div className="topbar-text">
         <h2>{title}</h2>
         <p>{subtitle}</p>
       </div>
@@ -149,18 +149,30 @@ const topbarCss = `
   align-items: center;
   justify-content: space-between;
   min-height: 65px;
-  margin-bottom: 17px;
+  margin: 0;
+  padding: 0;
+  text-align: left;
 }
 
-.topbar h2 {
+.topbar-text {
   margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.topbar-text h2 {
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
   font-size: 25px;
   font-weight: bold;
   color: black;
 }
 
-.topbar p {
-  margin: 5px 0 0;
+.topbar-text p {
+  margin: 5px 0 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
   font-size: 14px;
   font-weight: bold;
   color: #555;

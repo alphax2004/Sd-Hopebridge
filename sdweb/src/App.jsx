@@ -30,6 +30,8 @@ export default function App() {
 
         * {
           box-sizing: border-box;
+          margin: 0;
+          padding: 0;
         }
 
         html, body, #root {
@@ -65,8 +67,9 @@ export default function App() {
       {["dashboard", "disasterCenter"].includes(page) && (
         <Dashboard goTo={goTo} />
       )}
-      {page === "profile" && <Profile goTo={goTo} />}
+      
       {page === "requestHelp" && <RequestHelp goTo={goTo} />}
+      {page === "profile" && <Profile goTo={goTo} />}
 
       {page === "logout" && <Logout goTo={goTo} cameFrom={cameFrom} />}
     </div>
