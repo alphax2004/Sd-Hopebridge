@@ -1,6 +1,7 @@
 import { useState } from "react";
 import LandingPage from "./pages_alfa/landingpage";
 import Login from "./pages_alfa/login";
+import Register from "./pages_alfa/Register";   
 import Dashboard from "./pages_alfa/Dashboard";
 import Logout from "./pages_alfa/logout";
 import RequestHelp from "./pages_alfa/RequestHelp";
@@ -61,6 +62,7 @@ export default function App() {
 
       {page === "home" && <LandingPage goTo={goTo} />}
       {page === "login" && <Login goTo={goTo} />}
+      {page === "register" && <Register goTo={goTo} />}   {/* 👈 নতুন route */}
       {page === "requestHelp" && <RequestHelp goTo={goTo} />}
       {page === "profile" && <Profile goTo={goTo} />}
       {page === "dashboard" && <Dashboard goTo={goTo} />}

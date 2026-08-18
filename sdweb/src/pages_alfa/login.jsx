@@ -175,7 +175,7 @@ export default function Login({ goTo }) {
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              goTo("signup");
+              goTo("register");
             }}
           >
             Create Account
