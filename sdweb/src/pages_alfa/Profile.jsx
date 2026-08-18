@@ -229,8 +229,8 @@ export default function Profile({ goTo }) {
 
 const css = `
 
-/* =========================
-   MAIN LAYOUT
+
+ /*  MAIN LAYOUT
 ========================= */
 
 .profile-layout {
@@ -401,6 +401,7 @@ const css = `
 
 .field-group {
     margin-bottom: 18px;
+    text-align: left;
 }
 
 .field-group label {
