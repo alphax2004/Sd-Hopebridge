@@ -194,8 +194,8 @@ const css = `
   background: white;
   border: 1px solid #eee3d0;
   border-radius: 14px;
-  padding: 24px 28px;
-  max-width: 640px;
+  padding: 40px 28px;
+  
 }
 
 .field-group {
@@ -316,8 +316,9 @@ const css = `
   background: white;
   border: 1px solid #eee3d0;
   border-radius: 14px;
-  padding: 60px 30px;
-  max-width: 640px;
+  padding: 330px 30px;
+  max-width: 100%;
+  
   text-align: center;
 }
 
