@@ -18,8 +18,8 @@ export default function Login({ goTo }) {
         .login-card {
           flex: 1;
           padding: 60px 80px;
-          background: white;
-          border-radius: 30px 0 0 30px;
+          background: #ecd4a3;
+          //border-radius: 30px;
           text-align: left;
           display: flex;
           flex-direction: column;
@@ -41,7 +41,7 @@ export default function Login({ goTo }) {
         .login-card h1 {
           font-size: 36px;
           line-height: 1.2;
-          margin: 15px 0;
+          margin: 15px 0px 30px;
         }
 
         .login-card .subtitle {
@@ -76,38 +76,34 @@ export default function Login({ goTo }) {
           margin-bottom: 15px;
         }
 
-        .options a {
-          text-decoration: none;
-        }
+        
 
         .options a:hover {
-          color: var(--primary-orange);
+          color: red;
         }
 
         .submit-login-btn {
           width: 100%;
           padding: 14px;
           background: orange;
-          border: none;
+          //border: none;
           border-radius: 10px;
-          cursor: pointer;
+         // cursor: pointer;
         }
 
         .submit-login-btn:hover {
           background: rgb(242, 241, 239);
-          border: 1px solid orange;
+          border: 2px solid orange;
         }
 
         .signup-text {
           text-align: center;
         }
 
-        .signup-text a {
-          text-decoration: none;
-        }
+        
 
         .signup-text a:hover {
-          color: var(--primary-orange);
+          color: red;
         }
       `}</style>
 
