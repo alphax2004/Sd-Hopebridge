@@ -58,7 +58,7 @@ export default function Login({ goTo }) {
           align-items: center;
           padding: 12px 15px;
           margin-bottom: 20px;
-          border: 1px solid #f1dca0;
+          border: 2px solid #9a8447;
           border-radius: 10px;
           background: var(--cream-bg);
         }
@@ -74,6 +74,7 @@ export default function Login({ goTo }) {
         .options {
           text-align: right;
           margin-bottom: 15px;
+          
         }
 
         
@@ -128,7 +129,7 @@ export default function Login({ goTo }) {
           <i className="fa-regular fa-envelope"></i>
           <input
             type="email"
-            placeholder="Enter your email"
+            placeholder=" Enter your email"
           />
         </div>
 
@@ -139,7 +140,7 @@ export default function Login({ goTo }) {
 
           <input
             type="password"
-            placeholder="Enter your password"
+            placeholder=" Enter your password"
           />
 
           <i className="fa-regular fa-eye"></i>
@@ -147,13 +148,8 @@ export default function Login({ goTo }) {
 
         <div className="options">
           <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              goTo("forgot-password");
-            }}
-          >
-            Forgot Password?
+            href="#">
+            Forgot Password
           </a>
         </div>
 
@@ -166,7 +162,7 @@ export default function Login({ goTo }) {
         </button>
 
         <p className="signup-text">
-          Don't have an account?{" "}
+          Don't have an account?{"  "}
           <a
             href="#"
             onClick={(e) => {
