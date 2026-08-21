@@ -38,7 +38,7 @@ export default function RequestHelp({ goTo }) {
     e.preventDefault();
 
     if (!formData.items.trim() || !formData.location.trim() || !formData.contact.trim()) {
-      setError("Items, Location, r Contact number - egulo must fill up korte hobe.");
+      setError("Must fillup Items, Location, r Contact number.");
       return;
     }
 
