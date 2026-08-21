@@ -126,7 +126,7 @@ export default function LandingPage({ goTo }) {
 
       <div className="navbar">
 
-        <div className="logo brand-logo">
+        <div className="brand-logo">
           <img src="/images/logo.png" alt="HopeBridge logo" />
           HopeBridge
         </div>
