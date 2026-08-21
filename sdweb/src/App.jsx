@@ -25,7 +25,7 @@ export default function App() {
       <style>{`
         :root {
           --text-color: #000;
-          --primary-orange: rgb(238, 169, 41);
+          --primary-orange: rgb(230, 167, 48);
           --card-bg: #f6e9cc;
           --cream-bg: #fbf3e3;
         }
