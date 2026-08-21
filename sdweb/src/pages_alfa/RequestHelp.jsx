@@ -38,7 +38,7 @@ export default function RequestHelp({ goTo }) {
     e.preventDefault();
 
     if (!formData.items.trim() || !formData.location.trim() || !formData.contact.trim()) {
-      setError("Must fillup Items, Location, r Contact number.");
+      setError("Must fillup Items, Location, and Contact number.");
       return;
     }
 
