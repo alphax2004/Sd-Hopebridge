@@ -6,7 +6,7 @@ export default function LandingPage({ goTo }) {
         .landing-page {
           background: #efd194;
           width: 100%;
-          min-height: 100vh;
+          min-height: 100%;
         }
 
         .navbar {
@@ -15,17 +15,21 @@ export default function LandingPage({ goTo }) {
           justify-content: space-between;
           padding: 20px 40px;
         }
-
+      
         .brand-logo {
+        
           display: flex;
           align-items: center;
           gap: 8px;
           font-weight: 800;
         }
+          
+          
 
         .brand-logo img {
           width: 28px;
           height: 28px;
+          
         }
 
         .nav-links a {
@@ -46,15 +50,15 @@ export default function LandingPage({ goTo }) {
 
         .btn-primary {
           background: var(--primary-orange);
-          border: none;
+          //border: none;
           padding: 10px 20px;
           border-radius: 5px;
-          cursor: pointer;
+          
         }
 
         .btn-primary:hover {
           background: rgb(242, 241, 239);
-          border: 1px solid orange;
+          border: 2px solid orange;
         }
 
         .hero {
@@ -79,7 +83,7 @@ export default function LandingPage({ goTo }) {
         }
 
         .features {
-          text-align: center;
+          //text-align: center;
           padding: 20px 20px 50px;
         }
 
@@ -105,6 +109,7 @@ export default function LandingPage({ goTo }) {
 
         .card:hover {
           background: var(--primary-orange);
+          
         }
 
         .icon-box {
@@ -113,7 +118,7 @@ export default function LandingPage({ goTo }) {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgb(241, 220, 160);
+          background: rgb(226, 197, 116);
           border-radius: 10px;
           font-size: 20px;
         }
@@ -159,7 +164,10 @@ export default function LandingPage({ goTo }) {
           organized and transparent relief management.
         </p>
 
-        <button className="btn-primary">
+        <button 
+        className="btn-primary"
+        onClick={() => goTo("login")}
+        >
           Request Help
         </button>
       </div>
