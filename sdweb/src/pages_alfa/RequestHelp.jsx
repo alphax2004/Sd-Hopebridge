@@ -195,7 +195,7 @@ const css = `
   border: 1px solid #eee3d0;
   border-radius: 14px;
   padding: 24px 28px;
-  max-width: 640px;
+  
 }
 
 .field-group {
