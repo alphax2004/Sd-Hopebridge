@@ -90,7 +90,7 @@ export default function Dashboard({ goTo }) {
         <div className="table-card">
           <div className="card-header">
             <h3>Recent Requests</h3>
-            <button className="action-btn view-all">View All</button>
+            <button className="action-btn">View All</button>
           </div>
 
           <table>
@@ -150,7 +150,7 @@ const css = `
   background: #fdf1e3;
   border-radius: 14px;
   padding: 10px 14px;
-  text-align: left !important;
+  text-align: left /*!important*/;
 }
 
 .stat-card-top {
@@ -179,7 +179,7 @@ const css = `
   font-size: 24px;
   font-weight: bold;
   color: black;
-  text-align: left !important;
+  text-align: left /*!important*/;
 }
 
 .stat-note {
@@ -187,7 +187,7 @@ const css = `
   font-size: 12px;
   font-weight: bold;
   color: #555;
-  text-align: left !important;
+  text-align: left /*!important*/;
 }
 
 /* Cards */
@@ -216,15 +216,17 @@ const css = `
 /* Buttons */
 .action-btn {
   background: var(--primary-orange);
-  border: 1px solid var(--primary-orange);
+  border:none;
+ 
   border-radius: 7px;
   padding: 7px 15px;
   font-weight: bold;
-  cursor: pointer;
+  
 }
 
 .action-btn:hover {
   background: white;
+  border: 2px solid var(--primary-orange);
 }
 
 /* Chart */
@@ -259,7 +261,7 @@ const css = `
 /* Table */
 table {
   width: 100%;
-  border-collapse: collapse;
+  //border-collapse: collapse;
 }
 
 th,
@@ -267,18 +269,18 @@ td {
   text-align: left;
   padding: 8px;
   border-bottom: 1px solid #eee;
-  white-space: nowrap;
+  //white-space: nowrap;
 }
 
-th {
-  font-size: 11px;
-  font-weight: bold;
-}
-
-td {
+th ,td{
   font-size: 12px;
   font-weight: bold;
 }
+
+// td {
+//   font-size: 12px;
+//   font-weight: bold;
+// }
 
 .status {
   padding: 5px 9px;
