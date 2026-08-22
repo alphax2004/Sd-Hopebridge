@@ -45,7 +45,6 @@ export default function Profile({ goTo }) {
 
             <div className="main-content">
 
-                {/* Topbar */}
                 <div className="profile-topbar">
                     <Topbar
                         title="My Profile"
@@ -84,14 +83,10 @@ export default function Profile({ goTo }) {
 
                 </div>
 
-
-                {/* Personal Information */}
                 <div className="info-card">
 
                     <h3>Personal Information</h3>
 
-
-                    {/* First Row */}
                     <div className="field-row">
 
                         <div className="field-group">
@@ -133,8 +128,6 @@ export default function Profile({ goTo }) {
 
                     </div>
 
-
-                    {/* Second Row */}
                     <div className="field-row">
 
                         <div className="field-group">
@@ -176,8 +169,6 @@ export default function Profile({ goTo }) {
 
                     </div>
 
-
-                    {/* Address */}
                     <div className="field-group">
 
                         <label>Address</label>
@@ -196,8 +187,6 @@ export default function Profile({ goTo }) {
 
                     </div>
 
-
-                    {/* Edit / Save Button */}
                     <button
                         className="edit-btn"
                         onClick={handleEditClick}
@@ -229,10 +218,6 @@ export default function Profile({ goTo }) {
 
 const css = `
 
-
- /*  MAIN LAYOUT
-========================= */
-
 .profile-layout {
     display: flex;
     min-height: 100vh;
@@ -240,34 +225,15 @@ const css = `
 }
 
 
-/* =========================
-   MAIN CONTENT
-========================= */
-
 .main-content {
     flex: 1;
     padding: 24px 35px;
 }
 
-
-/* =========================
-   TOPBAR ALIGNMENT
-========================= */
-
-/*
-   Topbar and cards will have
-   the same left starting point.
-*/
-
 .profile-topbar {
     margin: 0;
     padding: 0;
 }
-
-
-/* =========================
-   PROFILE CARD
-========================= */
 
 .profile-card {
     background: white;
@@ -283,11 +249,6 @@ const css = `
 
     margin: 0 0 16px;
 }
-
-
-/* =========================
-   AVATAR
-========================= */
 
 .avatar-circle {
     width: 90px;
@@ -305,11 +266,6 @@ const css = `
     font-size: 34px;
     color: #d99e1f;
 }
-
-
-/* =========================
-   PROFILE INFO
-========================= */
 
 .profile-info {
     display: flex;
@@ -330,11 +286,6 @@ const css = `
     font-size: 14px;
     color: #555;
 }
-
-
-/* =========================
-   BADGES
-========================= */
 
 .badges {
     display: flex;
@@ -359,11 +310,6 @@ const css = `
     background: #d94b4b22;
 }
 
-
-/* =========================
-   INFORMATION CARD
-========================= */
-
 .info-card {
     background: white;
 
@@ -381,11 +327,6 @@ const css = `
   font-size: 19px;
 }
 
-
-/* =========================
-   FIELD ROW
-========================= */
-
 .field-row {
     display: grid;
 
@@ -393,11 +334,6 @@ const css = `
 
     gap: 14px;
 }
-
-
-/* =========================
-   FIELD GROUP
-========================= */
 
 .field-group {
     margin-bottom: 18px;
@@ -412,11 +348,6 @@ const css = `
     margin-bottom: 8px;
 }
 
-
-/* =========================
-   INPUT BOX
-========================= */
-
 .input-box {
     display: flex;
     align-items: center;
@@ -428,11 +359,6 @@ const css = `
 
     background: var(--cream-bg);
 }
-
-
-/* =========================
-   INPUT
-========================= */
 
 .input-box input {
     flex: 1;
@@ -450,8 +376,6 @@ const css = `
     width: 100%;
 }
 
-
-/* Disabled input */
 .input-box input:disabled {
     color: black;
 
@@ -459,11 +383,6 @@ const css = `
 
     cursor: default;
 }
-
-
-/* =========================
-   EDIT BUTTON
-========================= */
 
 .edit-btn {
     padding: 13px 26px;
@@ -478,18 +397,12 @@ const css = `
     cursor: pointer;
 }
 
-
-/* Hover */
 .edit-btn:hover {
     background: rgb(242, 241, 239);
 
     border: 1px solid orange;
 }
 
-
-/* =========================
-   RESPONSIVE
-========================= */
 
 @media (max-width: 800px) {
 
