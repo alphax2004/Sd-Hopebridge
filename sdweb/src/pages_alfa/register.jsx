@@ -109,15 +109,32 @@ export default function Register({ goTo }) {
         }
 
         .login-text a {
-          //text-decoration: none;
+          
           font-weight: bold;
           color: red;
-          //transition: color 0.2s ease, text-decoration-color 0.2s ease;
+         
         }
 
         .login-text a:hover {
           color: rgb(146, 88, 0);
           text-decoration: underline;
+        }
+          .logout-back {
+          
+          margin-top: 20px;
+          padding: 9px;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: bold;
+          border: none;
+          background: var(--primary-orange);
+          display:block;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .logout-back:hover {
+          background: rgb(255, 255, 255);
+          border: 2px solid orange;
         }
       `}</style>
 
@@ -213,6 +230,13 @@ export default function Register({ goTo }) {
             Login
           </a>
         </p>
+
+        <button
+          className="logout-back"
+          onClick={() => goTo("home")}
+        >
+          Back
+        </button>
 
       </div>
     </div>
