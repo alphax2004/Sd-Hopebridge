@@ -1,7 +1,6 @@
 export default function Login({ goTo }) {
   return (
     <div className="login-wrapper">
-
       <style>{`
         .login-wrapper {
           min-height: 100vh;
@@ -19,7 +18,7 @@ export default function Login({ goTo }) {
           flex: 1;
           padding: 60px 80px;
           background: #ecd4a3;
-          //border-radius: 30px;
+          
           text-align: left;
           display: flex;
           flex-direction: column;
@@ -58,9 +57,9 @@ export default function Login({ goTo }) {
           align-items: center;
           padding: 12px 15px;
           margin-bottom: 20px;
-          border: 2px solid #9a8447;
+          border: 2px solid orange;
           border-radius: 10px;
-          background: var(--cream-bg);
+          background: rgba(255, 255, 255);
         }
 
         .input-box input {
@@ -84,20 +83,21 @@ export default function Login({ goTo }) {
         }
 
         .submit-login-btn {
-          width: 100%;
+          width: 350px;
+          margin: 0 auto;
           padding: 14px;
-          background: orange;
-          //border: none;
+          background: var(--primary-orange);
           border-radius: 10px;
-         // cursor: pointer;
+          border:none;
         }
 
         .submit-login-btn:hover {
-          background: rgb(242, 241, 239);
+          background: rgb(255, 255, 255);
           border: 2px solid orange;
         }
 
         .signup-text {
+          margin-top: 9px;
           text-align: center;
         }
 
@@ -106,12 +106,29 @@ export default function Login({ goTo }) {
         .signup-text a:hover {
           color: red;
         }
+
+        .logout-back {
+          
+          margin-top: 20px;
+          padding: 9px;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: bold;
+          border: none;
+          background: var(--primary-orange);
+          display:block;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .logout-back:hover {
+          background: rgb(255, 255, 255);
+          border: 2px solid orange;
+        }
       `}</style>
 
       <div className="login-image"></div>
 
       <div className="login-card">
-
         <div className="login-logo">
           <img src="/images/logo.png" alt="HopeBridge logo" />
           HopeBridge
@@ -119,18 +136,13 @@ export default function Login({ goTo }) {
 
         <h1>Welcome Back</h1>
 
-        <p className="subtitle">
-          Login to your HopeBridge account
-        </p>
+        <p className="subtitle">Login to your HopeBridge account</p>
 
         <label>Email Address</label>
 
         <div className="input-box">
           <i className="fa-regular fa-envelope"></i>
-          <input
-            type="email"
-            placeholder=" Enter your email"
-          />
+          <input type="email" placeholder=" Enter your email" />
         </div>
 
         <label>Password</label>
@@ -138,27 +150,17 @@ export default function Login({ goTo }) {
         <div className="input-box">
           <i className="fa-solid fa-lock"></i>
 
-          <input
-            type="password"
-            placeholder=" Enter your password"
-          />
+          <input type="password" placeholder=" Enter your password" />
 
           <i className="fa-regular fa-eye"></i>
         </div>
 
         <div className="options">
-          <a
-            href="#">
-            Forgot Password
-          </a>
+          <a href="#">Forgot Password</a>
         </div>
 
-        <button
-          className="submit-login-btn"
-          onClick={() => goTo("dashboard")}
-        >
-          <i className="fa-solid fa-right-from-bracket"></i>
-          {" "}Login
+        <button className="submit-login-btn" onClick={() => goTo("dashboard")}>
+          <i className="fa-solid fa-right-from-bracket"></i> Login
         </button>
 
         <p className="signup-text">
@@ -173,7 +175,12 @@ export default function Login({ goTo }) {
             Create Account
           </a>
         </p>
-
+        <button
+          className="logout-back"
+          onClick={() => goTo("home")}
+        >
+          Back
+        </button>
       </div>
     </div>
   );

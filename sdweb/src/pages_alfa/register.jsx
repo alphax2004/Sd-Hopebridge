@@ -9,21 +9,29 @@ export default function Register({ goTo }) {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: var(--card-bg);
+          //background: #ecd4a3;
+           background-image:
+            linear-gradient(
+              rgba(251,243,227,0.6),
+              rgba(251,243,227,0.6)
+            ),
+            url("/images/flood.jpeg");
+          background-size: cover;
           padding: 40px 20px;
         }
 
         .register-card {
           width: 100%;
-          max-width: 480px;
+          max-width: 680px;
           padding: 60px 80px;
-          background: white;
+          background: #edd7ab;
+          
           border-radius: 30px;
           text-align: left;
           display: flex;
           flex-direction: column;
           justify-content: center;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+         
         }
 
         .register-logo {
@@ -58,9 +66,9 @@ export default function Register({ goTo }) {
           align-items: center;
           padding: 12px 15px;
           margin-bottom: 20px;
-          border: 1px solid #f1dca0;
+          border: 2px solid orange;
           border-radius: 10px;
-          background: var(--cream-bg);
+          background: rgb(255, 255, 255);
         }
 
         .input-box input,
@@ -72,26 +80,27 @@ export default function Register({ goTo }) {
           font-weight: bold;
         }
 
-        .input-box select {
-          appearance: none;
-          -webkit-appearance: none;
-          -moz-appearance: none;
-          cursor: pointer;
-        }
+        // .input-box select {
+        //   appearance: none;
+        //   //-webkit-appearance: none;
+        //   //-moz-appearance: none;
+        //   cursor: pointer;
+        // }
 
         .submit-register-btn {
-          width: 100%;
+          width: 350px;
+          margin: 0 auto;
           padding: 14px;
-          background: orange;
+          background: var(--primary-orange);
           border: none;
           border-radius: 10px;
-          cursor: pointer;
+         
           margin-top: 5px;
         }
 
         .submit-register-btn:hover {
-          background: rgb(242, 241, 239);
-          border: 1px solid orange;
+          background: rgb(255, 255, 255);
+          border: 2px solid orange;
         }
 
         .login-text {
@@ -100,14 +109,14 @@ export default function Register({ goTo }) {
         }
 
         .login-text a {
-          text-decoration: none;
+          //text-decoration: none;
           font-weight: bold;
-          color: orange;
-          transition: color 0.2s ease, text-decoration-color 0.2s ease;
+          color: red;
+          //transition: color 0.2s ease, text-decoration-color 0.2s ease;
         }
 
         .login-text a:hover {
-          color: rgb(200, 120, 0);
+          color: rgb(146, 88, 0);
           text-decoration: underline;
         }
       `}</style>
@@ -131,7 +140,7 @@ export default function Register({ goTo }) {
           <i className="fa-regular fa-user"></i>
           <input
             type="text"
-            placeholder="Enter your full name"
+            placeholder=" Enter your full name"
           />
         </div>
 
@@ -158,7 +167,7 @@ export default function Register({ goTo }) {
           <i className="fa-regular fa-envelope"></i>
           <input
             type="email"
-            placeholder="Enter your email"
+            placeholder=" Enter your email"
           />
         </div>
 
@@ -168,7 +177,7 @@ export default function Register({ goTo }) {
           <i className="fa-solid fa-lock"></i>
           <input
             type="password"
-            placeholder="Enter your password"
+            placeholder=" Enter your password"
           />
           <i className="fa-regular fa-eye"></i>
         </div>
@@ -179,7 +188,7 @@ export default function Register({ goTo }) {
           <i className="fa-solid fa-lock"></i>
           <input
             type="password"
-            placeholder="Re-enter your password"
+            placeholder=" Re-enter your password"
           />
           <i className="fa-regular fa-eye"></i>
         </div>
