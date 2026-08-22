@@ -7,27 +7,46 @@ const stats = [
 ];
 
 const barData = [
-  ["Sun", 3], ["Mon", 5], ["Tue", 6], ["Wed", 8],
-  ["Thu", 4], ["Fri", 7], ["Sat", 3],
+  ["Sun", 3],
+  ["Mon", 5],
+  ["Tue", 6],
+  ["Wed", 8],
+  ["Thu", 4],
+  ["Fri", 7],
+  ["Sat", 3],
 ];
 
 const requests = [
-  ["#REQ-0012", "Food", "Rice, Dal, Oil, Salt", "4 Items",
-   "Sylhet, Bangladesh", "12 May 2026", "High", "Pending"],
-  ["#REQ-0011", "Shelter", "Tents, Tarpaulin", "2 Items",
-   "Sunamganj, Bangladesh", "10 May 2026", "Medium", "Approved"],
+  [
+    "#REQ-0012",
+    "Food",
+    "Rice, Dal, Oil, Salt",
+    "4 Items",
+    "Sylhet, Bangladesh",
+    "12 May 2026",
+    "High",
+    "Pending",
+  ],
+  [
+    "#REQ-0011",
+    "Shelter",
+    "Tents, Tarpaulin",
+    "2 Items",
+    "Sunamganj, Bangladesh",
+    "10 May 2026",
+    "Medium",
+    "Approved",
+  ],
 ];
 
 export default function Dashboard({ goTo }) {
   return (
     <div className="dashboard-layout">
       <style>{css}</style>
-     
 
       <Sidebar goTo={goTo} current="dashboard" />
 
       <div className="main-content">
-
         <Topbar
           title="Welcome back, Sanjida 👋"
           subtitle="Stay safe, stay informed. We are here to help you."
@@ -60,10 +79,7 @@ export default function Dashboard({ goTo }) {
           <div className="bar-chart">
             {barData.map((b) => (
               <div className="bar-col" key={b[0]}>
-                <div
-                  className="bar"
-                  style={{ height: `${b[1] * 18}px` }}
-                />
+                <div className="bar" style={{ height: `${b[1] * 18}px` }} />
                 <span>{b[0]}</span>
               </div>
             ))}
@@ -98,16 +114,13 @@ export default function Dashboard({ goTo }) {
                     <td key={i}>{x}</td>
                   ))}
                   <td>
-                    <span className={`status ${r[7]}`}>
-                      {r[7]}
-                    </span>
+                    <span className={`status ${r[7]}`}>{r[7]}</span>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-
       </div>
     </div>
   );

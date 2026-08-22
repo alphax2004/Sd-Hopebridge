@@ -2,7 +2,7 @@ import { useState } from "react";
 import LandingPage from "./pages_alfa/landingpage";
 import Login from "./pages_alfa/login";
 import Register from "./pages_alfa/Register";   
-import Dashboard from "./pages_alfa/Dashboard";
+import Dashboard from "./pages_alfa/dashboard";
 import Logout from "./pages_alfa/logout";
 import RequestHelp from "./pages_alfa/RequestHelp";
 import Profile from "./pages_alfa/Profile";
@@ -25,7 +25,7 @@ export default function App() {
       <style>{`
         :root {
           --text-color: #000;
-          --primary-orange: rgb(230, 167, 48);
+          --primary-orange: rgb(240, 160, 12);
           --card-bg: #f6e9cc;
           --cream-bg: #fbf3e3;
         }
