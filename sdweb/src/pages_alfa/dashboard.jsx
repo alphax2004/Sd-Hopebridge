@@ -150,7 +150,7 @@ const css = `
   background: #fdf1e3;
   border-radius: 14px;
   padding: 10px 14px;
-  text-align: left /*!important*/;
+  text-align: left ;
 }
 
 .stat-card-top {
@@ -179,7 +179,7 @@ const css = `
   font-size: 24px;
   font-weight: bold;
   color: black;
-  text-align: left /*!important*/;
+  text-align: left ;
 }
 
 .stat-note {
@@ -187,7 +187,7 @@ const css = `
   font-size: 12px;
   font-weight: bold;
   color: #555;
-  text-align: left /*!important*/;
+  text-align: left ;
 }
 
 /* Cards */
