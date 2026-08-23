@@ -161,18 +161,18 @@ const topbarCss = `
 }
 
 .topbar-text h2 {
-  margin: 0 !important;
-  padding: 0 !important;
-  text-align: left !important;
+  margin: 0 ;
+  padding: 0 ;
+  text-align: left ;
   font-size: 25px;
   font-weight: bold;
   color: black;
 }
 
 .topbar-text p {
-  margin: 5px 0 0 !important;
-  padding: 0 !important;
-  text-align: left !important;
+  margin: 5px 0 0 ;
+  padding: 0 ;
+  text-align: left ;
   font-size: 14px;
   font-weight: bold;
   color: #555;

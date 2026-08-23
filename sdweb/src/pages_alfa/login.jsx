@@ -166,8 +166,7 @@ export default function Login({ goTo }) {
         <p className="signup-text">
           Don't have an account?{"  "}
           <a
-            href="#"
-            onClick={(e) => {
+            href="#" onClick={(e) => {
               e.preventDefault();
               goTo("register");
             }}

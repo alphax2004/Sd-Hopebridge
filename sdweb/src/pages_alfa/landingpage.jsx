@@ -50,7 +50,7 @@ export default function LandingPage({ goTo }) {
 
         .btn-primary {
           background: var(--primary-orange);
-          //border: none;
+          border: none;
           padding: 10px 20px;
           border-radius: 5px;
           
