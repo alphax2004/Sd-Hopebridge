@@ -404,20 +404,6 @@ const css = `
 }
 
 
-@media (max-width: 800px) {
 
-    .main-content {
-        padding: 20px;
-    }
-
-    .field-row {
-        grid-template-columns: 1fr;
-    }
-
-    .profile-card {
-        padding: 20px;
-    }
-
-}
 
 `;
