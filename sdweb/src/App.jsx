@@ -62,7 +62,7 @@ export default function App() {
 
       {page === "home" && <LandingPage goTo={goTo} />}
       {page === "login" && <Login goTo={goTo} />}
-      {page === "register" && <Register goTo={goTo} />}   {/* 👈 নতুন route */}
+      {page === "register" && <Register goTo={goTo} />}   
       {page === "requestHelp" && <RequestHelp goTo={goTo} />}
       {page === "profile" && <Profile goTo={goTo} />}
       {page === "dashboard" && <Dashboard goTo={goTo} />}
