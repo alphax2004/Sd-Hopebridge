@@ -1,12 +1,16 @@
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+
 const menuItems = [
-  { key: "dashboard", label: "Dashboard", icon: "fa-grip" },
-  { key: "requestHelp", label: "Request Help", icon: "fa-hand-holding-heart" },
-  { key: "disasterCenter", label: "Disaster Center", icon: "fa-triangle-exclamation" },
-  { key: "profile", label: "Profile", icon: "fa-user" },
-  { key: "logout", label: "Logout", icon: "fa-right-from-bracket" },
+  { path: "/dashboard", label: "Dashboard", icon: "fa-grip" },
+  { path: "/request-help", label: "Request Help", icon: "fa-hand-holding-heart" },
+  { path: "/disaster-center", label: "Disaster Center", icon: "fa-triangle-exclamation" },
+  { path: "/profile", label: "Profile", icon: "fa-user" },
 ];
 
-export function Sidebar({ goTo, current }) {
+export function Sidebar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   return (
     <aside className="sidebar">
       <style>{sidebarCss}</style>
@@ -22,18 +26,23 @@ export function Sidebar({ goTo, current }) {
 
       <div className="sidebar-menu">
         {menuItems.map((item) => (
-          <div
-            key={item.key}
-            className={`sidebar-item ${item.key === "logout" ? "logout" : ""} ${
-              current === item.key ? "active" : ""
-            }`}
-           
-            onClick={() => goTo(item.key)}
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
           >
             <i className={`fa-solid ${item.icon}`}></i>
             <span>{item.label}</span>
-          </div>
+          </NavLink>
         ))}
+
+        <div
+          className="sidebar-item logout"
+          onClick={() => navigate("/logout", { state: { from: location.pathname } })}
+        >
+          <i className="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </div>
       </div>
     </aside>
   );
@@ -118,6 +127,7 @@ const sidebarCss = `
   font-weight: bold;
   color: black;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .sidebar-item i {
@@ -161,18 +171,18 @@ const topbarCss = `
 }
 
 .topbar-text h2 {
-  margin: 0 ;
-  padding: 0 ;
-  text-align: left ;
+  margin: 0;
+  padding: 0;
+  text-align: left;
   font-size: 25px;
   font-weight: bold;
   color: black;
 }
 
 .topbar-text p {
-  margin: 5px 0 0 ;
-  padding: 0 ;
-  text-align: left ;
+  margin: 5px 0 0;
+  padding: 0;
+  text-align: left;
   font-size: 14px;
   font-weight: bold;
   color: #555;

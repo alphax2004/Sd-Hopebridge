@@ -1,7 +1,10 @@
-export default function Register({ goTo }) {
+import { useNavigate } from "react-router-dom";
+
+export default function Register() {
+  const navigate = useNavigate();
+
   return (
     <div className="register-wrapper">
-
       <style>{`
         .register-wrapper {
           min-height: 100vh;
@@ -9,8 +12,7 @@ export default function Register({ goTo }) {
           display: flex;
           align-items: center;
           justify-content: center;
-          //background: #ecd4a3;
-           background-image:
+          background-image:
             linear-gradient(
               rgba(251,243,227,0.6),
               rgba(251,243,227,0.6)
@@ -25,13 +27,11 @@ export default function Register({ goTo }) {
           max-width: 680px;
           padding: 60px 80px;
           background: #edd7ab;
-          
           border-radius: 30px;
           text-align: left;
           display: flex;
           flex-direction: column;
           justify-content: center;
-         
         }
 
         .register-logo {
@@ -80,13 +80,6 @@ export default function Register({ goTo }) {
           font-weight: bold;
         }
 
-        // .input-box select {
-        //   appearance: none;
-        //   //-webkit-appearance: none;
-        //   //-moz-appearance: none;
-        //   cursor: pointer;
-        // }
-
         .submit-register-btn {
           width: 350px;
           margin: 0 auto;
@@ -94,7 +87,6 @@ export default function Register({ goTo }) {
           background: var(--primary-orange);
           border: none;
           border-radius: 10px;
-         
           margin-top: 5px;
         }
 
@@ -109,18 +101,16 @@ export default function Register({ goTo }) {
         }
 
         .login-text a {
-          
           font-weight: bold;
           color: red;
-         
         }
 
         .login-text a:hover {
           color: rgb(146, 88, 0);
           text-decoration: underline;
         }
-          .logout-back {
-          
+
+        .logout-back {
           margin-top: 20px;
           padding: 9px;
           border-radius: 8px;
@@ -128,10 +118,11 @@ export default function Register({ goTo }) {
           font-weight: bold;
           border: none;
           background: var(--primary-orange);
-          display:block;
+          display: block;
           margin-left: auto;
           margin-right: auto;
         }
+
         .logout-back:hover {
           background: rgb(255, 255, 255);
           border: 2px solid orange;
@@ -139,30 +130,21 @@ export default function Register({ goTo }) {
       `}</style>
 
       <div className="register-card">
-
         <div className="register-logo">
           <img src="/images/logo.png" alt="HopeBridge logo" />
           HopeBridge
         </div>
 
         <h1>Create Account</h1>
-
-        <p className="subtitle">
-          Register for a HopeBridge account
-        </p>
+        <p className="subtitle">Register for a HopeBridge account</p>
 
         <label>Full Name</label>
-
         <div className="input-box">
           <i className="fa-regular fa-user"></i>
-          <input
-            type="text"
-            placeholder=" Enter your full name"
-          />
+          <input type="text" placeholder=" Enter your full name" />
         </div>
 
         <label>Blood Group</label>
-
         <div className="input-box">
           <i className="fa-solid fa-droplet"></i>
           <select defaultValue="">
@@ -179,43 +161,33 @@ export default function Register({ goTo }) {
         </div>
 
         <label>Email Address</label>
-
         <div className="input-box">
           <i className="fa-regular fa-envelope"></i>
-          <input
-            type="email"
-            placeholder=" Enter your email"
-          />
+          <input type="email" placeholder=" Enter your email" />
         </div>
 
         <label>Password</label>
-
         <div className="input-box">
           <i className="fa-solid fa-lock"></i>
-          <input
-            type="password"
-            placeholder=" Enter your password"
-          />
+          <input type="password" placeholder=" Enter your password" />
           <i className="fa-regular fa-eye"></i>
         </div>
 
         <label>Confirm Password</label>
-
         <div className="input-box">
           <i className="fa-solid fa-lock"></i>
-          <input
-            type="password"
-            placeholder=" Re-enter your password"
-          />
+          <input type="password" placeholder=" Re-enter your password" />
           <i className="fa-regular fa-eye"></i>
         </div>
 
         <button
           className="submit-register-btn"
-          onClick={() => goTo("dashboard")}
+          onClick={() => {
+            // TODO: এখানে actual register/authToken সেট করার লজিক বসাও
+            navigate("/dashboard");
+          }}
         >
-          <i className="fa-solid fa-user-plus"></i>
-          {" "}Register
+          <i className="fa-solid fa-user-plus"></i> Register
         </button>
 
         <p className="login-text">
@@ -224,20 +196,16 @@ export default function Register({ goTo }) {
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              goTo("login");
+              navigate("/login");
             }}
           >
             Login
           </a>
         </p>
 
-        <button
-          className="logout-back"
-          onClick={() => goTo("home")}
-        >
+        <button className="logout-back" onClick={() => navigate("/")}>
           Back
         </button>
-
       </div>
     </div>
   );

@@ -17,34 +17,16 @@ const barData = [
 ];
 
 const requests = [
-  [
-    "#REQ-0012",
-    "Food",
-    "Rice, Dal, Oil, Salt",
-    "4 Items",
-    "Sylhet, Bangladesh",
-    "12 May 2026",
-    "High",
-    "Pending",
-  ],
-  [
-    "#REQ-0011",
-    "Shelter",
-    "Tents, Tarpaulin",
-    "2 Items",
-    "Sunamganj, Bangladesh",
-    "10 May 2026",
-    "Medium",
-    "Approved",
-  ],
+  ["#REQ-0012", "Food", "Rice, Dal, Oil, Salt", "4 Items", "Sylhet, Bangladesh", "12 May 2026", "High", "Pending"],
+  ["#REQ-0011", "Shelter", "Tents, Tarpaulin", "2 Items", "Sunamganj, Bangladesh", "10 May 2026", "Medium", "Approved"],
 ];
 
-export default function Dashboard({ goTo }) {
+export default function Dashboard() {
   return (
     <div className="dashboard-layout">
       <style>{css}</style>
 
-      <Sidebar goTo={goTo} current="dashboard" />
+      <Sidebar />
 
       <div className="main-content">
         <Topbar
@@ -52,7 +34,6 @@ export default function Dashboard({ goTo }) {
           subtitle="Stay safe, stay informed. We are here to help you."
         />
 
-        {/* Statistics */}
         <div className="stat-cards">
           {stats.map((s) => (
             <div className="stat-card" key={s[1]}>
@@ -69,7 +50,6 @@ export default function Dashboard({ goTo }) {
           ))}
         </div>
 
-        {/* Chart */}
         <div className="chart-card">
           <div className="card-header">
             <h3>Requests Over Time</h3>
@@ -86,7 +66,6 @@ export default function Dashboard({ goTo }) {
           </div>
         </div>
 
-        {/* Recent Requests */}
         <div className="table-card">
           <div className="card-header">
             <h3>Recent Requests</h3>
@@ -138,7 +117,6 @@ const css = `
   padding: 24px 35px;
 }
 
-/* Stats */
 .stat-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -150,7 +128,7 @@ const css = `
   background: #fdf1e3;
   border-radius: 14px;
   padding: 10px 14px;
-  text-align: left ;
+  text-align: left;
 }
 
 .stat-card-top {
@@ -179,7 +157,7 @@ const css = `
   font-size: 24px;
   font-weight: bold;
   color: black;
-  text-align: left ;
+  text-align: left;
 }
 
 .stat-note {
@@ -187,10 +165,9 @@ const css = `
   font-size: 12px;
   font-weight: bold;
   color: #555;
-  text-align: left ;
+  text-align: left;
 }
 
-/* Cards */
 .chart-card,
 .table-card {
   background: white;
@@ -213,15 +190,12 @@ const css = `
   font-weight: bold;
 }
 
-/* Buttons */
 .action-btn {
   background: var(--primary-orange);
-  border:none;
- 
+  border: none;
   border-radius: 7px;
   padding: 7px 15px;
   font-weight: bold;
-  
 }
 
 .action-btn:hover {
@@ -229,7 +203,6 @@ const css = `
   border: 2px solid var(--primary-orange);
 }
 
-/* Chart */
 .bar-chart {
   height: 150px;
   display: flex;
@@ -258,10 +231,8 @@ const css = `
   font-weight: bold;
 }
 
-/* Table */
 table {
   width: 100%;
-  //border-collapse: collapse;
 }
 
 th,
@@ -269,18 +240,13 @@ td {
   text-align: left;
   padding: 8px;
   border-bottom: 1px solid #eee;
-  //white-space: nowrap;
 }
 
-th ,td{
+th,
+td {
   font-size: 12px;
   font-weight: bold;
 }
-
-// td {
-//   font-size: 12px;
-//   font-weight: bold;
-// }
 
 .status {
   padding: 5px 9px;
