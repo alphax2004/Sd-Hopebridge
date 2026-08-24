@@ -1,7 +1,10 @@
-export default function LandingPage({ goTo }) {
+import { useNavigate } from "react-router-dom";
+
+export default function LandingPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="landing-page">
-
       <style>{`
         .landing-page {
           background: #efd194;
@@ -15,21 +18,17 @@ export default function LandingPage({ goTo }) {
           justify-content: space-between;
           padding: 20px 40px;
         }
-      
+
         .brand-logo {
-        
           display: flex;
           align-items: center;
           gap: 8px;
           font-weight: 800;
         }
-          
-          
 
         .brand-logo img {
           width: 28px;
           height: 28px;
-          
         }
 
         .nav-links a {
@@ -53,7 +52,6 @@ export default function LandingPage({ goTo }) {
           border: none;
           padding: 10px 20px;
           border-radius: 5px;
-          
         }
 
         .btn-primary:hover {
@@ -83,7 +81,6 @@ export default function LandingPage({ goTo }) {
         }
 
         .features {
-          //text-align: center;
           padding: 20px 20px 50px;
         }
 
@@ -109,7 +106,6 @@ export default function LandingPage({ goTo }) {
 
         .card:hover {
           background: var(--primary-orange);
-          
         }
 
         .icon-box {
@@ -125,7 +121,6 @@ export default function LandingPage({ goTo }) {
       `}</style>
 
       <div className="navbar">
-
         <div className="brand-logo">
           <img src="/images/logo.png" alt="HopeBridge logo" />
           HopeBridge
@@ -139,21 +134,14 @@ export default function LandingPage({ goTo }) {
         </div>
 
         <div className="nav-right">
-          <button
-            className="btn-primary"
-            onClick={() => goTo("login")}
-          >
+          <button className="btn-primary" onClick={() => navigate("/login")}>
             Login
           </button>
 
-          <button
-              className="btn-primary"
-              onClick={() => goTo("register")}
-          >
+          <button className="btn-primary" onClick={() => navigate("/register")}>
             Register
           </button>
         </div>
-
       </div>
 
       <div className="hero">
@@ -164,30 +152,22 @@ export default function LandingPage({ goTo }) {
           organized and transparent relief management.
         </p>
 
-        <button 
-        className="btn-primary"
-        onClick={() => goTo("login")}
-        >
+        <button className="btn-primary" onClick={() => navigate("/login")}>
           Request Help
         </button>
       </div>
 
       <div className="features">
-
         <h2>Key HopeBridge Features</h2>
-
         <p>Connecting disaster relief with real-time tools</p>
 
         <div className="card-container">
-
           <div className="card">
             <div className="icon-box">
               <i className="fa-solid fa-robot"></i>
             </div>
             <h3>AI Disaster Predictions</h3>
-            <p>
-              AI-powered forecasts help identify risk zones early.
-            </p>
+            <p>AI-powered forecasts help identify risk zones early.</p>
           </div>
 
           <div className="card">
@@ -195,9 +175,7 @@ export default function LandingPage({ goTo }) {
               <i className="fa-solid fa-hand-holding-heart"></i>
             </div>
             <h3>Volunteer Mobilization</h3>
-            <p>
-              Quickly organize volunteers where they are needed.
-            </p>
+            <p>Quickly organize volunteers where they are needed.</p>
           </div>
 
           <div className="card">
@@ -205,14 +183,10 @@ export default function LandingPage({ goTo }) {
               <i className="fa-solid fa-box-open"></i>
             </div>
             <h3>Rapid Aid Distribution</h3>
-            <p>
-              Fast logistics to deliver supplies without delay.
-            </p>
+            <p>Fast logistics to deliver supplies without delay.</p>
           </div>
-
         </div>
       </div>
-
     </div>
   );
 }

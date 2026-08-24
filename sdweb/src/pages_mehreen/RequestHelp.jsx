@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sidebar, Topbar } from "./sidebar";
 
 const helpTypes = [
@@ -8,7 +9,9 @@ const helpTypes = [
   { key: "Water", icon: "fa-droplet" },
 ];
 
-export default function RequestHelp({ goTo }) {
+export default function RequestHelp() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     type: "Food",
     items: "",
@@ -38,7 +41,7 @@ export default function RequestHelp({ goTo }) {
     e.preventDefault();
 
     if (!formData.items.trim() || !formData.location.trim() || !formData.contact.trim()) {
-      setError("Items, Location, r Contact number - egulo must fill up korte hobe.");
+      setError("Must fillup Items, Location, and Contact number.");
       return;
     }
 
@@ -47,7 +50,7 @@ export default function RequestHelp({ goTo }) {
     setSubmitted(true);
 
     setTimeout(() => {
-      goTo("dashboard");
+      navigate("/dashboard");
     }, 2500);
   }
 
@@ -55,7 +58,7 @@ export default function RequestHelp({ goTo }) {
     <div className="request-help-layout">
       <style>{css}</style>
 
-      <Sidebar goTo={goTo} current="requestHelp" />
+      <Sidebar current="requestHelp" />
 
       <div className="main-content">
         <Topbar
@@ -194,8 +197,7 @@ const css = `
   background: white;
   border: 1px solid #eee3d0;
   border-radius: 14px;
-  padding: 24px 28px;
-  max-width: 640px;
+  padding: 40px 28px;
 }
 
 .field-group {
@@ -273,7 +275,6 @@ const css = `
   font-family: Arial, sans-serif;
   font-size: 13px;
   width: 100%;
-  
 }
 
 .textarea-box {
@@ -316,8 +317,8 @@ const css = `
   background: white;
   border: 1px solid #eee3d0;
   border-radius: 14px;
-  padding: 60px 30px;
-  max-width: 640px;
+  padding: 330px 30px;
+  max-width: 100%;
   text-align: center;
 }
 

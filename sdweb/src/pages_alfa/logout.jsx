@@ -1,4 +1,10 @@
-export default function Logout({ goTo, cameFrom }) {
+import { useNavigate, useLocation } from "react-router-dom";
+
+export default function Logout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const cameFrom = location.state?.from || "/dashboard";
+
   return (
     <div className="logout-wrapper">
       <style>{css}</style>
@@ -7,27 +13,25 @@ export default function Logout({ goTo, cameFrom }) {
         <div className="logout-card">
           <h2>Do you want to log out?</h2>
 
-          <div className= "logout-actions">
+          <div className="logout-actions">
             <button
               className="logout-yes"
-              onClick={() => goTo("home")}
+              onClick={() => {
+                // TODO: এখানে actual logout logic বসাও
+                // localStorage.removeItem("authToken");
+                navigate("/", { replace: true });
+              }}
             >
               Yes
             </button>
 
-            <button
-              className="logout-no"
-              onClick={() => goTo(cameFrom || "dashboard")}
-            >
+            <button className="logout-no" onClick={() => navigate(cameFrom)}>
               No
             </button>
           </div>
         </div>
 
-        <button
-          className="logout-back"
-          onClick={() => goTo(cameFrom || "dashboard")}
-        >
+        <button className="logout-back" onClick={() => navigate(cameFrom)}>
           Back
         </button>
       </div>
@@ -68,7 +72,8 @@ const css = `
   justify-content: center;
 }
 
-.logout-yes,.logout-no {
+.logout-yes,
+.logout-no {
   padding: 20px 40px;
   border-radius: 8px;
   font-size: 18px;
@@ -78,7 +83,9 @@ const css = `
   background: var(--primary-orange);
 }
 
-.logout-yes:hover,.logout-no:hover,.logout-back:hover {
+.logout-yes:hover,
+.logout-no:hover,
+.logout-back:hover {
   background: rgb(242, 241, 239);
   border: 1px solid orange;
 }

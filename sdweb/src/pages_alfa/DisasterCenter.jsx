@@ -16,7 +16,7 @@ const disasters = [
   ["fa-mountain", "Landslide Risk", "Landslide", "Bandarban, Bangladesh", "2 days ago", "Low"],
 ];
 
-export default function DisasterCenter({ goTo }) {
+export default function DisasterCenter() {
   const [filter, setFilter] = useState("All");
 
   const filteredList =
@@ -26,7 +26,7 @@ export default function DisasterCenter({ goTo }) {
     <div className="disaster-layout">
       <style>{css}</style>
 
-      <Sidebar goTo={goTo} current="disasterCenter" />
+      <Sidebar />
 
       <div className="main-content">
         <Topbar
@@ -34,7 +34,6 @@ export default function DisasterCenter({ goTo }) {
           subtitle="Real-time updates on ongoing disasters"
         />
 
-        {/* Stats */}
         <div className="stat-cards">
           {stats.map((s) => (
             <div className="stat-card" key={s[1]}>
@@ -47,7 +46,6 @@ export default function DisasterCenter({ goTo }) {
           ))}
         </div>
 
-        {/* Filter buttons */}
         <div className="filter-row">
           {types.map((t) => (
             <button
@@ -60,7 +58,6 @@ export default function DisasterCenter({ goTo }) {
           ))}
         </div>
 
-        {/* Disaster list */}
         <div className="disaster-list">
           {filteredList.map((d, i) => (
             <div className="disaster-card" key={i}>

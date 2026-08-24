@@ -1,4 +1,8 @@
-export default function Login({ goTo }) {
+import { useNavigate } from "react-router-dom";
+
+export default function Login() {
+  const navigate = useNavigate();
+
   return (
     <div className="login-wrapper">
       <style>{`
@@ -18,7 +22,6 @@ export default function Login({ goTo }) {
           flex: 1;
           padding: 60px 80px;
           background: #ecd4a3;
-          
           text-align: left;
           display: flex;
           flex-direction: column;
@@ -73,10 +76,7 @@ export default function Login({ goTo }) {
         .options {
           text-align: right;
           margin-bottom: 15px;
-          
         }
-
-        
 
         .options a:hover {
           color: red;
@@ -88,7 +88,7 @@ export default function Login({ goTo }) {
           padding: 14px;
           background: var(--primary-orange);
           border-radius: 10px;
-          border:none;
+          border: none;
         }
 
         .submit-login-btn:hover {
@@ -101,14 +101,11 @@ export default function Login({ goTo }) {
           text-align: center;
         }
 
-        
-
         .signup-text a:hover {
           color: red;
         }
 
         .logout-back {
-          
           margin-top: 20px;
           padding: 9px;
           border-radius: 8px;
@@ -116,10 +113,11 @@ export default function Login({ goTo }) {
           font-weight: bold;
           border: none;
           background: var(--primary-orange);
-          display:block;
+          display: block;
           margin-left: auto;
           margin-right: auto;
         }
+
         .logout-back:hover {
           background: rgb(255, 255, 255);
           border: 2px solid orange;
@@ -135,23 +133,18 @@ export default function Login({ goTo }) {
         </div>
 
         <h1>Welcome Back</h1>
-
         <p className="subtitle">Login to your HopeBridge account</p>
 
         <label>Email Address</label>
-
         <div className="input-box">
           <i className="fa-regular fa-envelope"></i>
           <input type="email" placeholder=" Enter your email" />
         </div>
 
         <label>Password</label>
-
         <div className="input-box">
           <i className="fa-solid fa-lock"></i>
-
           <input type="password" placeholder=" Enter your password" />
-
           <i className="fa-regular fa-eye"></i>
         </div>
 
@@ -159,25 +152,31 @@ export default function Login({ goTo }) {
           <a href="#">Forgot Password</a>
         </div>
 
-        <button className="submit-login-btn" onClick={() => goTo("dashboard")}>
+        <button
+          className="submit-login-btn"
+          onClick={() => {
+            // TODO: এখানে actual login/authToken সেট করার লজিক বসাও
+            // localStorage.setItem("authToken", "dummy-token");
+            navigate("/dashboard");
+          }}
+        >
           <i className="fa-solid fa-right-from-bracket"></i> Login
         </button>
 
         <p className="signup-text">
-          Don't have an account?{"  "}
+          Don't have an account? {" "}
           <a
-            href="#" onClick={(e) => {
+            href="#"
+            onClick={(e) => {
               e.preventDefault();
-              goTo("register");
+              navigate("/register");
             }}
           >
             Create Account
           </a>
         </p>
-        <button
-          className="logout-back"
-          onClick={() => goTo("home")}
-        >
+
+        <button className="logout-back" onClick={() => navigate("/")}>
           Back
         </button>
       </div>
