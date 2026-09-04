@@ -1,198 +1,309 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Sidebar, Topbar } from "./sidebar";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:4000";
+const menuItems = [
+  { path: "/dashboard", label: "Dashboard", icon: "fa-grip" },
+  { path: "/request-help", label: "Request Help", icon: "fa-hand-holding-heart" },
+  { path: "/disaster-center", label: "Disaster Center", icon: "fa-triangle-exclamation" },
+  { path: "/profile", label: "Profile", icon: "fa-user" },
+];
 
-export default function Password() {
+export function Sidebar() {
   const navigate = useNavigate();
-
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
-
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
-
-    if (newPassword !== confirmPassword) {
-      setMessage("New password and confirm password do not match.");
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${API_URL}/api/users/change-password`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            currentPassword,
-            newPassword,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message || "Password change failed"
-        );
-      }
-
-      setMessage("Password changed successfully.");
-
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (error) {
-      setMessage(error.message);
-    }
-  };
+  const location = useLocation();
 
   return (
-    <div className="password-page">
-      <style>{`
-        .password-page {
-          min-height: 100vh;
-          display: flex;
-          background: #fbf3e3;
-          font-family: Arial, sans-serif;
-        }
+    <aside className="sidebar">
+      <style>{sidebarCss}</style>
 
-        .password-main {
-          flex: 1;
-          padding: 25px;
-        }
+      <div className="sidebar-logo">
+        <img src="/images/logo.png" alt="HopeBridge logo" />
 
-        .password-card {
-          max-width: 650px;
-          background: white;
-          padding: 30px;
-          margin-top: 25px;
-          border-radius: 12px;
-        }
-
-        .form-group {
-          margin-bottom: 18px;
-        }
-
-        .form-group label {
-          display: block;
-          margin-bottom: 7px;
-        }
-
-        .form-group input {
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #ccc;
-          border-radius: 7px;
-        }
-
-        .change-btn {
-          padding: 13px 25px;
-          border: none;
-          border-radius: 7px;
-          background: rgb(240, 160, 12);
-          cursor: pointer;
-          font-weight: bold;
-        }
-
-        .message {
-          padding: 10px;
-          margin-bottom: 15px;
-          background: #f6e9cc;
-          border-radius: 7px;
-        }
-
-        .back-btn {
-          margin-top: 15px;
-          padding: 10px 20px;
-          border: none;
-          border-radius: 7px;
-          background: #f8b945;
-          cursor: pointer;
-          font-weight: bold;
-        }
-      `}</style>
-
-      <Sidebar />
-
-      <div className="password-main">
-        <Topbar
-          title="Change Password"
-          subtitle="Update your account password."
-        />
-
-        <div className="password-card">
-          {message && (
-            <div className="message">
-              {message}
-            </div>
-          )}
-
-          <form onSubmit={handleChangePassword}>
-            <div className="form-group">
-              <label>Current Password</label>
-
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) =>
-                  setCurrentPassword(e.target.value)
-                }
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>New Password</label>
-
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) =>
-                  setNewPassword(e.target.value)
-                }
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Confirm New Password</label>
-
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) =>
-                  setConfirmPassword(e.target.value)
-                }
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="change-btn"
-            >
-              Change Password
-            </button>
-          </form>
-
-          <button
-            type="button"
-            className="back-btn"
-            onClick={() => navigate("/profile")}
-          >
-            Back to Profile
-          </button>
+        <div>
+          <div className="sidebar-title">HopeBridge</div>
+          <div className="sidebar-subtitle">Together We Save Lives</div>
         </div>
+      </div>
+
+      <div className="sidebar-menu">
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) =>
+              `sidebar-item ${isActive ? "active" : ""}`
+            }
+          >
+            <i className={`fa-solid ${item.icon}`}></i>
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
+
+        <div
+          className="sidebar-item logout"
+          onClick={() =>
+            navigate("/logout", {
+              state: { from: location.pathname },
+            })
+          }
+        >
+          <i className="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+export function Topbar({ title, subtitle }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  return (
+    <div className="topbar">
+      <style>{topbarCss}</style>
+
+      <div className="topbar-text">
+        <h2>{title}</h2>
+        <p>{subtitle}</p>
+      </div>
+
+      <div className="profile-dropdown-wrapper">
+        <div
+          className="profile-section"
+          onClick={() => setShowDropdown(!showDropdown)}
+        >
+          <div className="profile-avatar">
+            <i className="fa-solid fa-user"></i>
+          </div>
+
+          <span>Sanjida Islam</span>
+
+          <i className="fa-solid fa-chevron-down"></i>
+        </div>
+
+        {showDropdown && (
+          <div className="profile-dropdown">
+            <div
+              className="dropdown-item"
+              onClick={() => {
+                navigate("/profile");
+                setShowDropdown(false);
+              }}
+            >
+              <i className="fa-solid fa-user"></i>
+              <span>Profile</span>
+            </div>
+
+            <div
+              className="dropdown-item"
+              onClick={() => {
+                navigate("/password");
+                setShowDropdown(false);
+              }}
+            >
+              <i className="fa-solid fa-lock"></i>
+              <span>Password</span>
+            </div>
+
+            <div
+              className="dropdown-item dropdown-logout"
+              onClick={() => {
+                navigate("/logout", {
+                  state: { from: location.pathname },
+                });
+                setShowDropdown(false);
+              }}
+            >
+              <i className="fa-solid fa-right-from-bracket"></i>
+              <span>Logout</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
+const sidebarCss = `
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+  min-height: 100vh;
+  background: white;
+  border-right: 1px solid #eee;
+  padding: 22px 18px;
+  box-sizing: border-box;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px;
+  margin-bottom: 22px;
+}
+
+.sidebar-logo img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: black;
+  line-height: 1.1;
+  margin-top: 25px;
+}
+
+.sidebar-subtitle {
+  font-size: 11px;
+  font-weight: bold;
+  color: #555;
+  margin-top: 2px;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sidebar-item {
+  height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sidebar-item i {
+  width: 18px;
+  text-align: center;
+}
+
+.sidebar-item:hover {
+  background: #f8b945;
+}
+
+.sidebar-item.active {
+  background: var(--primary-orange);
+}
+
+.sidebar-item.logout {
+  color: #e05555;
+  margin-top: 10px;
+}
+
+.sidebar-item.logout:hover {
+  background: #fde3e3;
+}
+`;
+
+const topbarCss = `
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 65px;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.topbar-text {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.topbar-text h2 {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  font-size: 25px;
+  font-weight: bold;
+  color: black;
+}
+
+.topbar-text p {
+  margin: 5px 0 0;
+  padding: 0;
+  text-align: left;
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+}
+
+.profile-dropdown-wrapper {
+  position: relative;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+  cursor: pointer;
+}
+
+.profile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f1dca0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d99e1f;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 180px;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 9px;
+  padding: 5px 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+  z-index: 1000;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 43px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+  cursor: pointer;
+}
+
+.dropdown-item i {
+  width: 18px;
+  text-align: center;
+}
+
+.dropdown-item:hover {
+  background: #f8b945;
+}
+
+.dropdown-logout {
+  color: #e05555;
+}
+`;
