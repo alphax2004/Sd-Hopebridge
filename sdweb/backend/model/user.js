@@ -21,6 +21,18 @@ const userSchema = new Schema(
       enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
       required: true,
     },
+    phone: {
+      type: Schema.Types.String,
+      default: "",
+    },
+    location: {
+      type: Schema.Types.String,
+      default: "",
+    },
+    verified: {
+      type: Schema.Types.Boolean,
+      default: false,
+    },
     role: {
       type: Schema.Types.String,
       enum: ["user", "ngo", "admin"],
