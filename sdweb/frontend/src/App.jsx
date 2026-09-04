@@ -1,27 +1,17 @@
-import { useState } from "react";
+import { Routes, Route } from "react-router-dom";
+
 import LandingPage from "./pages_alfa/landingpage";
 import Login from "./pages_alfa/login";
-import Register from "./pages_alfa/Register";   
+import Register from "./pages_alfa/register";
 import Dashboard from "./pages_alfa/dashboard";
-import Logout from "./pages_alfa/logout";
 import RequestHelp from "./pages_alfa/RequestHelp";
 import Profile from "./pages_alfa/Profile";
 import DisasterCenter from "./pages_alfa/DisasterCenter";
+import Logout from "./pages_alfa/logout";
 
 export default function App() {
-  const [page, setPage] = useState("home");
-  const [cameFrom, setCameFrom] = useState("dashboard");
-
-  const goTo = (newPage) => {
-    if (newPage === "logout") {
-      setCameFrom(page);
-    }
-
-    setPage(newPage);
-  };
-
   return (
-     <div style={{ width: "100%", minHeight: "100vh" }}>
+    <div className="app-container">
       <style>{`
         :root {
           --text-color: #000;
@@ -36,7 +26,9 @@ export default function App() {
           padding: 0;
         }
 
-        html, body, #root {
+        html,
+        body,
+        #root {
           margin: 0;
           padding: 0;
           width: 100%;
@@ -48,7 +40,14 @@ export default function App() {
           color: var(--text-color);
         }
 
-        h1, h2, h3, p, label, a, span {
+        h1,
+        h2,
+        h3,
+        h4,
+        p,
+        label,
+        a,
+        span {
           color: var(--text-color);
           font-weight: bold;
         }
@@ -57,17 +56,27 @@ export default function App() {
           font-family: Arial, sans-serif;
           color: black;
           font-weight: bold;
+          cursor: pointer;
+        }
+
+        .app-container {
+          width: 100%;
+          min-height: 100vh;
         }
       `}</style>
 
-      {page === "home" && <LandingPage goTo={goTo} />}
-      {page === "login" && <Login goTo={goTo} />}
-      {page === "register" && <Register goTo={goTo} />}   
-      {page === "requestHelp" && <RequestHelp goTo={goTo} />}
-      {page === "profile" && <Profile goTo={goTo} />}
-      {page === "dashboard" && <Dashboard goTo={goTo} />}
-      {page === "disasterCenter" && <DisasterCenter goTo={goTo} />}
-      {page === "logout" && <Logout goTo={goTo} cameFrom={cameFrom} />}
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/request-help" element={<RequestHelp />} />
+        <Route path="/disaster-center" element={<DisasterCenter />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="*" element={<LandingPage />} />
+      </Routes>
     </div>
   );
 }
+

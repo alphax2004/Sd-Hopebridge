@@ -1,7 +1,75 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export default function Register() {
   const navigate = useNavigate();
+
+  const [fullName, setFullName] = useState("");
+  const [bloodGroup, setBloodGroup] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async () => {
+    setError("");
+
+    if (
+      !fullName ||
+      !bloodGroup ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
+      setError("সব ঘর পূরণ করুন");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Password মিলছে না");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${API_URL}/api/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          fullName,
+          email,
+          password,
+          bloodGroup,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(
+          data.error || "Registration failed"
+        );
+        return;
+      }
+
+      // Registration successful
+      navigate("/login");
+    } catch {
+      setError(
+        "Server এর সাথে যোগাযোগ করা যাচ্ছে না"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="register-wrapper">
@@ -80,14 +148,23 @@ export default function Register() {
           font-weight: bold;
         }
 
+        .error-text {
+          color: #c0392b;
+          font-weight: bold;
+          margin-bottom: 15px;
+        }
+
         .submit-register-btn {
           width: 350px;
-          margin: 0 auto;
+          margin: 5px auto 0;
           padding: 14px;
           background: var(--primary-orange);
           border: none;
           border-radius: 10px;
-          margin-top: 5px;
+        }
+
+        .submit-register-btn:disabled {
+          opacity: 0.6;
         }
 
         .submit-register-btn:hover {
@@ -131,24 +208,55 @@ export default function Register() {
 
       <div className="register-card">
         <div className="register-logo">
-          <img src="/images/logo.png" alt="HopeBridge logo" />
+          <img
+            src="/images/logo.png"
+            alt="HopeBridge logo"
+          />
           HopeBridge
         </div>
 
         <h1>Create Account</h1>
-        <p className="subtitle">Register for a HopeBridge account</p>
+
+        <p className="subtitle">
+          Register for a HopeBridge account
+        </p>
+
+        {error && (
+          <p className="error-text">
+            {error}
+          </p>
+        )}
 
         <label>Full Name</label>
+
         <div className="input-box">
           <i className="fa-regular fa-user"></i>
-          <input type="text" placeholder=" Enter your full name" />
+
+          <input
+            type="text"
+            placeholder=" Enter your full name"
+            value={fullName}
+            onChange={(e) =>
+              setFullName(e.target.value)
+            }
+          />
         </div>
 
         <label>Blood Group</label>
+
         <div className="input-box">
           <i className="fa-solid fa-droplet"></i>
-          <select defaultValue="">
-            <option value="" disabled>Select your blood group</option>
+
+          <select
+            value={bloodGroup}
+            onChange={(e) =>
+              setBloodGroup(e.target.value)
+            }
+          >
+            <option value="" disabled>
+              Select your blood group
+            </option>
+
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
@@ -161,37 +269,66 @@ export default function Register() {
         </div>
 
         <label>Email Address</label>
+
         <div className="input-box">
           <i className="fa-regular fa-envelope"></i>
-          <input type="email" placeholder=" Enter your email" />
+
+          <input
+            type="email"
+            placeholder=" Enter your email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+          />
         </div>
 
         <label>Password</label>
+
         <div className="input-box">
           <i className="fa-solid fa-lock"></i>
-          <input type="password" placeholder=" Enter your password" />
+
+          <input
+            type="password"
+            placeholder=" Enter your password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+          />
+
           <i className="fa-regular fa-eye"></i>
         </div>
 
         <label>Confirm Password</label>
+
         <div className="input-box">
           <i className="fa-solid fa-lock"></i>
-          <input type="password" placeholder=" Re-enter your password" />
+
+          <input
+            type="password"
+            placeholder=" Re-enter your password"
+            value={confirmPassword}
+            onChange={(e) =>
+              setConfirmPassword(e.target.value)
+            }
+          />
+
           <i className="fa-regular fa-eye"></i>
         </div>
 
         <button
           className="submit-register-btn"
-          onClick={() => {
-            // TODO: এখানে actual register/authToken সেট করার লজিক বসাও
-            navigate("/dashboard");
-          }}
+          disabled={loading}
+          onClick={handleRegister}
         >
-          <i className="fa-solid fa-user-plus"></i> Register
+          <i className="fa-solid fa-user-plus"></i>{" "}
+          {loading ? "Creating..." : "Register"}
         </button>
 
         <p className="login-text">
           Already have an account?{" "}
+
           <a
             href="#"
             onClick={(e) => {
@@ -203,7 +340,10 @@ export default function Register() {
           </a>
         </p>
 
-        <button className="logout-back" onClick={() => navigate("/")}>
+        <button
+          className="logout-back"
+          onClick={() => navigate("/")}
+        >
           Back
         </button>
       </div>

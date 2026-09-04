@@ -6,7 +6,7 @@ import authRouter from "./routes/auth.js";
 import usersRouter from "./routes/users.js";
 import mongoose from "mongoose";
 import cors from "cors";
-
+ 
 const app = express();
 app.use(log);
 app.use(express.json());
@@ -17,7 +17,7 @@ app.use(
     origin: process.env.ALLOWED_ORIGIN,
   })
 );
-
+ 
 mongoose
   .connect(process.env.DATABASE_URL)
   .then(() => console.log("Connected to database"))
@@ -25,14 +25,19 @@ mongoose
     console.log(`Error connecting to database ${err}`);
     process.exit(1);
   });
-
+ 
 const PORT = process.env.PORT || 4000;
-
+ 
+app.get("/api/test", (req, res) => {
+  return res.json({ message: "Api is working" });
+});
+ 
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
-
+ 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
-
+ 
 export default app;
+ 

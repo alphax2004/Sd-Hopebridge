@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 
 const menuItems = [
@@ -29,7 +30,9 @@ export function Sidebar() {
           <NavLink
             key={item.path}
             to={item.path}
-            className={({ isActive }) => `sidebar-item ${isActive ? "active" : ""}`}
+            className={({ isActive }) =>
+              `sidebar-item ${isActive ? "active" : ""}`
+            }
           >
             <i className={`fa-solid ${item.icon}`}></i>
             <span>{item.label}</span>
@@ -38,7 +41,11 @@ export function Sidebar() {
 
         <div
           className="sidebar-item logout"
-          onClick={() => navigate("/logout", { state: { from: location.pathname } })}
+          onClick={() =>
+            navigate("/logout", {
+              state: { from: location.pathname },
+            })
+          }
         >
           <i className="fa-solid fa-right-from-bracket"></i>
           <span>Logout</span>
@@ -49,6 +56,10 @@ export function Sidebar() {
 }
 
 export function Topbar({ title, subtitle }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [showDropdown, setShowDropdown] = useState(false);
+
   return (
     <div className="topbar">
       <style>{topbarCss}</style>
@@ -58,13 +69,58 @@ export function Topbar({ title, subtitle }) {
         <p>{subtitle}</p>
       </div>
 
-      <div className="profile-section">
-        <div className="profile-avatar">
-          <i className="fa-solid fa-user"></i>
+      <div className="profile-dropdown-wrapper">
+        <div
+          className="profile-section"
+          onClick={() => setShowDropdown(!showDropdown)}
+        >
+          <div className="profile-avatar">
+            <i className="fa-solid fa-user"></i>
+          </div>
+
+          <span>Sanjida Islam</span>
+
+          <i className="fa-solid fa-chevron-down"></i>
         </div>
 
-        <span>Sanjida Islam</span>
-        <i className="fa-solid fa-chevron-down"></i>
+        {showDropdown && (
+          <div className="profile-dropdown">
+            <div
+              className="dropdown-item"
+              onClick={() => {
+                navigate("/profile");
+                setShowDropdown(false);
+              }}
+            >
+              <i className="fa-solid fa-user"></i>
+              <span>Profile</span>
+            </div>
+
+            <div
+              className="dropdown-item"
+              onClick={() => {
+                navigate("/password");
+                setShowDropdown(false);
+              }}
+            >
+              <i className="fa-solid fa-lock"></i>
+              <span>Password</span>
+            </div>
+
+            <div
+              className="dropdown-item dropdown-logout"
+              onClick={() => {
+                navigate("/logout", {
+                  state: { from: location.pathname },
+                });
+                setShowDropdown(false);
+              }}
+            >
+              <i className="fa-solid fa-right-from-bracket"></i>
+              <span>Logout</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -188,6 +244,10 @@ const topbarCss = `
   color: #555;
 }
 
+.profile-dropdown-wrapper {
+  position: relative;
+}
+
 .profile-section {
   display: flex;
   align-items: center;
@@ -195,6 +255,7 @@ const topbarCss = `
   font-size: 14px;
   font-weight: bold;
   color: black;
+  cursor: pointer;
 }
 
 .profile-avatar {
@@ -206,5 +267,43 @@ const topbarCss = `
   align-items: center;
   justify-content: center;
   color: #d99e1f;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 180px;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 9px;
+  padding: 5px 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+  z-index: 1000;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 43px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+  cursor: pointer;
+}
+
+.dropdown-item i {
+  width: 18px;
+  text-align: center;
+}
+
+.dropdown-item:hover {
+  background: #f8b945;
+}
+
+.dropdown-logout {
+  color: #e05555;
 }
 `;
