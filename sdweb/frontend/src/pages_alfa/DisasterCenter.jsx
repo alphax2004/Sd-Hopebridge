@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Sidebar, Topbar } from "./sidebar";
 
+import"./DisasterCenter.css";
 const stats = [
   ["fa-triangle-exclamation", "Active Disasters", 6],
   ["fa-map-location-dot", "High Risk Zones", 9],
@@ -24,7 +25,7 @@ export default function DisasterCenter() {
 
   return (
     <div className="disaster-layout">
-      <style>{css}</style>
+      
 
       <Sidebar />
 
@@ -78,132 +79,3 @@ export default function DisasterCenter() {
     </div>
   );
 }
-
-const css = `
-.disaster-layout {
-  display: flex;
-  min-height: 100vh;
-  background: var(--cream-bg);
-}
-
-.main-content {
-  flex: 1;
-  padding: 24px 35px;
-}
-
-.stat-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.stat-card {
-  background: #fdf1e3;
-  border-radius: 14px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.stat-card i {
-  font-size: 22px;
-  color: var(--primary-orange);
-}
-
-.stat-value {
-  font-size: 22px;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #555;
-}
-
-.filter-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.filter-btn {
-  padding: 8px 18px;
-  border: 1px solid #eee3d0;
-  border-radius: 20px;
-  background: white;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.filter-btn.active {
-  background: var(--primary-orange);
-  border-color: var(--primary-orange);
-}
-
-.disaster-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.disaster-card {
-  background: white;
-  border: 1px solid #eee3d0;
-  border-radius: 14px;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.disaster-icon {
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  border-radius: 10px;
-  background: #fdf1e3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary-orange);
-  font-size: 18px;
-}
-
-.disaster-info {
-  flex: 1;
-  text-align: left;
-}
-
-.disaster-info h4 {
-  margin: 0 0 4px;
-  font-size: 15px;
-}
-
-.disaster-info p {
-  margin: 0;
-  font-size: 13px;
-  color: #555;
-}
-
-.severity {
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-}
-
-.severity.High {
-  color: #d94b4b;
-  background: #d94b4b22;
-}
-
-.severity.Medium {
-  color: #d99e1f;
-  background: #d99e1f22;
-}
-
-.severity.Low {
-  color: #4caf7d;
-  background: #4caf7d22;
-}
-`;

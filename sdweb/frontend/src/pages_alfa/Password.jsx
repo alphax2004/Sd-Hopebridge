@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sidebar, Topbar } from "./sidebar";
+import "./Password.css";
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:4000";
@@ -59,70 +60,6 @@ export default function Password() {
 
   return (
     <div className="password-page">
-      <style>{`
-        .password-page {
-          min-height: 100vh;
-          display: flex;
-          background: #fbf3e3;
-          font-family: Arial, sans-serif;
-        }
-
-        .password-main {
-          flex: 1;
-          padding: 25px;
-        }
-
-        .password-card {
-          max-width: 650px;
-          background: white;
-          padding: 30px;
-          margin-top: 25px;
-          border-radius: 12px;
-        }
-
-        .form-group {
-          margin-bottom: 18px;
-        }
-
-        .form-group label {
-          display: block;
-          margin-bottom: 7px;
-        }
-
-        .form-group input {
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #ccc;
-          border-radius: 7px;
-        }
-
-        .change-btn {
-          padding: 13px 25px;
-          border: none;
-          border-radius: 7px;
-          background: rgb(240, 160, 12);
-          cursor: pointer;
-          font-weight: bold;
-        }
-
-        .message {
-          padding: 10px;
-          margin-bottom: 15px;
-          background: #f6e9cc;
-          border-radius: 7px;
-        }
-
-        .back-btn {
-          margin-top: 15px;
-          padding: 10px 20px;
-          border: none;
-          border-radius: 7px;
-          background: #f8b945;
-          cursor: pointer;
-          font-weight: bold;
-        }
-      `}</style>
-
       <Sidebar />
 
       <div className="password-main">

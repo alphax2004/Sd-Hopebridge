@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import "./sidebar.css";
 
 const menuItems = [
   { path: "/dashboard", label: "Dashboard", icon: "fa-grip" },
@@ -8,50 +9,87 @@ const menuItems = [
   { path: "/profile", label: "Profile", icon: "fa-user" },
 ];
 
+/*
+  Chhoto shared store — Sidebar r Topbar alada component হলেও
+  ei state duijon share korte parbe, kono page file change na kore.
+*/
+let sidebarOpen = false;
+let listeners = [];
+
+function setSidebarOpenGlobal(value) {
+  sidebarOpen = value;
+  listeners.forEach((listener) => listener());
+}
+
+function subscribe(listener) {
+  listeners.push(listener);
+  return () => {
+    listeners = listeners.filter((l) => l !== listener);
+  };
+}
+
+function getSnapshot() {
+  return sidebarOpen;
+}
+
+function useSidebarOpen() {
+  return useSyncExternalStore(subscribe, getSnapshot);
+}
+
 export function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const isOpen = useSidebarOpen();
+
+  const closeSidebar = () => setSidebarOpenGlobal(false);
 
   return (
-    <aside className="sidebar">
-      <style>{sidebarCss}</style>
+    <>
+      <div
+        className={`sidebar-overlay ${isOpen ? "open" : ""}`}
+        onClick={closeSidebar}
+      ></div>
 
-      <div className="sidebar-logo">
-        <img src="/images/logo.png" alt="HopeBridge logo" />
+      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
+        <div className="sidebar-logo">
+          <img src="/images/logo.png" alt="HopeBridge logo" />
 
-        <div>
-          <div className="sidebar-title">HopeBridge</div>
-          <div className="sidebar-subtitle">Together We Save Lives</div>
+          <div>
+            <div className="sidebar-title">HopeBridge</div>
+            <div className="sidebar-subtitle">Together We Save Lives</div>
+          </div>
         </div>
-      </div>
 
-      <div className="sidebar-menu">
-        {menuItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `sidebar-item ${isActive ? "active" : ""}`
-            }
+        <div className="sidebar-menu">
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={closeSidebar}
+              className={({ isActive }) =>
+                `sidebar-item ${isActive ? "active" : ""}`
+              }
+            >
+              <i className={`fa-solid ${item.icon}`}></i>
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+
+          <div
+            className="sidebar-item logout"
+            onClick={() => {
+              closeSidebar();
+              navigate("/logout", {
+                state: { from: location.pathname },
+              });
+            }}
           >
-            <i className={`fa-solid ${item.icon}`}></i>
-            <span>{item.label}</span>
-          </NavLink>
-        ))}
-
-        <div
-          className="sidebar-item logout"
-          onClick={() =>
-            navigate("/logout", {
-              state: { from: location.pathname },
-            })
-          }
-        >
-          <i className="fa-solid fa-right-from-bracket"></i>
-          <span>Logout</span>
+            <i className="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }
 
@@ -62,7 +100,12 @@ export function Topbar({ title, subtitle }) {
 
   return (
     <div className="topbar">
-      <style>{topbarCss}</style>
+      <button
+        className="hamburger-btn"
+        onClick={() => setSidebarOpenGlobal(true)}
+      >
+        <i className="fa-solid fa-bars"></i>
+      </button>
 
       <div className="topbar-text">
         <h2>{title}</h2>
@@ -125,185 +168,3 @@ export function Topbar({ title, subtitle }) {
     </div>
   );
 }
-
-const sidebarCss = `
-.sidebar {
-  width: 250px;
-  min-width: 250px;
-  min-height: 100vh;
-  background: white;
-  border-right: 1px solid #eee;
-  padding: 22px 18px;
-  box-sizing: border-box;
-}
-
-.sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 8px;
-  margin-bottom: 22px;
-}
-
-.sidebar-logo img {
-  width: 42px;
-  height: 42px;
-  object-fit: contain;
-}
-
-.sidebar-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: black;
-  line-height: 1.1;
-  margin-top: 25px;
-}
-
-.sidebar-subtitle {
-  font-size: 11px;
-  font-weight: bold;
-  color: #555;
-  margin-top: 2px;
-}
-
-.sidebar-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.sidebar-item {
-  height: 43px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 14px;
-  border-radius: 9px;
-  font-size: 14px;
-  font-weight: bold;
-  color: black;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.sidebar-item i {
-  width: 18px;
-  text-align: center;
-}
-
-.sidebar-item:hover {
-  background: #f8b945;
-}
-
-.sidebar-item.active {
-  background: var(--primary-orange);
-}
-
-.sidebar-item.logout {
-  color: #e05555;
-  margin-top: 10px;
-}
-
-.sidebar-item.logout:hover {
-  background: #fde3e3;
-}
-`;
-
-const topbarCss = `
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 65px;
-  margin: 0;
-  padding: 0;
-  text-align: left;
-}
-
-.topbar-text {
-  margin: 0;
-  padding: 0;
-  text-align: left;
-}
-
-.topbar-text h2 {
-  margin: 0;
-  padding: 0;
-  text-align: left;
-  font-size: 25px;
-  font-weight: bold;
-  color: black;
-}
-
-.topbar-text p {
-  margin: 5px 0 0;
-  padding: 0;
-  text-align: left;
-  font-size: 14px;
-  font-weight: bold;
-  color: #555;
-}
-
-.profile-dropdown-wrapper {
-  position: relative;
-}
-
-.profile-section {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 14px;
-  font-weight: bold;
-  color: black;
-  cursor: pointer;
-}
-
-.profile-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #f1dca0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #d99e1f;
-}
-
-.profile-dropdown {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  width: 180px;
-  background: white;
-  border: 1px solid #eee;
-  border-radius: 9px;
-  padding: 5px 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
-  z-index: 1000;
-}
-
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 43px;
-  padding: 0 14px;
-  font-size: 14px;
-  font-weight: bold;
-  color: black;
-  cursor: pointer;
-}
-
-.dropdown-item i {
-  width: 18px;
-  text-align: center;
-}
-
-.dropdown-item:hover {
-  background: #f8b945;
-}
-
-.dropdown-logout {
-  color: #e05555;
-}
-`;
