@@ -1,95 +1,180 @@
-import { hashPassword } from "../utils/helpers.js";
 import User from "../model/user.js";
-import jwt from "jsonwebtoken";
 
-// Register
+import {
+  hashPassword,
+  comparePassword,
+} from "../utils/helpers.js";
+
 export const createUser = async (req, res) => {
-  const { fullName, email, password, bloodGroup } = req.body;
-
   try {
-    const otherUser = await User.findOne({
-      email: email?.toLowerCase(),
-    }).select(["email"]);
+    const {
+      fullName,
+      email,
+      password,
+      bloodGroup,
+      phone,
+      location,
+      role,
+    } = req.body;
 
-    if (otherUser) {
-      return res.status(400).json({ error: "Email already in use" });
+    if (
+      !fullName ||
+      !email ||
+      !password ||
+      !bloodGroup ||
+      !phone ||
+      !location ||
+      !role
+    ) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
     }
 
-    const hashedPassword = await hashPassword(password);
-
-    const newUser = new User({
-      fullName,
-      email: email?.toLowerCase(),
-      password: hashedPassword,
-      bloodGroup,
+    const existingUser = await User.findOne({
+      email: email.toLowerCase(),
     });
 
-    await newUser.save();
-    return res.status(201).json({ message: "New user added successfully" });
-  } catch (err) {
-    return res.status(400).json(err);
+    if (existingUser) {
+      return res.status(400).json({
+        message: "Email already exists",
+      });
+    }
+
+    const hashedPassword =
+      await hashPassword(password);
+
+    const user = await User.create({
+      fullName,
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      bloodGroup,
+      phone,
+      location,
+      role,
+      verified: false,
+    });
+
+    const {
+      password: pass,
+      ...userWithoutPassword
+    } = user.toObject();
+
+    return res.status(201).json(
+      userWithoutPassword
+    );
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Registration failed",
+    });
   }
 };
 
-// Logged-in user এর profile (cookie token থেকে)
 export const getProfile = async (req, res) => {
   try {
-    const { token } = req.cookies;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userInfo = await User.findById(decoded.id).select([
-      "-password",
-      "-__v",
-    ]);
-    return res.status(200).json(userInfo);
-  } catch (err) {
-    return res.status(400).json(err);
+    const user = await User.findById(req.user.id).select(
+      "-password -__v -verificationToken -verificationTokenExpires"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Failed to load profile",
+    });
   }
 };
 
 export const getAllUsers = async (req, res) => {
   try {
-    const allUsers = await User.find().select(["-password", "-__v"]);
-    return res.status(200).json(allUsers);
-  } catch (err) {
-    return res.status(400).json(err);
+    const users = await User.find().select(
+      "-password -__v -verificationToken -verificationTokenExpires"
+    );
+
+    return res.status(200).json(users);
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Failed to get users",
+    });
   }
 };
 
 export const updateUser = async (req, res) => {
-  const { fullName, email, password, bloodGroup, phone, location } = req.body;
-  const { id } = req.params;
-
   try {
-    if (email) {
-      const anotherUser = await User.findOne({ email: email.toLowerCase() })
-        .select("_id")
-        .lean();
-      if (anotherUser && anotherUser._id.toString() !== id) {
-        return res.status(400).json({ error: "Email already in use" });
-      }
+    const { id } = req.params;
+
+    const {
+      fullName,
+      bloodGroup,
+      phone,
+      location,
+    } = req.body;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
     }
 
-    const updateData = { fullName, email, bloodGroup, phone, location };
-    if (password) {
-      updateData.password = await hashPassword(password);
-    }
+    user.fullName = fullName;
+    user.bloodGroup = bloodGroup;
+    user.phone = phone;
+    user.location = location;
 
-    const updatedUser = await User.findOneAndUpdate({ _id: id }, updateData, {
-      new: true,
-    }).select(["-password", "-__v"]);
+    await user.save();
 
-    return res.status(200).json(updatedUser);
-  } catch (err) {
-    return res.status(400).json(err);
+    const {
+      password: pass,
+      ...userWithoutPassword
+    } = user.toObject();
+
+    return res.status(200).json(
+      userWithoutPassword
+    );
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Update failed",
+    });
   }
 };
 
 export const deleteUser = async (req, res) => {
-  const { id } = req.params;
   try {
-    await User.deleteOne({ _id: id });
-    return res.status(200).json({ message: "User deleted" });
-  } catch (err) {
-    return res.status(400).json(err);
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    await User.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Delete failed",
+    });
   }
 };
