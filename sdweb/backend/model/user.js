@@ -49,6 +49,16 @@ const userSchema = new Schema(
       default: false,
     },
 
+    verificationToken: {
+      type: Schema.Types.String,
+      default: "",
+    },
+
+    verificationTokenExpires: {
+      type: Date,
+      default: null,
+    },
+
     role: {
       type: Schema.Types.String,
       enum: ["user", "ngo", "admin"],

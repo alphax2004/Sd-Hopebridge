@@ -64,13 +64,23 @@ export default function Register() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || data.message || "Registration failed");
+        setError(
+          data.error ||
+            data.message ||
+            "Registration failed"
+        );
         return;
       }
 
-      navigate("/login");
-    } catch {
-      setError("Server এর সাথে যোগাযোগ করা যাচ্ছে না");
+      navigate(
+        `/verify-email?email=${encodeURIComponent(email)}`
+      );
+    } catch (error) {
+      console.log(error);
+
+      setError(
+        "Server এর সাথে যোগাযোগ করা যাচ্ছে না"
+      );
     } finally {
       setLoading(false);
     }
@@ -212,6 +222,7 @@ export default function Register() {
       `}</style>
 
       <div className="register-card">
+
         <div className="register-logo">
           <img
             src="/images/logo.png"
@@ -241,7 +252,9 @@ export default function Register() {
             type="text"
             placeholder=" Enter your full name"
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            onChange={(e) =>
+              setFullName(e.target.value)
+            }
           />
         </div>
 
@@ -252,7 +265,9 @@ export default function Register() {
 
           <select
             value={bloodGroup}
-            onChange={(e) => setBloodGroup(e.target.value)}
+            onChange={(e) =>
+              setBloodGroup(e.target.value)
+            }
           >
             <option value="" disabled>
               Select your blood group
@@ -276,11 +291,21 @@ export default function Register() {
 
           <select
             value={role}
-            onChange={(e) => setRole(e.target.value)}
+            onChange={(e) =>
+              setRole(e.target.value)
+            }
           >
-            <option value="user">User</option>
-            <option value="ngo">NGO</option>
-            <option value="admin">Admin</option>
+            <option value="user">
+              User
+            </option>
+
+            <option value="ngo">
+              NGO
+            </option>
+
+            <option value="admin">
+              Admin
+            </option>
           </select>
         </div>
 
@@ -293,7 +318,9 @@ export default function Register() {
             type="email"
             placeholder=" Enter your email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
           />
         </div>
 
@@ -306,7 +333,9 @@ export default function Register() {
             type="text"
             placeholder=" Enter your phone number"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) =>
+              setPhone(e.target.value)
+            }
           />
         </div>
 
@@ -319,7 +348,9 @@ export default function Register() {
             type="text"
             placeholder=" Enter your location"
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={(e) =>
+              setLocation(e.target.value)
+            }
           />
         </div>
 
@@ -332,7 +363,9 @@ export default function Register() {
             type="password"
             placeholder=" Enter your password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
           />
 
           <i className="fa-regular fa-eye"></i>
@@ -347,7 +380,9 @@ export default function Register() {
             type="password"
             placeholder=" Re-enter your password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) =>
+              setConfirmPassword(e.target.value)
+            }
           />
 
           <i className="fa-regular fa-eye"></i>
@@ -359,7 +394,9 @@ export default function Register() {
           onClick={handleRegister}
         >
           <i className="fa-solid fa-user-plus"></i>{" "}
-          {loading ? "Creating..." : "Register"}
+          {loading
+            ? "Creating..."
+            : "Register"}
         </button>
 
         <p className="login-text">
@@ -382,6 +419,7 @@ export default function Register() {
         >
           Back
         </button>
+
       </div>
     </div>
   );
