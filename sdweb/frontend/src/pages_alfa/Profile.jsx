@@ -11,7 +11,7 @@ export default function Profile() {
     bloodGroup: "",
     phone: "",
     location: "",
-    role: "user",
+    role: "",
     verified: false,
   });
 
@@ -44,7 +44,7 @@ export default function Profile() {
             bloodGroup: data.bloodGroup || "",
             phone: data.phone || "",
             location: data.location || "",
-            role: data.role || "user",
+            role: data.role || "",
             verified: data.verified || false,
           });
         }
