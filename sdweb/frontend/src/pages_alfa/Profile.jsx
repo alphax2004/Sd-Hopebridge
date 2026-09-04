@@ -10,6 +10,10 @@ export default function Profile() {
     fullName: "",
     email: "",
     bloodGroup: "",
+    phone: "",
+    location: "",
+    role: "user",
+    verified: false,
   });
 
   const [loading, setLoading] = useState(true);
@@ -41,6 +45,10 @@ export default function Profile() {
             fullName: data.fullName || "",
             email: data.email || "",
             bloodGroup: data.bloodGroup || "",
+            phone: data.phone || "",
+            location: data.location || "",
+            role: data.role || "user",
+            verified: data.verified || false,
           });
         }
       } catch (error) {
@@ -83,6 +91,8 @@ export default function Profile() {
           body: JSON.stringify({
             fullName: formData.fullName,
             bloodGroup: formData.bloodGroup,
+            phone: formData.phone,
+            location: formData.location,
           }),
         }
       );
@@ -170,6 +180,7 @@ export default function Profile() {
         />
 
         <div className="profile-card">
+
           {message && (
             <div className="message">
               {message}
@@ -177,6 +188,7 @@ export default function Profile() {
           )}
 
           <form onSubmit={handleUpdate}>
+
             <div className="form-group">
               <label>Full Name</label>
 
@@ -219,12 +231,61 @@ export default function Profile() {
               </select>
             </div>
 
+            <div className="form-group">
+              <label>Phone</label>
+
+              <input
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Location</label>
+
+              <input
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Role</label>
+
+              <input
+                value={
+                  formData.role === "ngo"
+                    ? "NGO"
+                    : formData.role === "admin"
+                    ? "Admin"
+                    : "User"
+                }
+                disabled
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Verification Status</label>
+
+              <input
+                value={
+                  formData.verified
+                    ? "Verified"
+                    : "Not Verified"
+                }
+                disabled
+              />
+            </div>
+
             <button
               className="update-btn"
               type="submit"
             >
               Update Profile
             </button>
+
           </form>
         </div>
       </div>

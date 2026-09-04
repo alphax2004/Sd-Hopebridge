@@ -9,9 +9,13 @@ export default function Register() {
 
   const [fullName, setFullName] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
+  const [role, setRole] = useState("user");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [location, setLocation] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +25,10 @@ export default function Register() {
     if (
       !fullName ||
       !bloodGroup ||
+      !role ||
       !email ||
+      !phone ||
+      !location ||
       !password ||
       !confirmPassword
     ) {
@@ -48,24 +55,22 @@ export default function Register() {
           email,
           password,
           bloodGroup,
+          phone,
+          location,
+          role,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(
-          data.error || "Registration failed"
-        );
+        setError(data.error || data.message || "Registration failed");
         return;
       }
 
-      // Registration successful
       navigate("/login");
     } catch {
-      setError(
-        "Server এর সাথে যোগাযোগ করা যাচ্ছে না"
-      );
+      setError("Server এর সাথে যোগাযোগ করা যাচ্ছে না");
     } finally {
       setLoading(false);
     }
@@ -236,9 +241,7 @@ export default function Register() {
             type="text"
             placeholder=" Enter your full name"
             value={fullName}
-            onChange={(e) =>
-              setFullName(e.target.value)
-            }
+            onChange={(e) => setFullName(e.target.value)}
           />
         </div>
 
@@ -249,9 +252,7 @@ export default function Register() {
 
           <select
             value={bloodGroup}
-            onChange={(e) =>
-              setBloodGroup(e.target.value)
-            }
+            onChange={(e) => setBloodGroup(e.target.value)}
           >
             <option value="" disabled>
               Select your blood group
@@ -268,6 +269,21 @@ export default function Register() {
           </select>
         </div>
 
+        <label>Role</label>
+
+        <div className="input-box">
+          <i className="fa-solid fa-user-tag"></i>
+
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="user">User</option>
+            <option value="ngo">NGO</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
         <label>Email Address</label>
 
         <div className="input-box">
@@ -277,9 +293,33 @@ export default function Register() {
             type="email"
             placeholder=" Enter your email"
             value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <label>Phone</label>
+
+        <div className="input-box">
+          <i className="fa-solid fa-phone"></i>
+
+          <input
+            type="text"
+            placeholder=" Enter your phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </div>
+
+        <label>Location</label>
+
+        <div className="input-box">
+          <i className="fa-solid fa-location-dot"></i>
+
+          <input
+            type="text"
+            placeholder=" Enter your location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
           />
         </div>
 
@@ -292,9 +332,7 @@ export default function Register() {
             type="password"
             placeholder=" Enter your password"
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => setPassword(e.target.value)}
           />
 
           <i className="fa-regular fa-eye"></i>
@@ -309,9 +347,7 @@ export default function Register() {
             type="password"
             placeholder=" Re-enter your password"
             value={confirmPassword}
-            onChange={(e) =>
-              setConfirmPassword(e.target.value)
-            }
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
 
           <i className="fa-regular fa-eye"></i>
