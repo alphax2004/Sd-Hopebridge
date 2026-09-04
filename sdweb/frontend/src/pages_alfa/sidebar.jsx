@@ -13,7 +13,7 @@ export function Sidebar() {
   const location = useLocation();
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar"> 
       <style>{sidebarCss}</style>
 
       <div className="sidebar-logo">

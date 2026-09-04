@@ -1,0 +1,150 @@
+.verification-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image:
+    linear-gradient(
+      rgba(251, 243, 227, 0.6),
+      rgba(251, 243, 227, 0.6)
+    ),
+    url("/images/flood.jpeg");
+  background-size: cover;
+  padding: 40px 20px;
+}
+
+.verification-card {
+  width: 100%;
+  max-width: 680px;
+  padding: 60px 80px;
+  background: #edd7ab;
+  border-radius: 30px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.verification-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.verification-logo img {
+  width: 28px;
+  height: 28px;
+}
+
+.verification-card h1 {
+  font-size: 36px;
+  line-height: 1.2;
+  margin: 15px 0;
+}
+
+.verification-card .subtitle {
+  margin-bottom: 20px;
+}
+
+.email-box {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 2px solid orange;
+  border-radius: 10px;
+  background: rgb(255, 255, 255);
+}
+
+.email-box i {
+  margin-right: 10px;
+}
+
+.email-box span {
+  flex: 1;
+  font-weight: bold;
+}
+
+.verification-message {
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 2px solid orange;
+  border-radius: 10px;
+  background: rgb(255, 255, 255);
+  font-weight: bold;
+}
+
+.verification-btn {
+  width: 350px;
+  margin: 5px auto 0;
+  padding: 14px;
+  background: var(--primary-orange);
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.verification-btn:disabled {
+  opacity: 0.6;
+}
+
+.verification-btn:hover {
+  background: rgb(255, 255, 255);
+  border: 2px solid orange;
+}
+
+.back-btn {
+  margin-top: 20px;
+  padding: 9px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  background: var(--primary-orange);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.back-btn:hover {
+  background: rgb(255, 255, 255);
+  border: 2px solid orange;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+  .verification-wrapper {
+    padding: 20px 12px;
+  }
+
+  .verification-card {
+    padding: 40px 24px;
+    border-radius: 20px;
+  }
+
+  .verification-card h1 {
+    font-size: 26px;
+  }
+
+  .verification-btn {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .verification-card {
+    padding: 30px 18px;
+  }
+
+  .verification-card h1 {
+    font-size: 22px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+}
