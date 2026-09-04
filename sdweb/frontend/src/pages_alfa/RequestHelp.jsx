@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sidebar, Topbar } from "./sidebar";
-
+import"./RequestHelp.css";
 const helpTypes = [
   { key: "Food", icon: "fa-bowl-food" },
   { key: "Shelter", icon: "fa-house" },
@@ -56,7 +56,7 @@ export default function RequestHelp() {
 
   return (
     <div className="request-help-layout">
-      <style>{css}</style>
+      
 
       <Sidebar current="requestHelp" />
 
