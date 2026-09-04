@@ -6,6 +6,7 @@ import Register from "./pages_alfa/register";
 import Dashboard from "./pages_alfa/dashboard";
 import RequestHelp from "./pages_alfa/RequestHelp";
 import Profile from "./pages_alfa/Profile";
+import Password from "./pages_alfa/Password";
 import DisasterCenter from "./pages_alfa/DisasterCenter";
 import Logout from "./pages_alfa/logout";
 
@@ -67,16 +68,28 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<LandingPage />} />
+
         <Route path="/login" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
+
         <Route path="/dashboard" element={<Dashboard />} />
+
         <Route path="/request-help" element={<RequestHelp />} />
-        <Route path="/disaster-center" element={<DisasterCenter />} />
+
+        <Route
+          path="/disaster-center"
+          element={<DisasterCenter />}
+        />
+
         <Route path="/profile" element={<Profile />} />
+
+        <Route path="/password" element={<Password />} />
+
         <Route path="/logout" element={<Logout />} />
+
         <Route path="*" element={<LandingPage />} />
       </Routes>
     </div>
   );
 }
-
