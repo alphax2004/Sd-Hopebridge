@@ -1,4 +1,5 @@
 import { Sidebar, Topbar } from "./sidebar";
+import"./dashboard.css";
 
 const stats = [
   ["fa-clipboard-list", "Total Requests", 12, "All time requests"],
@@ -24,7 +25,7 @@ const requests = [
 export default function Dashboard() {
   return (
     <div className="dashboard-layout">
-      <style>{css}</style>
+      
 
       <Sidebar />
 
@@ -104,162 +105,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-const css = `
-.dashboard-layout {
-  display: flex;
-  min-height: 100vh;
-  background: var(--cream-bg);
-}
-
-.main-content {
-  flex: 1;
-  padding: 24px 35px;
-}
-
-.stat-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.stat-card {
-  background: #fdf1e3;
-  border-radius: 14px;
-  padding: 10px 14px;
-  text-align: left;
-}
-
-.stat-card-top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.stat-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  background: var(--primary-orange);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.stat-label {
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.stat-value {
-  margin: 6px 0 2px 46px;
-  font-size: 24px;
-  font-weight: bold;
-  color: black;
-  text-align: left;
-}
-
-.stat-note {
-  margin-left: 46px;
-  font-size: 12px;
-  font-weight: bold;
-  color: #555;
-  text-align: left;
-}
-
-.chart-card,
-.table-card {
-  background: white;
-  border: 1px solid #eee3d0;
-  border-radius: 14px;
-  padding: 12px;
-  margin-bottom: 14px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.card-header h3 {
-  margin: 0;
-  font-size: 17px;
-  font-weight: bold;
-}
-
-.action-btn {
-  background: var(--primary-orange);
-  border: none;
-  border-radius: 7px;
-  padding: 7px 15px;
-  font-weight: bold;
-}
-
-.action-btn:hover {
-  background: white;
-  border: 2px solid var(--primary-orange);
-}
-
-.bar-chart {
-  height: 150px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: 0 25px;
-}
-
-.bar-col {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.bar {
-  width: 70px;
-  background: var(--primary-orange);
-  border-radius: 5px 5px 0 0;
-}
-
-.bar-col span {
-  margin-top: 7px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-table {
-  width: 100%;
-}
-
-th,
-td {
-  text-align: left;
-  padding: 8px;
-  border-bottom: 1px solid #eee;
-}
-
-th,
-td {
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.status {
-  padding: 5px 9px;
-  border-radius: 20px;
-}
-
-.Pending {
-  color: #f0a63a;
-  background: #f0a63a22;
-}
-
-.Approved {
-  color: #4caf7d;
-  background: #4caf7d22;
-}
-`;
