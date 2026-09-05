@@ -17,7 +17,7 @@ export default function Login() {
     setError("");
 
     if (!email || !password) {
-      setError("Email এবং Password দিন");
+      setError("Email and Password are required");
       return;
     }
 
@@ -46,7 +46,7 @@ export default function Login() {
       // Login successful
       navigate("/dashboard");
     } catch {
-      setError("Server এর সাথে যোগাযোগ করা যাচ্ছে না");
+      setError("Server could not be reached. Please try again later.");
     } finally {
       setLoading(false);
     }
