@@ -1,67 +1,99 @@
 import { useEffect, useState } from "react";
-import { Sidebar, Topbar } from "./sidebar";
+import {
+  Sidebar,
+  Topbar,
+} from "./sidebar";
 import "./Profile.css";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:4000";
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:4000";
 
 export default function Profile() {
-  const [formData, setFormData] = useState({
-    id: "",
-    fullName: "",
-    email: "",
-    bloodGroup: "",
-    phone: "",
-    location: "",
-    role: "",
-    verified: false,
-  });
+  const [formData, setFormData] =
+    useState({
+      id: "",
+      fullName: "",
+      email: "",
+      bloodGroup: "",
+      phone: "",
+      location: "",
+      role: "",
+      verified: false,
+    });
 
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] =
+    useState(true);
+
+  const [message, setMessage] =
+    useState("");
 
   useEffect(() => {
     let cancelled = false;
 
-    const loadProfile = async () => {
-      try {
-        const response = await fetch(
-          `${API_URL}/api/users/profile`,
-          {
-            credentials: "include",
+    const loadProfile =
+      async () => {
+        try {
+          const response =
+            await fetch(
+              `${API_URL}/api/users/profile`,
+              {
+                credentials:
+                  "include",
+              }
+            );
+
+          const data =
+            await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.message ||
+              "Failed to load profile"
+            );
           }
-        );
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            data.message || "Failed to load profile"
-          );
+          if (!cancelled) {
+            setFormData({
+              id:
+                data._id ||
+                data.id ||
+                "",
+              fullName:
+                data.fullName ||
+                "",
+              email:
+                data.email ||
+                "",
+              bloodGroup:
+                data.bloodGroup ||
+                "",
+              phone:
+                data.phone ||
+                "",
+              location:
+                data.location ||
+                "",
+              role:
+                data.role ||
+                "",
+              verified:
+                data.verified ||
+                false,
+            });
+          }
+        } catch (error) {
+          if (!cancelled) {
+            setMessage(
+              error.message
+            );
+          }
+        } finally {
+          if (!cancelled) {
+            setLoading(false);
+          }
         }
-
-        if (!cancelled) {
-          setFormData({
-            id: data._id || data.id || "",
-            fullName: data.fullName || "",
-            email: data.email || "",
-            bloodGroup: data.bloodGroup || "",
-            phone: data.phone || "",
-            location: data.location || "",
-            role: data.role || "",
-            verified: data.verified || false,
-          });
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setMessage(error.message);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
+      };
 
     loadProfile();
 
@@ -70,50 +102,108 @@ export default function Profile() {
     };
   }, []);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const handleChange =
+    (e) => {
+      setFormData({
+        ...formData,
+        [e.target.name]:
+          e.target.value,
+      });
+    };
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
+  const handleUpdate =
+    async (e) => {
+      e.preventDefault();
 
-    try {
-      const response = await fetch(
-        `${API_URL}/api/users/${formData.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            fullName: formData.fullName,
-            bloodGroup: formData.bloodGroup,
-            phone: formData.phone,
-            location: formData.location,
-          }),
+      setMessage("");
+
+      try {
+        const response =
+          await fetch(
+            `${API_URL}/api/users/${formData.id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+              credentials:
+                "include",
+              body: JSON.stringify({
+                fullName:
+                  formData.fullName,
+                email:
+                  formData.email,
+                bloodGroup:
+                  formData.bloodGroup,
+                phone:
+                  formData.phone,
+                location:
+                  formData.location,
+              }),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            "Update failed"
+          );
         }
-      );
 
-      const data = await response.json();
+        if (data.user) {
+          setFormData({
+            id:
+              data.user._id ||
+              data.user.id ||
+              formData.id,
+            fullName:
+              data.user.fullName ||
+              "",
+            email:
+              data.user.email ||
+              "",
+            bloodGroup:
+              data.user.bloodGroup ||
+              "",
+            phone:
+              data.user.phone ||
+              "",
+            location:
+              data.user.location ||
+              "",
+            role:
+              data.user.role ||
+              "",
+            verified:
+              data.user.verified ||
+              false,
+          });
+        }
 
-      if (!response.ok) {
-        throw new Error(
-          data.message || "Update failed"
+        setMessage(
+          data.message ||
+          "Profile updated successfully."
+        );
+      } catch (error) {
+        console.log(error);
+
+        setMessage(
+          error.message ||
+          "Update failed"
         );
       }
-
-      setMessage("Profile updated successfully.");
-    } catch (error) {
-      setMessage(error.message);
-    }
-  };
+    };
 
   if (loading) {
-    return <div>Loading profile...</div>;
+    return (
+      <div>
+        Loading profile...
+      </div>
+    );
   }
 
   return (
@@ -134,78 +224,137 @@ export default function Profile() {
             </div>
           )}
 
-          <form onSubmit={handleUpdate}>
-
+          <form
+            onSubmit={handleUpdate}
+          >
             <div className="form-group">
-              <label>Full Name</label>
+              <label>
+                Full Name
+              </label>
 
               <input
                 name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
+                value={
+                  formData.fullName
+                }
+                onChange={
+                  handleChange
+                }
               />
             </div>
 
             <div className="form-group">
-              <label>Email</label>
+              <label>
+                Email
+              </label>
 
               <input
-                value={formData.email}
-                disabled
+                name="email"
+                type="email"
+                value={
+                  formData.email
+                }
+                onChange={
+                  handleChange
+                }
               />
             </div>
 
             <div className="form-group">
-              <label>Blood Group</label>
+              <label>
+                Blood Group
+              </label>
 
               <select
                 name="bloodGroup"
-                value={formData.bloodGroup}
-                onChange={handleChange}
+                value={
+                  formData.bloodGroup
+                }
+                onChange={
+                  handleChange
+                }
               >
                 <option value="">
                   Select Blood Group
                 </option>
 
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
+                <option value="A+">
+                  A+
+                </option>
+
+                <option value="A-">
+                  A-
+                </option>
+
+                <option value="B+">
+                  B+
+                </option>
+
+                <option value="B-">
+                  B-
+                </option>
+
+                <option value="AB+">
+                  AB+
+                </option>
+
+                <option value="AB-">
+                  AB-
+                </option>
+
+                <option value="O+">
+                  O+
+                </option>
+
+                <option value="O-">
+                  O-
+                </option>
               </select>
             </div>
 
             <div className="form-group">
-              <label>Phone</label>
+              <label>
+                Phone
+              </label>
 
               <input
                 name="phone"
-                value={formData.phone}
-                onChange={handleChange}
+                value={
+                  formData.phone
+                }
+                onChange={
+                  handleChange
+                }
               />
             </div>
 
             <div className="form-group">
-              <label>Location</label>
+              <label>
+                Location
+              </label>
 
               <input
                 name="location"
-                value={formData.location}
-                onChange={handleChange}
+                value={
+                  formData.location
+                }
+                onChange={
+                  handleChange
+                }
               />
             </div>
 
             <div className="form-group">
-              <label>Role</label>
+              <label>
+                Role
+              </label>
 
               <input
                 value={
                   formData.role === "ngo"
                     ? "NGO"
-                    : formData.role === "admin"
+                    : formData.role ===
+                      "admin"
                     ? "Admin"
                     : "User"
                 }
@@ -214,7 +363,9 @@ export default function Profile() {
             </div>
 
             <div className="form-group">
-              <label>Verification Status</label>
+              <label>
+                Verification Status
+              </label>
 
               <input
                 value={
@@ -232,7 +383,6 @@ export default function Profile() {
             >
               Update Profile
             </button>
-
           </form>
         </div>
       </div>

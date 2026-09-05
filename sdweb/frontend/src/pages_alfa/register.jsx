@@ -3,64 +3,114 @@ import { useNavigate } from "react-router-dom";
 import "./Register.css";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:4000";
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:4000";
 
 export default function Register() {
   const navigate = useNavigate();
 
   const [fullName, setFullName] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
-  const [role, setRole] = useState("user");
+  const [role, setRole] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleRegister = async () => {
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
     setError("");
 
+    const actualFullName =
+      document.querySelector(
+        'input[name="fullName"]'
+      )?.value?.trim() || "";
+
+    const actualBloodGroup =
+      document.querySelector(
+        'select[name="bloodGroup"]'
+      )?.value || "";
+
+    const actualRole =
+      document.querySelector(
+        'select[name="role"]'
+      )?.value || "";
+
+    const actualEmail =
+      document.querySelector(
+        'input[name="email"]'
+      )?.value?.trim() || "";
+
+    const actualPhone =
+      document.querySelector(
+        'input[name="phone"]'
+      )?.value?.trim() || "";
+
+    const actualLocation =
+      document.querySelector(
+        'input[name="location"]'
+      )?.value?.trim() || "";
+
+    const actualPassword =
+      document.querySelector(
+        'input[name="password"]'
+      )?.value || "";
+
+    const actualConfirmPassword =
+      document.querySelector(
+        'input[name="confirmPassword"]'
+      )?.value || "";
+
     if (
-      !fullName ||
-      !bloodGroup ||
-      !role ||
-      !email ||
-      !phone ||
-      !location ||
-      !password ||
-      !confirmPassword
+      !actualFullName ||
+      !actualBloodGroup ||
+      !actualRole ||
+      !actualEmail ||
+      !actualPhone ||
+      !actualLocation ||
+      !actualPassword ||
+      !actualConfirmPassword
     ) {
-      setError("সব ঘর পূরণ করুন");
+      setError("Fill all the required fields");
       return;
     }
 
-    if (password !== confirmPassword) {
-      setError("Password মিলছে না");
+    if (
+      actualPassword !==
+      actualConfirmPassword
+    ) {
+      setError("Passwords do not match");
       return;
     }
 
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/users`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          fullName,
-          email,
-          password,
-          bloodGroup,
-          phone,
-          location,
-          role,
-        }),
-      });
+      const res = await fetch(
+        `${API_URL}/api/users`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            fullName: actualFullName,
+            email: actualEmail.toLowerCase(),
+            password: actualPassword,
+            bloodGroup: actualBloodGroup,
+            phone: actualPhone,
+            location: actualLocation,
+            role: actualRole,
+          }),
+        }
+      );
 
       const data = await res.json();
 
@@ -74,13 +124,15 @@ export default function Register() {
       }
 
       navigate(
-        `/verify-email?email=${encodeURIComponent(email)}`
+        `/verify-email?email=${encodeURIComponent(
+          actualEmail.toLowerCase()
+        )}`
       );
     } catch (error) {
       console.log(error);
 
       setError(
-        "Server এর সাথে যোগাযোগ করা যাচ্ছে না"
+        "Failed to connect with the server"
       );
     } finally {
       setLoading(false);
@@ -118,11 +170,13 @@ export default function Register() {
 
           <input
             type="text"
+            name="fullName"
             placeholder=" Enter your full name"
             value={fullName}
             onChange={(e) =>
               setFullName(e.target.value)
             }
+            autoComplete="off"
           />
         </div>
 
@@ -132,10 +186,12 @@ export default function Register() {
           <i className="fa-solid fa-droplet"></i>
 
           <select
+            name="bloodGroup"
             value={bloodGroup}
             onChange={(e) =>
               setBloodGroup(e.target.value)
             }
+            autoComplete="off"
           >
             <option value="" disabled>
               Select your blood group
@@ -158,22 +214,20 @@ export default function Register() {
           <i className="fa-solid fa-user-tag"></i>
 
           <select
+            name="role"
             value={role}
             onChange={(e) =>
               setRole(e.target.value)
             }
+            autoComplete="off"
           >
-            <option value="user">
-              User
+            <option value="" disabled>
+              Select your role
             </option>
 
-            <option value="ngo">
-              NGO
-            </option>
-
-            <option value="admin">
-              Admin
-            </option>
+            <option value="user">User</option>
+            <option value="ngo">NGO</option>
+            <option value="admin">Admin</option>
           </select>
         </div>
 
@@ -184,11 +238,15 @@ export default function Register() {
 
           <input
             type="email"
+            name="email"
             placeholder=" Enter your email"
             value={email}
             onChange={(e) =>
               setEmail(e.target.value)
             }
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck="false"
           />
         </div>
 
@@ -199,11 +257,13 @@ export default function Register() {
 
           <input
             type="text"
+            name="phone"
             placeholder=" Enter your phone number"
             value={phone}
             onChange={(e) =>
               setPhone(e.target.value)
             }
+            autoComplete="off"
           />
         </div>
 
@@ -214,11 +274,13 @@ export default function Register() {
 
           <input
             type="text"
+            name="location"
             placeholder=" Enter your location"
             value={location}
             onChange={(e) =>
               setLocation(e.target.value)
             }
+            autoComplete="off"
           />
         </div>
 
@@ -229,11 +291,13 @@ export default function Register() {
 
           <input
             type="password"
+            name="password"
             placeholder=" Enter your password"
             value={password}
             onChange={(e) =>
               setPassword(e.target.value)
             }
+            autoComplete="new-password"
           />
 
           <i className="fa-regular fa-eye"></i>
@@ -246,11 +310,13 @@ export default function Register() {
 
           <input
             type="password"
+            name="confirmPassword"
             placeholder=" Re-enter your password"
             value={confirmPassword}
             onChange={(e) =>
               setConfirmPassword(e.target.value)
             }
+            autoComplete="new-password"
           />
 
           <i className="fa-regular fa-eye"></i>

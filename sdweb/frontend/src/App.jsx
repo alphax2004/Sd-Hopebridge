@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "./pages_alfa/landingpage";
 import Login from "./pages_alfa/login";
 import Register from "./pages_alfa/register";
+import EmailVerification from "./pages_alfa/EmailVerification";
 import Dashboard from "./pages_alfa/dashboard";
 import RequestHelp from "./pages_alfa/RequestHelp";
 import Profile from "./pages_alfa/Profile";
@@ -67,28 +68,60 @@ export default function App() {
       `}</style>
 
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/"
+          element={<LandingPage />}
+        />
 
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/verify-email"
+          element={<EmailVerification />}
+        />
 
-        <Route path="/request-help" element={<RequestHelp />} />
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+        <Route
+          path="/request-help"
+          element={<RequestHelp />}
+        />
 
         <Route
           path="/disaster-center"
           element={<DisasterCenter />}
         />
 
-        <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/profile"
+          element={<Profile />}
+        />
 
-        <Route path="/password" element={<Password />} />
+        <Route
+          path="/password"
+          element={<Password />}
+        />
 
-        <Route path="/logout" element={<Logout />} />
+        <Route
+          path="/logout"
+          element={<Logout />}
+        />
 
-        <Route path="*" element={<LandingPage />} />
+        <Route
+          path="*"
+          element={<LandingPage />}
+        />
       </Routes>
     </div>
   );
