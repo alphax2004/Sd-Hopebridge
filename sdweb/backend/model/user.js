@@ -3,24 +3,26 @@ import { Schema, model } from "mongoose";
 const userSchema = new Schema(
   {
     fullName: {
-      type: Schema.Types.String,
+      type: String,
       required: true,
+      trim: true,
     },
 
     email: {
-      type: Schema.Types.String,
+      type: String,
       required: true,
       unique: true,
       lowercase: true,
+      trim: true,
     },
 
     password: {
-      type: Schema.Types.String,
+      type: String,
       required: true,
     },
 
     bloodGroup: {
-      type: Schema.Types.String,
+      type: String,
       enum: [
         "A+",
         "A-",
@@ -35,22 +37,24 @@ const userSchema = new Schema(
     },
 
     phone: {
-      type: Schema.Types.String,
+      type: String,
       default: "",
+      trim: true,
     },
 
     location: {
-      type: Schema.Types.String,
+      type: String,
       default: "",
+      trim: true,
     },
 
     verified: {
-      type: Schema.Types.Boolean,
+      type: Boolean,
       default: false,
     },
 
     verificationToken: {
-      type: Schema.Types.String,
+      type: String,
       default: "",
     },
 
@@ -60,7 +64,7 @@ const userSchema = new Schema(
     },
 
     role: {
-      type: Schema.Types.String,
+      type: String,
       enum: ["user", "ngo", "admin"],
       default: "user",
     },

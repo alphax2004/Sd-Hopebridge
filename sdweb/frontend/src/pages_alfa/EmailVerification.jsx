@@ -1,5 +1,11 @@
-import { useEffect, useState } from "react";
-import"./EmailVerification.css";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import "./EmailVerification.css";
+
 import {
   useNavigate,
   useSearchParams,
@@ -12,97 +18,147 @@ const API_URL =
 export default function EmailVerification() {
   const navigate = useNavigate();
 
-  const [searchParams] = useSearchParams();
+  const [searchParams] =
+    useSearchParams();
 
-  const email = searchParams.get("email");
-  const token = searchParams.get("token");
+  const email =
+    searchParams.get("email");
 
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [verified, setVerified] = useState(false);
+  const token =
+    searchParams.get("token");
 
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
+  const [message, setMessage] =
+    useState("");
 
-    const verifyEmail = async () => {
+  const [loading, setLoading] =
+    useState(false);
+
+  const [verified, setVerified] =
+    useState(false);
+
+  const verificationStarted =
+    useRef(false);
+
+  const emailSentAutomatically =
+    useRef(false);
+
+  const sendVerificationLink =
+    async (automatic = false) => {
+      if (!email) {
+        setMessage("Email not found");
+        return;
+      }
+
       setLoading(true);
 
-      try {
-        const response = await fetch(
-          `${API_URL}/api/users/verify-email?token=${encodeURIComponent(
-            token
-          )}`
-        );
+      if (!automatic) {
+        setMessage("");
+      }
 
-        const data = await response.json();
+      try {
+        const response =
+          await fetch(
+            `${API_URL}/api/users/send-verification`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+              body: JSON.stringify({
+                email:
+                  email.trim().toLowerCase(),
+              }),
+            }
+          );
+
+        const data =
+          await response.json();
 
         if (!response.ok) {
           throw new Error(
             data.message ||
-              "Email verification failed"
+              data.error ||
+              "Failed to send verification email"
           );
         }
 
-        setVerified(true);
-
         setMessage(
-          "Verification Completed"
+          "Verification link sent to your email."
         );
       } catch (error) {
-        setMessage(error.message);
+        console.log(error);
+
+        setMessage(
+          error.message ||
+            "Failed to send verification email"
+        );
       } finally {
         setLoading(false);
       }
     };
 
-    verifyEmail();
-  }, [token]);
+  useEffect(() => {
+    if (token) {
+      if (verificationStarted.current) {
+        return;
+      }
 
-  const sendVerificationLink = async () => {
-    if (!email) {
-      setMessage("Email not found");
+      verificationStarted.current = true;
+
+      const verifyEmail = async () => {
+        setLoading(true);
+
+        try {
+          const response =
+            await fetch(
+              `${API_URL}/api/users/verify-email?token=${encodeURIComponent(
+                token
+              )}`
+            );
+
+          const data =
+            await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.message ||
+                data.error ||
+                "Email verification failed"
+            );
+          }
+
+          setVerified(true);
+
+          setMessage(
+            "Verification Completed"
+          );
+        } catch (error) {
+          console.log(error);
+
+          setMessage(
+            error.message ||
+              "Email verification failed"
+          );
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      verifyEmail();
+
       return;
     }
 
-    setLoading(true);
-    setMessage("");
+    if (
+      email &&
+      !emailSentAutomatically.current
+    ) {
+      emailSentAutomatically.current = true;
 
-    try {
-      const response = await fetch(
-        `${API_URL}/api/users/send-verification`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            email,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message ||
-            "Failed to send verification email"
-        );
-      }
-
-      setMessage(
-        "Verification link sent to your email."
-      );
-    } catch (error) {
-      setMessage(error.message);
-    } finally {
-      setLoading(false);
+      sendVerificationLink(true);
     }
-  };
+  }, [token, email]);
 
   return (
     <div className="verification-wrapper">
@@ -171,8 +227,8 @@ export default function EmailVerification() {
 
             <button
               className="verification-btn"
-              onClick={
-                sendVerificationLink
+              onClick={() =>
+                sendVerificationLink(false)
               }
               disabled={loading}
             >

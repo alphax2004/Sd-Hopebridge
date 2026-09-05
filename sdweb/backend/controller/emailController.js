@@ -1,14 +1,8 @@
 import crypto from "crypto";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import User from "../model/user.js";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendVerificationEmail = async (req, res) => {
   try {
@@ -21,7 +15,7 @@ export const sendVerificationEmail = async (req, res) => {
     }
 
     const user = await User.findOne({
-      email: email.toLowerCase(),
+      email: email.toLowerCase().trim(),
     });
 
     if (!user) {
@@ -39,14 +33,17 @@ export const sendVerificationEmail = async (req, res) => {
     const token = crypto.randomBytes(32).toString("hex");
 
     user.verificationToken = token;
-    user.verificationTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
+    user.verificationTokenExpires = new Date(
+      Date.now() + 15 * 60 * 1000
+    );
 
     await user.save();
 
-    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+    const verificationLink =
+      `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+    const { data, error } = await resend.emails.send({
+      from: "HopeBridge <onboarding@resend.dev>",
       to: user.email,
       subject: "HopeBridge Email Verification",
       html: `
@@ -57,8 +54,15 @@ export const sendVerificationEmail = async (req, res) => {
           padding: 30px;
         ">
           <h2>HopeBridge Email Verification</h2>
-          <p>You need to verify your email first to get started.</p>
-          <p>Click the button below to verify your email.</p>
+
+          <p>
+            You need to verify your email first to get started.
+          </p>
+
+          <p>
+            Click the button below to verify your email.
+          </p>
+
           <a
             href="${verificationLink}"
             style="
@@ -73,16 +77,30 @@ export const sendVerificationEmail = async (req, res) => {
           >
             Verify Email
           </a>
-          <p>This verification link will expire in 15 minutes.</p>
+
+          <p>
+            This verification link will expire in 15 minutes.
+          </p>
         </div>
       `,
     });
+
+    if (error) {
+      console.log("RESEND ERROR:", error);
+
+      return res.status(500).json({
+        message: "Failed to send verification email",
+      });
+    }
+
+    console.log("Verification email sent:", data);
 
     return res.status(200).json({
       message: "Verification email sent successfully",
     });
   } catch (error) {
-    console.log(error);
+    console.log("EMAIL ERROR:", error);
+
     return res.status(500).json({
       message: "Failed to send verification email",
     });
@@ -128,7 +146,8 @@ export const verifyEmail = async (req, res) => {
       message: "Email verified successfully",
     });
   } catch (error) {
-    console.log(error);
+    console.log("VERIFY ERROR:", error);
+
     return res.status(500).json({
       message: "Email verification failed",
     });
