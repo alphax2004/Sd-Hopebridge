@@ -10,6 +10,7 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -106,7 +107,16 @@ export default function Login() {
             }
           />
 
-          <i className="fa-regular fa-eye"></i>
+          
+  <i
+    className={
+      showPassword
+        ? "fa-regular fa-eye-slash"
+        : "fa-regular fa-eye"
+    }
+    onClick={() => setShowPassword(!showPassword)}
+    style={{ cursor: "pointer" }}
+  ></i>
         </div>
 
         <div className="options">
