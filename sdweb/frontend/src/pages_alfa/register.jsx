@@ -18,7 +18,8 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] =
     useState("");
-
+const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -300,7 +301,16 @@ export default function Register() {
             autoComplete="new-password"
           />
 
-          <i className="fa-regular fa-eye"></i>
+          
+  <i
+    className={
+      showPassword
+        ? "fa-regular fa-eye-slash"
+        : "fa-regular fa-eye"
+    }
+    onClick={() => setShowPassword(!showPassword)}
+    style={{ cursor: "pointer" }}
+  ></i>
         </div>
 
         <label>Confirm Password</label>
@@ -319,7 +329,16 @@ export default function Register() {
             autoComplete="new-password"
           />
 
-          <i className="fa-regular fa-eye"></i>
+          
+  <i
+    className={
+      showConfirmPassword
+        ? "fa-regular fa-eye-slash"
+        : "fa-regular fa-eye"
+    }
+    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+    style={{ cursor: "pointer" }}
+  ></i>
         </div>
 
         <button
