@@ -1,444 +1,305 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Sidebar, Topbar } from "../pages_alfa/sidebar";
 import "./admin.css";
 
 const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:4000";
+  import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export default function AdminDashboard() {
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [requests, setRequests] =
-    useState([]);
+  // =====================================================
+  // LOAD REQUESTS FROM BACKEND
+  // =====================================================
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [actionLoading, setActionLoading] =
-    useState("");
-
-  const [error, setError] =
-    useState("");
-
-
-  // ==========================================
-  // LOAD REQUESTS
-  // ==========================================
-
-  async function loadRequests() {
+  const loadRequests = useCallback(async () => {
     try {
       setError("");
 
-      const response = await fetch(
-        `${API_URL}/api/requests`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/api/requests`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-
-      const contentType =
-        response.headers.get(
-          "content-type"
-        );
-
-      let data = null;
-
-      if (
-        contentType &&
-        contentType.includes(
-          "application/json"
-        )
-      ) {
-        data = await response.json();
-      }
-
-
-      // ========================================
-      // BACKEND ERROR
-      // ========================================
+      const data = await response.json();
 
       if (!response.ok) {
-
-        if (response.status === 401) {
-          setError(
-            "Your session has expired. Please login again."
-          );
-        } else if (
-          response.status === 403
-        ) {
-          setError(
-            "Admin access required."
-          );
-        } else {
-          setError(
-            data?.error ||
-            data?.message ||
-            "Failed to load requests"
-          );
-        }
-
-        setRequests([]);
-
-        return;
-      }
-
-
-      // ========================================
-      // CHECK DATA
-      // ========================================
-
-      if (!Array.isArray(data)) {
-        setError(
-          "Invalid request data received from server."
+        throw new Error(
+          data.message || "Failed to load victim requests"
         );
-
-        setRequests([]);
-
-        return;
       }
 
+      // Backend response can be:
+      // []
+      // { requests: [] }
+      // { data: [] }
 
-      setRequests(data);
-
+      if (Array.isArray(data)) {
+        setRequests(data);
+      } else if (Array.isArray(data.requests)) {
+        setRequests(data.requests);
+      } else if (Array.isArray(data.data)) {
+        setRequests(data.data);
+      } else {
+        setRequests([]);
+      }
     } catch (err) {
-
-      console.log(
-        "LOAD REQUESTS ERROR:",
-        err
-      );
+      console.error("Load requests error:", err);
 
       setError(
-        "Unable to connect to server"
+        err.message || "Failed to load victim requests"
       );
-
     } finally {
-
       setLoading(false);
-
     }
-  }
-
-
-  // ==========================================
-  // INITIAL LOAD + AUTO REFRESH
-  // ==========================================
-
-  useEffect(() => {
-
-    let cancelled = false;
-
-    async function fetchInitialRequests() {
-
-      try {
-
-        const response = await fetch(
-          `${API_URL}/api/requests`,
-          {
-            method: "GET",
-
-            credentials: "include",
-
-            headers: {
-              Accept: "application/json",
-            },
-          }
-        );
-
-
-        const contentType =
-          response.headers.get(
-            "content-type"
-          );
-
-        let data = null;
-
-        if (
-          contentType &&
-          contentType.includes(
-            "application/json"
-          )
-        ) {
-          data = await response.json();
-        }
-
-
-        if (cancelled) {
-          return;
-        }
-
-
-        // ======================================
-        // BACKEND ERROR
-        // ======================================
-
-        if (!response.ok) {
-
-          if (
-            response.status === 401
-          ) {
-
-            setError(
-              "Your session has expired. Please login again."
-            );
-
-          } else if (
-            response.status === 403
-          ) {
-
-            setError(
-              "Admin access required."
-            );
-
-          } else {
-
-            setError(
-              data?.error ||
-              data?.message ||
-              "Failed to load requests"
-            );
-
-          }
-
-          setRequests([]);
-          setLoading(false);
-
-          return;
-        }
-
-
-        // ======================================
-        // CHECK DATA
-        // ======================================
-
-        if (!Array.isArray(data)) {
-
-          setError(
-            "Invalid request data received from server."
-          );
-
-          setRequests([]);
-          setLoading(false);
-
-          return;
-        }
-
-
-        setRequests(data);
-        setError("");
-        setLoading(false);
-
-      } catch (err) {
-
-        if (cancelled) {
-          return;
-        }
-
-        console.log(
-          "LOAD REQUESTS ERROR:",
-          err
-        );
-
-        setError(
-          "Unable to connect to server"
-        );
-
-        setRequests([]);
-        setLoading(false);
-      }
-    }
-
-
-    // Initial API call
-    fetchInitialRequests();
-
-
-    // ========================================
-    // AUTO REFRESH EVERY 10 SECONDS
-    // ========================================
-
-    const interval =
-      setInterval(() => {
-
-        if (!cancelled) {
-          loadRequests();
-        }
-
-      }, 10000);
-
-
-    return () => {
-
-      cancelled = true;
-
-      clearInterval(interval);
-
-    };
-
   }, []);
 
+  // =====================================================
+  // FIRST LOAD
+  // =====================================================
 
-  // ==========================================
-  // APPROVE / REJECT REQUEST
-  // ==========================================
+  useEffect(() => {
+    const timeout = setTimeout(loadRequests, 0);
 
-  async function updateRequest(
-    id,
-    action
-  ) {
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [loadRequests]);
 
-    try {
+  // =====================================================
+  // AUTO REFRESH
+  // Every 10 seconds
+  // =====================================================
 
-      setActionLoading(id);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadRequests();
+    }, 10000);
 
+    return () => {
+      clearInterval(interval);
+    };
+  }, [loadRequests]);
 
-      const response = await fetch(
-        `${API_URL}/api/requests/${id}/${action}`,
-        {
-          method: "PUT",
+  // =====================================================
+  // GET STATUS
+  // =====================================================
 
-          credentials: "include",
+  const getStatus = (request) => {
+    return (
+      request.status ||
+      request.requestStatus ||
+      "Pending"
+    );
+  };
 
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
+  // =====================================================
+  // GET PRIORITY / URGENCY
+  // =====================================================
 
+  const getUrgency = (request) => {
+    return (
+      request.urgency ||
+      request.priority ||
+      "Low"
+    );
+  };
 
-      const contentType =
-        response.headers.get(
-          "content-type"
-        );
+  // =====================================================
+  // STATUS COUNT
+  // =====================================================
 
-      let data = null;
+  const totalRequests = requests.length;
 
-      if (
-        contentType &&
-        contentType.includes(
-          "application/json"
-        )
-      ) {
-        data = await response.json();
-      }
+  const pendingRequests = requests.filter(
+    (request) =>
+      getStatus(request).toLowerCase() === "pending"
+  ).length;
 
+  const approvedRequests = requests.filter(
+    (request) =>
+      getStatus(request).toLowerCase() === "approved"
+  ).length;
 
-      if (!response.ok) {
+  const rejectedRequests = requests.filter(
+    (request) =>
+      getStatus(request).toLowerCase() === "rejected"
+  ).length;
 
-        alert(
-          data?.error ||
-          data?.message ||
-          "Failed to update request"
-        );
+  const volunteerAssignedRequests = requests.filter(
+    (request) =>
+      getStatus(request).toLowerCase() ===
+      "volunteer assigned"
+  ).length;
 
-        return;
-      }
+  const deliveredRequests = requests.filter(
+    (request) =>
+      getStatus(request).toLowerCase() === "delivered"
+  ).length;
 
+  // =====================================================
+  // PRIORITY COUNT
+  // =====================================================
 
-      // ========================================
-      // UPDATE TABLE WITHOUT RELOADING
-      // ========================================
+  const lowPriorityRequests = requests.filter(
+    (request) =>
+      getUrgency(request).toLowerCase() === "low"
+  ).length;
 
-      setRequests((prev) =>
-        prev.map((request) =>
-          request._id === id
-            ? {
-                ...request,
+  const mediumPriorityRequests = requests.filter(
+    (request) =>
+      getUrgency(request).toLowerCase() === "medium"
+  ).length;
 
-                status:
-                  action === "approve"
-                    ? "Approved"
-                    : "Rejected",
-              }
-            : request
-        )
-      );
+  const highPriorityRequests = requests.filter(
+    (request) =>
+      getUrgency(request).toLowerCase() === "high"
+  ).length;
 
-    } catch (err) {
+  const criticalRequests = requests.filter(
+    (request) =>
+      getUrgency(request).toLowerCase() === "critical"
+  ).length;
 
-      console.log(
-        "UPDATE REQUEST ERROR:",
-        err
-      );
+  // =====================================================
+  // EMERGENCY LEVEL
+  // =====================================================
 
-      alert(
-        "Server error. Please try again."
-      );
+  let emergencyLevel = "Low";
 
-    } finally {
-
-      setActionLoading("");
-
-    }
+  if (criticalRequests > 0) {
+    emergencyLevel = "Critical";
+  } else if (highPriorityRequests > 0) {
+    emergencyLevel = "High";
+  } else if (mediumPriorityRequests > 0) {
+    emergencyLevel = "Medium";
   }
 
+  // =====================================================
+  // GET VICTIM NAME
+  // =====================================================
 
-  // ==========================================
-  // STATISTICS
-  // ==========================================
+  const getVictimName = (request) => {
+    return (
+      request.userId?.fullName ||
+      request.user?.fullName ||
+      request.fullName ||
+      request.name ||
+      "Unknown User"
+    );
+  };
 
-  const totalRequests =
-    requests.length;
+  // =====================================================
+  // GET LOCATION
+  // =====================================================
 
-  const pendingRequests =
-    requests.filter(
-      (r) =>
-        r.status === "Pending"
-    ).length;
+  const getLocation = (request) => {
+    return (
+      request.location ||
+      request.address ||
+      "Unknown"
+    );
+  };
 
-  const approvedRequests =
-    requests.filter(
-      (r) =>
-        r.status === "Approved"
-    ).length;
+  // =====================================================
+  // GET DISASTER
+  // =====================================================
 
-  const rejectedRequests =
-    requests.filter(
-      (r) =>
-        r.status === "Rejected"
-    ).length;
+  const getDisaster = (request) => {
+    return (
+      request.disaster ||
+      request.disasterType ||
+      request.incidentType ||
+      "Unknown"
+    );
+  };
 
+  // =====================================================
+  // GET REQUEST TYPE
+  // =====================================================
 
-  const stats = [
-    [
-      "fa-clipboard-list",
-      "Victim Requests",
-      totalRequests,
-    ],
+  const getRequestType = (request) => {
+    return (
+      request.type ||
+      request.need ||
+      request.requestType ||
+      "General Help"
+    );
+  };
 
-    [
-      "fa-clock",
-      "Pending Requests",
-      pendingRequests,
-    ],
+  // =====================================================
+  // GET FAMILY MEMBERS
+  // =====================================================
 
-    [
-      "fa-circle-check",
-      "Approved Requests",
-      approvedRequests,
-    ],
+  const getFamilyMembers = (request) => {
+    return (
+      request.familyMembers ??
+      request.members ??
+      request.numberOfPeople ??
+      "-"
+    );
+  };
 
-    [
-      "fa-circle-xmark",
-      "Rejected Requests",
-      rejectedRequests,
-    ],
+  // =====================================================
+  // RECENT REQUESTS
+  // =====================================================
 
-    [
-      "fa-triangle-exclamation",
-      "Emergency Level",
-      "HIGH",
-    ],
-  ];
+  const recentRequests = [...requests]
+    .sort((a, b) => {
+      const dateA = new Date(
+        a.createdAt || a.created_at || 0
+      );
 
+      const dateB = new Date(
+        b.createdAt || b.created_at || 0
+      );
 
-  // ==========================================
-  // UI
-  // ==========================================
+      return dateB - dateA;
+    })
+    .slice(0, 5);
+
+  // =====================================================
+  // MANUAL REFRESH
+  // =====================================================
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    await loadRequests();
+  };
+
+  // =====================================================
+  // LOADING SCREEN
+  // =====================================================
+
+  if (loading && requests.length === 0) {
+    return (
+      <div className="admin-layout">
+        <Sidebar variant="admin" />
+
+        <div className="main-content">
+          <Topbar
+            variant="admin"
+            userName="Admin"
+            title="Admin Dashboard"
+            subtitle="Monitor disaster relief activities and victim requests."
+          />
+
+          <div className="admin-card">
+            <p>Loading dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =====================================================
+  // MAIN DASHBOARD
+  // =====================================================
 
   return (
     <div className="admin-layout">
@@ -451,279 +312,340 @@ export default function AdminDashboard() {
           variant="admin"
           userName="Admin"
           title="Admin Dashboard"
-          subtitle="Overview of relief operations and requests."
+          subtitle="Monitor disaster relief activities and victim requests."
         />
 
+        {/* ==========================================
+            ERROR
+        ========================================== */}
 
-        <div className="admin-stat-cards">
-
-          {stats.map((s) => (
-
-            <div
-              className="admin-stat-card"
-              key={s[1]}
-            >
-
-              <div className="stat-icon">
-
-                <i
-                  className={`fa-solid ${s[0]}`}
-                ></i>
-
-              </div>
-
-              <div className="stat-label">
-                {s[1]}
-              </div>
-
-              <div className="stat-value">
-                {s[2]}
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
-
-
-        <div className="admin-card">
-
-          <div className="admin-card-header">
-
-            <h3>
-              Request Overview
-            </h3>
+        {error && (
+          <div className="admin-card">
+            <p>{error}</p>
 
             <button
-              className="admin-refresh-btn"
-              onClick={loadRequests}
-              disabled={loading}
+              type="button"
+              className="filter-btn"
+              onClick={handleRefresh}
             >
-
-              <i className="fa-solid fa-rotate"></i>
-
-              {loading
-                ? "Loading..."
-                : "Refresh"}
-
+              Retry
             </button>
+          </div>
+        )}
 
+        {/* ==========================================
+            MAIN STATISTICS
+        ========================================== */}
+
+        <div className="stats-grid">
+
+          <div className="stat-card">
+            <h4>Total Requests</h4>
+            <h2>{totalRequests}</h2>
+            <p>All victim requests</p>
           </div>
 
+          <div className="stat-card">
+            <h4>Pending Requests</h4>
+            <h2>{pendingRequests}</h2>
+            <p>Waiting for approval</p>
+          </div>
 
-          {loading ? (
+          <div className="stat-card">
+            <h4>Approved</h4>
+            <h2>{approvedRequests}</h2>
+            <p>Accepted requests</p>
+          </div>
 
-            <div className="admin-message">
-              Loading requests...
-            </div>
-
-          ) : error ? (
-
-            <div className="admin-message error-message">
-              {error}
-            </div>
-
-          ) : requests.length === 0 ? (
-
-            <div className="admin-message">
-              No victim requests yet.
-            </div>
-
-          ) : (
-
-            <div className="admin-table-wrapper">
-
-              <table>
-
-                <thead>
-
-                  <tr>
-
-                    <th>
-                      Victim
-                    </th>
-
-                    <th>
-                      Location
-                    </th>
-
-                    <th>
-                      Need
-                    </th>
-
-                    <th>
-                      Items
-                    </th>
-
-                    <th>
-                      Priority
-                    </th>
-
-                    <th>
-                      Status
-                    </th>
-
-                    <th>
-                      Action
-                    </th>
-
-                  </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                  {requests.map(
-                    (r) => (
-
-                      <tr
-                        key={r._id}
-                      >
-
-                        <td>
-                          {r.userId?.fullName ||
-                            "Unknown"}
-                        </td>
-
-
-                        <td>
-                          {r.location}
-                        </td>
-
-
-                        <td>
-                          {r.type}
-                        </td>
-
-
-                        <td>
-                          {r.items}
-                        </td>
-
-
-                        <td>
-
-                          <span
-                            className={`badge ${r.urgency}`}
-                          >
-                            {r.urgency}
-                          </span>
-
-                        </td>
-
-
-                        <td>
-
-                          <span
-                            className={`badge ${r.status}`}
-                          >
-                            {r.status}
-                          </span>
-
-                        </td>
-
-
-                        <td>
-
-                          {r.status ===
-                          "Pending" ? (
-
-                            <div className="request-actions">
-
-                              <button
-                                className="approve-btn"
-                                disabled={
-                                  actionLoading ===
-                                  r._id
-                                }
-                                onClick={() =>
-                                  updateRequest(
-                                    r._id,
-                                    "approve"
-                                  )
-                                }
-                              >
-
-                                <i className="fa-solid fa-check"></i>
-
-                                {actionLoading ===
-                                r._id
-                                  ? "..."
-                                  : "Accept"}
-
-                              </button>
-
-
-                              <button
-                                className="reject-btn"
-                                disabled={
-                                  actionLoading ===
-                                  r._id
-                                }
-                                onClick={() =>
-                                  updateRequest(
-                                    r._id,
-                                    "reject"
-                                  )
-                                }
-                              >
-
-                                <i className="fa-solid fa-xmark"></i>
-
-                                Reject
-
-                              </button>
-
-                            </div>
-
-                          ) : (
-
-                            <span className="action-done">
-                              {r.status}
-                            </span>
-
-                          )}
-
-                        </td>
-
-                      </tr>
-
-                    )
-                  )}
-
-                </tbody>
-
-              </table>
-
-            </div>
-
-          )}
+          <div className="stat-card">
+            <h4>Rejected</h4>
+            <h2>{rejectedRequests}</h2>
+            <p>Rejected requests</p>
+          </div>
 
         </div>
 
+        {/* ==========================================
+            RELIEF STATISTICS
+        ========================================== */}
+
+        <div className="stats-grid">
+
+          <div className="stat-card">
+            <h4>Volunteer Assigned</h4>
+            <h2>{volunteerAssignedRequests}</h2>
+            <p>Requests assigned to volunteers</p>
+          </div>
+
+          <div className="stat-card">
+            <h4>Delivered</h4>
+            <h2>{deliveredRequests}</h2>
+            <p>Successfully delivered</p>
+          </div>
+
+          <div className="stat-card">
+            <h4>High Priority</h4>
+            <h2>{highPriorityRequests}</h2>
+            <p>High urgency requests</p>
+          </div>
+
+          <div className="stat-card">
+            <h4>Critical</h4>
+            <h2>{criticalRequests}</h2>
+            <p>Critical urgency requests</p>
+          </div>
+
+        </div>
+
+        {/* ==========================================
+            EMERGENCY OVERVIEW
+        ========================================== */}
 
         <div className="admin-card">
 
-          <h3>
-            Emergency Level
-          </h3>
+          <h3>Emergency Overview</h3>
 
-          <div className="emergency-indicator">
+          <p>
+            Current Emergency Level:{" "}
+            <strong>{emergencyLevel}</strong>
+          </p>
 
-            <span className="level-dot"></span>
+          <p>
+            Low Priority: {lowPriorityRequests}
+          </p>
 
-            <span className="level-text">
-              Current Level: HIGH
-            </span>
+          <p>
+            Medium Priority: {mediumPriorityRequests}
+          </p>
 
-          </div>
+          <p>
+            High Priority: {highPriorityRequests}
+          </p>
+
+          <p>
+            Critical: {criticalRequests}
+          </p>
+
+        </div>
+
+        {/* ==========================================
+            RECENT REQUESTS
+        ========================================== */}
+
+        <div className="admin-card">
+
+          <h3>Recent Victim Requests</h3>
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Victim</th>
+                <th>Location</th>
+                <th>Disaster</th>
+                <th>Request</th>
+                <th>Members</th>
+                <th>Priority</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              {recentRequests.map((request) => {
+
+                const status = getStatus(request);
+                const urgency = getUrgency(request);
+
+                return (
+                  <tr key={request._id}>
+
+                    <td>
+                      {getVictimName(request)}
+                    </td>
+
+                    <td>
+                      {getLocation(request)}
+                    </td>
+
+                    <td>
+                      {getDisaster(request)}
+                    </td>
+
+                    <td>
+                      {getRequestType(request)}
+                    </td>
+
+                    <td>
+                      {getFamilyMembers(request)}
+                    </td>
+
+                    <td>
+                      <span
+                        className={`badge ${urgency}`}
+                      >
+                        {urgency}
+                      </span>
+                    </td>
+
+                    <td>
+                      <span
+                        className={`badge ${status}`}
+                      >
+                        {status}
+                      </span>
+                    </td>
+
+                  </tr>
+                );
+              })}
+
+              {recentRequests.length === 0 && (
+                <tr>
+                  <td colSpan="7">
+                    No victim requests found.
+                  </td>
+                </tr>
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        {/* ==========================================
+            PRIORITY BREAKDOWN
+        ========================================== */}
+
+        <div className="admin-card">
+
+          <h3>Priority Breakdown</h3>
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Total Requests</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr>
+                <td>
+                  <span className="badge Low">
+                    Low
+                  </span>
+                </td>
+                <td>{lowPriorityRequests}</td>
+              </tr>
+
+              <tr>
+                <td>
+                  <span className="badge Medium">
+                    Medium
+                  </span>
+                </td>
+                <td>{mediumPriorityRequests}</td>
+              </tr>
+
+              <tr>
+                <td>
+                  <span className="badge High">
+                    High
+                  </span>
+                </td>
+                <td>{highPriorityRequests}</td>
+              </tr>
+
+              <tr>
+                <td>
+                  <span className="badge Critical">
+                    Critical
+                  </span>
+                </td>
+                <td>{criticalRequests}</td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        {/* ==========================================
+            STATUS BREAKDOWN
+        ========================================== */}
+
+        <div className="admin-card">
+
+          <h3>Request Status</h3>
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr>
+                <td>
+                  <span className="badge Pending">
+                    Pending
+                  </span>
+                </td>
+                <td>{pendingRequests}</td>
+              </tr>
+
+              <tr>
+                <td>
+                  <span className="badge Approved">
+                    Approved
+                  </span>
+                </td>
+                <td>{approvedRequests}</td>
+              </tr>
+
+              <tr>
+                <td>
+                  <span className="badge Rejected">
+                    Rejected
+                  </span>
+                </td>
+                <td>{rejectedRequests}</td>
+              </tr>
+
+              <tr>
+                <td>
+                  <span className="badge Volunteer Assigned">
+                    Volunteer Assigned
+                  </span>
+                </td>
+                <td>{volunteerAssignedRequests}</td>
+              </tr>
+
+              <tr>
+                <td>
+                  <span className="badge Delivered">
+                    Delivered
+                  </span>
+                </td>
+                <td>{deliveredRequests}</td>
+              </tr>
+
+            </tbody>
+
+          </table>
 
         </div>
 
       </div>
-
     </div>
   );
 }
