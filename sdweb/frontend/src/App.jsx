@@ -11,6 +11,14 @@ import Password from "./pages_alfa/Password";
 import DisasterCenter from "./pages_alfa/DisasterCenter";
 import Logout from "./pages_alfa/logout";
 
+import AdminDashboard from "./pages_admin/AdminDashboard";
+import VictimRequests from "./pages_admin/VictimRequests";
+import ReliefManagement from "./pages_admin/ReliefManagement";
+import AdminDisasterCentre from "./pages_admin/AdminDisasterCentre";
+import AdminProfile from "./pages_admin/AdminProfile";
+import AdminPassword from "./pages_admin/AdminPassword";
+import RequireAdmin from "./pages_admin/RequireAdmin";
+
 export default function App() {
   return (
     <div className="app-container">
@@ -68,20 +76,11 @@ export default function App() {
       `}</style>
 
       <Routes>
-        <Route
-          path="/"
-          element={<LandingPage />}
-        />
+        <Route path="/" element={<LandingPage />} />
 
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+        <Route path="/login" element={<Login />} />
 
-        <Route
-          path="/register"
-          element={<Register />}
-        />
+        <Route path="/register" element={<Register />} />
 
         <Route
           path="/verify-email"
@@ -116,6 +115,60 @@ export default function App() {
         <Route
           path="/logout"
           element={<Logout />}
+        />
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <RequireAdmin>
+              <AdminDashboard />
+            </RequireAdmin>
+          }
+        />
+
+        <Route
+          path="/admin/victim-requests"
+          element={
+            <RequireAdmin>
+              <VictimRequests />
+            </RequireAdmin>
+          }
+        />
+
+        <Route
+          path="/admin/relief-management"
+          element={
+            <RequireAdmin>
+              <ReliefManagement />
+            </RequireAdmin>
+          }
+        />
+
+        <Route
+          path="/admin/disaster-centre"
+          element={
+            <RequireAdmin>
+              <AdminDisasterCentre />
+            </RequireAdmin>
+          }
+        />
+
+        <Route
+          path="/admin/profile"
+          element={
+            <RequireAdmin>
+              <AdminProfile />
+            </RequireAdmin>
+          }
+        />
+
+        <Route
+          path="/admin/password"
+          element={
+            <RequireAdmin>
+              <AdminPassword />
+            </RequireAdmin>
+          }
         />
 
         <Route

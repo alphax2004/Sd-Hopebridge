@@ -1,3 +1,10 @@
+import { useState } from "react";
+import {
+  signInWithEmailAndPassword,
+  reload,
+} from "firebase/auth";
+
+import { auth } from "../firebase";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function EmailVerification() {
@@ -6,6 +13,63 @@ export default function EmailVerification() {
   const [searchParams] = useSearchParams();
 
   const email = searchParams.get("email") || "";
+
+  const [message, setMessage] = useState(
+    "Please check your email and verify your account."
+  );
+
+  const [loading, setLoading] = useState(false);
+
+  const checkVerification = async () => {
+    setLoading(true);
+
+    try {
+      setMessage("Checking verification...");
+
+      const password = prompt(
+        "Enter your password to check verification:"
+      );
+
+      if (!password) {
+        setMessage("Password is required.");
+        setLoading(false);
+        return;
+      }
+
+      const userCredential =
+        await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+      const user = userCredential.user;
+
+      await reload(user);
+
+      if (user.emailVerified) {
+        setMessage(
+          "Email verified successfully. Please login."
+        );
+
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+      } else {
+        setMessage(
+          "Your email is not verified yet. Please check your email and click the verification link."
+        );
+      }
+    } catch (error) {
+      console.log(error);
+
+      setMessage(
+        "Unable to check verification. Please check your email and password."
+      );
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div
@@ -34,7 +98,9 @@ export default function EmailVerification() {
           }}
         ></i>
 
-        <h2>Verify Your Email</h2>
+        <h2>
+          Verify Your Email
+        </h2>
 
         <p
           style={{
@@ -45,14 +111,17 @@ export default function EmailVerification() {
           Verification email has been sent to:
         </p>
 
-        <strong>{email}</strong>
+        <strong>
+          {email}
+        </strong>
 
         <p
           style={{
             marginTop: "15px",
           }}
         >
-          Open your email and click the verification link.
+          Open your email and click the
+          verification link.
         </p>
 
         <p
@@ -61,16 +130,44 @@ export default function EmailVerification() {
             color: "#555",
           }}
         >
-          After verification, go back to Login and login
-          with your email and password.
+          After verification, click the
+          button below to check your account.
+        </p>
+
+        <button
+          onClick={checkVerification}
+          disabled={loading}
+          style={{
+            marginTop: "20px",
+            padding: "12px 25px",
+            background: "rgb(240, 160, 12)",
+            border: "none",
+            borderRadius: "8px",
+            cursor: loading
+              ? "not-allowed"
+              : "pointer",
+          }}
+        >
+          {loading
+            ? "Checking..."
+            : "Check Verification"}
+        </button>
+
+        <p
+          style={{
+            marginTop: "15px",
+            color: "#555",
+          }}
+        >
+          {message}
         </p>
 
         <button
           onClick={() => navigate("/login")}
           style={{
-            marginTop: "20px",
-            padding: "12px 25px",
-            background: "rgb(240, 160, 12)",
+            marginTop: "10px",
+            padding: "10px 20px",
+            background: "#eee",
             border: "none",
             borderRadius: "8px",
             cursor: "pointer",

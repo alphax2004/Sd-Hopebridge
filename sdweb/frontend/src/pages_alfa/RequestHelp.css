@@ -7,6 +7,7 @@
 .main-content {
   flex: 1;
   padding: 24px 35px;
+  min-width: 0;
 }
 
 .form-card {
@@ -45,6 +46,7 @@
   text-align: center;
   cursor: pointer;
   color: #888;
+  transition: 0.2s;
 }
 
 .type-card i {
@@ -77,6 +79,10 @@
   gap: 8px;
 }
 
+.input-box:focus-within {
+  border-color: var(--primary-orange);
+}
+
 .input-box i {
   color: #888;
   font-size: 14px;
@@ -106,6 +112,7 @@
   font-size: 13px;
   min-height: 60px;
   resize: none;
+  width: 100%;
 }
 
 .error-text {
@@ -122,6 +129,7 @@
   border-radius: 10px;
   font-size: 14px;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 .submit-btn:hover {
@@ -129,13 +137,22 @@
   border: 1px solid orange;
 }
 
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .success-card {
   background: white;
   border: 1px solid #eee3d0;
   border-radius: 14px;
-  padding: 330px 30px;
-  max-width: 100%;
+  padding: 120px 30px;
+  min-height: 500px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .success-card i {
@@ -155,56 +172,41 @@
   color: #555;
 }
 
-/* ================= RESPONSIVE ================= */
 
-/* Tablet */
-@media (max-width: 1024px) {
-  .type-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-  }
-}
+/* =========================
+   RESPONSIVE
+========================= */
 
-/* Mobile */
-@media (max-width: 768px) {
-  .request-help-layout {
-    flex-direction: column;
-  }
-
+@media (max-width: 800px) {
   .main-content {
-    padding: 16px;
+    padding: 20px;
   }
 
   .form-card {
-    padding: 24px 18px;
+    padding: 28px 20px;
   }
 
   .field-row {
     grid-template-columns: 1fr;
     gap: 0;
   }
+}
+
+@media (max-width: 600px) {
+  .main-content {
+    padding: 15px;
+  }
+
+  .form-card {
+    padding: 22px 15px;
+  }
 
   .type-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
   }
 
   .success-card {
-    padding: 60px 20px;
-  }
-}
-
-/* Small phones */
-@media (max-width: 400px) {
-  .form-card {
-    padding: 18px 14px;
-  }
-
-  .type-card {
-    padding: 10px 4px;
-  }
-
-  .type-card span {
-    font-size: 10px;
+    min-height: 400px;
+    padding: 50px 20px;
   }
 }
