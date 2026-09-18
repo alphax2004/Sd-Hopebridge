@@ -5,9 +5,14 @@ import User from "../model/user.js";
 // CREATE USER PROFILE
 // ===============================
 
-export const createUser = async (req, res) => {
+export const createUser = async (
+  req,
+  res
+) => {
+
   try {
-    // Firebase token থেকে নেওয়া
+
+    // Firebase user information
     const firebaseUid =
       req.firebaseUser.uid;
 
@@ -16,6 +21,8 @@ export const createUser = async (req, res) => {
         ?.toLowerCase()
         .trim();
 
+
+    // Request body
     const {
       fullName,
       bloodGroup,
@@ -24,125 +31,197 @@ export const createUser = async (req, res) => {
       role,
     } = req.body;
 
+
+    // ===============================
     // Required fields
+    // ===============================
+
     if (
-      !fullName ||
+      !fullName?.trim() ||
       !bloodGroup ||
-      !phone ||
-      !location ||
+      !phone?.trim() ||
+      !location?.trim() ||
       !role
     ) {
+
       return res.status(400).json({
-        message: "All fields are required",
+        message:
+          "All fields are required",
       });
+
     }
 
+
+    // ===============================
+    // Firebase email
+    // ===============================
+
     if (!firebaseEmail) {
+
       return res.status(400).json({
         message:
           "Firebase email not found",
       });
+
     }
 
-    // Check role
+
+    // ===============================
+    // Role validation
+    // ===============================
+
     if (
       !["user", "ngo", "admin"].includes(
         role
       )
     ) {
+
       return res.status(400).json({
-        message: "Invalid role",
+        message:
+          "Invalid role",
       });
+
     }
 
-    // Check existing email
+
+    // ===============================
+    // Existing email
+    // ===============================
+
     const existingEmail =
       await User.findOne({
         email: firebaseEmail,
       });
 
     if (existingEmail) {
+
       return res.status(400).json({
         message:
           "Email already exists",
       });
+
     }
 
-    // Check Firebase UID
+
+    // ===============================
+    // Existing Firebase UID
+    // ===============================
+
     const existingFirebaseUser =
       await User.findOne({
         firebaseUid,
       });
 
     if (existingFirebaseUser) {
+
       return res.status(400).json({
         message:
           "Firebase account already exists",
       });
+
     }
 
+
+    // ===============================
     // Create MongoDB profile
-    const user = await User.create({
-      firebaseUid,
+    // ===============================
 
-      fullName:
-        fullName.trim(),
+    const user =
+      await User.create({
 
-      email: firebaseEmail,
+        firebaseUid,
 
-      password: "",
+        fullName:
+          fullName.trim(),
 
-      bloodGroup,
+        email:
+          firebaseEmail,
 
-      phone:
-        phone.trim(),
+        // Firebase handles password
+        password: "",
 
-      location:
-        location.trim(),
+        bloodGroup,
 
-      role,
+        phone:
+          phone.trim(),
 
-      verified: false,
-    });
+        location:
+          location.trim(),
+
+        role,
+
+        // Firebase email is
+        // not verified yet
+        verified: false,
+
+      });
+
+
+    // ===============================
+    // Success
+    // ===============================
 
     return res.status(201).json({
+
       message:
         "Registration successful",
 
       user: {
-        id: user._id,
+
+        id:
+          user._id,
+
         fullName:
           user.fullName,
+
         email:
           user.email,
+
         bloodGroup:
           user.bloodGroup,
+
         phone:
           user.phone,
+
         location:
           user.location,
+
         role:
           user.role,
+
+        verified:
+          user.verified,
+
       },
+
     });
 
   } catch (error) {
+
     console.log(
       "REGISTRATION ERROR:",
       error
     );
 
-    if (error.code === 11000) {
+
+    // MongoDB duplicate key
+    if (
+      error.code === 11000
+    ) {
+
       return res.status(400).json({
         message:
           "Email or Firebase account already exists",
       });
+
     }
+
 
     return res.status(500).json({
       message:
         "Registration failed",
     });
+
   }
 };
 
@@ -155,10 +234,14 @@ export const getAllUsers = async (
   req,
   res
 ) => {
+
   try {
+
     const users =
       await User.find()
-        .select("-password -__v")
+        .select(
+          "-password -__v"
+        )
         .sort({
           createdAt: -1,
         });
@@ -168,6 +251,7 @@ export const getAllUsers = async (
     );
 
   } catch (error) {
+
     console.log(
       "GET USERS ERROR:",
       error
@@ -177,6 +261,7 @@ export const getAllUsers = async (
       message:
         "Failed to load users",
     });
+
   }
 };
 
@@ -189,7 +274,9 @@ export const getProfile = async (
   req,
   res
 ) => {
+
   try {
+
     const user =
       await User.findById(
         req.user.id
@@ -198,10 +285,12 @@ export const getProfile = async (
       );
 
     if (!user) {
+
       return res.status(404).json({
         message:
           "User not found",
       });
+
     }
 
     return res.status(200).json(
@@ -209,6 +298,7 @@ export const getProfile = async (
     );
 
   } catch (error) {
+
     console.log(
       "PROFILE ERROR:",
       error
@@ -218,6 +308,7 @@ export const getProfile = async (
       message:
         "Failed to load profile",
     });
+
   }
 };
 
@@ -230,7 +321,9 @@ export const updateUser = async (
   req,
   res
 ) => {
+
   try {
+
     const { id } =
       req.params;
 
@@ -242,87 +335,124 @@ export const updateUser = async (
       role,
     } = req.body;
 
+
     const user =
       await User.findById(id);
 
     if (!user) {
+
       return res.status(404).json({
         message:
           "User not found",
       });
+
     }
+
 
     if (
       fullName !== undefined
     ) {
+
       user.fullName =
         fullName.trim();
+
     }
+
 
     if (
       bloodGroup !== undefined
     ) {
+
       user.bloodGroup =
         bloodGroup;
+
     }
+
 
     if (
       phone !== undefined
     ) {
+
       user.phone =
         phone.trim();
+
     }
+
 
     if (
       location !== undefined
     ) {
+
       user.location =
         location.trim();
+
     }
+
 
     if (
       role !== undefined
     ) {
+
       if (
-        !["user", "ngo", "admin"].includes(
-          role
-        )
+        ![
+          "user",
+          "ngo",
+          "admin",
+        ].includes(role)
       ) {
+
         return res.status(400).json({
           message:
             "Invalid role",
         });
+
       }
 
       user.role = role;
+
     }
+
 
     await user.save();
 
+
     return res.status(200).json({
+
       message:
         "User updated successfully",
 
       user: {
-        id: user._id,
+
+        id:
+          user._id,
+
         fullName:
           user.fullName,
+
         email:
           user.email,
+
         bloodGroup:
           user.bloodGroup,
+
         phone:
           user.phone,
+
         location:
           user.location,
+
         role:
           user.role,
+
         verified:
           user.verified,
+
       },
+
     });
 
   } catch (error) {
+
     console.log(
       "UPDATE USER ERROR:",
       error
@@ -332,6 +462,7 @@ export const updateUser = async (
       message:
         "Failed to update user",
     });
+
   }
 };
 
@@ -344,21 +475,30 @@ export const deleteUser = async (
   req,
   res
 ) => {
+
   try {
+
     const { id } =
       req.params;
+
 
     const user =
       await User.findById(id);
 
     if (!user) {
+
       return res.status(404).json({
         message:
           "User not found",
       });
+
     }
 
-    await User.findByIdAndDelete(id);
+
+    await User.findByIdAndDelete(
+      id
+    );
+
 
     return res.status(200).json({
       message:
@@ -366,6 +506,7 @@ export const deleteUser = async (
     });
 
   } catch (error) {
+
     console.log(
       "DELETE USER ERROR:",
       error
@@ -375,5 +516,6 @@ export const deleteUser = async (
       message:
         "Failed to delete user",
     });
+
   }
 };

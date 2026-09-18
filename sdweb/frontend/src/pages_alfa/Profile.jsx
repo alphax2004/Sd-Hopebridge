@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Sidebar,
   Topbar,
@@ -9,7 +10,9 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:4000";
 
-export default function Profile() {
+export default function Profile({ variant = "victim" }) {
+  const navigate = useNavigate();
+
   const [formData, setFormData] =
     useState({
       id: "",
@@ -208,11 +211,13 @@ export default function Profile() {
 
   return (
     <div className="profile-page">
-      <Sidebar />
+      <Sidebar variant={variant} />
 
       <div className="profile-main">
         <Topbar
-          title="My Profile"
+          variant={variant}
+          userName={formData.fullName || (variant === "admin" ? "Admin" : "Sanjida Islam")}
+          title={variant === "admin" ? "Admin Profile" : "My Profile"}
           subtitle="Manage your personal information."
         />
 
@@ -381,9 +386,33 @@ export default function Profile() {
               className="update-btn"
               type="submit"
             >
-              Update Profile
+              Edit Profile
             </button>
           </form>
+
+          {variant === "admin" && (
+            <div className="profile-extra-actions">
+              <button
+                type="button"
+                className="back-btn"
+                onClick={() => navigate("/admin/password")}
+              >
+                Change Password
+              </button>
+
+              <button
+                type="button"
+                className="back-btn"
+                onClick={() =>
+                  navigate("/logout", {
+                    state: { from: "/admin/profile" },
+                  })
+                }
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

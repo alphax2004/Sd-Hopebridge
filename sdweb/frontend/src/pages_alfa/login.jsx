@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   sendEmailVerification,
   signOut,
+  reload,
 } from "firebase/auth";
 
 import { auth } from "../firebase";
@@ -82,10 +83,10 @@ export default function Login() {
 
       // ========================================
       // STEP 3: Reload Firebase user
-      // This gets the latest emailVerified value
+      // Gets latest emailVerified status
       // ========================================
 
-      await firebaseUser.reload();
+      await reload(firebaseUser);
 
 
       // ========================================
@@ -118,7 +119,7 @@ export default function Login() {
         }
 
 
-        // Sign out because user is not verified
+        // Sign out unverified user
         await signOut(auth);
 
         return;
@@ -135,10 +136,14 @@ export default function Login() {
         );
 
 
+      console.log(
+        "Firebase token exists:",
+        !!firebaseToken
+      );
+
+
       // ========================================
       // STEP 6: Send token to backend
-      // Backend verifies Firebase token
-      // and creates JWT cookie
       // ========================================
 
       const res = await fetch(
@@ -172,6 +177,12 @@ export default function Login() {
         await res.json();
 
 
+      console.log(
+        "LOGIN RESPONSE:",
+        data
+      );
+
+
       // ========================================
       // STEP 8: Backend error
       // ========================================
@@ -191,12 +202,40 @@ export default function Login() {
 
 
       // ========================================
-      // STEP 9: Role-based navigation
+      // STEP 9: Check user information
+      // ========================================
+
+      if (!data.user) {
+
+        setError(
+          "User information not found"
+        );
+
+        await signOut(auth);
+
+        return;
+      }
+
+
+      // ========================================
+      // STEP 10: Get user role
+      // ========================================
+
+      const userRole =
+        data.user.role;
+
+      console.log(
+        "USER ROLE:",
+        userRole
+      );
+
+
+      // ========================================
+      // STEP 11: Role-based navigation
       // ========================================
 
       if (
-        data.user &&
-        data.user.role === "admin"
+        userRole === "admin"
       ) {
 
         navigate(
@@ -280,12 +319,16 @@ export default function Login() {
       } else {
 
         setError(
+          error.message ||
           "Login failed. Please try again."
         );
       }
 
 
+      // ========================================
       // Make sure Firebase is signed out
+      // ========================================
+
       try {
 
         await signOut(auth);
@@ -309,6 +352,7 @@ export default function Login() {
 
   // ==========================================
   // UI
+  // EXACT SAME UI
   // ==========================================
 
   return (

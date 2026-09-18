@@ -2,12 +2,26 @@ import { useState, useSyncExternalStore } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import "./sidebar.css";
 
-const menuItems = [
-  { path: "/dashboard", label: "Dashboard", icon: "fa-grip" },
-  { path: "/request-help", label: "Request Help", icon: "fa-hand-holding-heart" },
-  { path: "/disaster-center", label: "Disaster Center", icon: "fa-triangle-exclamation" },
-  { path: "/profile", label: "Profile", icon: "fa-user" },
-];
+const menuItemsByVariant = {
+  victim: [
+    { path: "/dashboard", label: "Dashboard", icon: "fa-grip" },
+    { path: "/request-help", label: "Request Help", icon: "fa-hand-holding-heart" },
+    { path: "/disaster-center", label: "Disaster Center", icon: "fa-triangle-exclamation" },
+    { path: "/profile", label: "Profile", icon: "fa-user" },
+  ],
+  admin: [
+    { path: "/admin/dashboard", label: "Admin Dashboard", icon: "fa-grip" },
+    { path: "/admin/victim-requests", label: "Victim Requests", icon: "fa-hand-holding-heart" },
+    { path: "/admin/relief-management", label: "Relief Management", icon: "fa-boxes-stacked" },
+    { path: "/admin/disaster-centre", label: "Disaster Centre", icon: "fa-triangle-exclamation" },
+    { path: "/admin/profile", label: "Admin Profile", icon: "fa-user" },
+  ],
+};
+
+const profilePathByVariant = {
+  victim: { profile: "/profile", password: "/password", logout: "/logout" },
+  admin: { profile: "/admin/profile", password: "/admin/password", logout: "/logout" },
+};
 
 /*
   Chhoto shared store — Sidebar r Topbar alada component হলেও
@@ -36,10 +50,12 @@ function useSidebarOpen() {
   return useSyncExternalStore(subscribe, getSnapshot);
 }
 
-export function Sidebar() {
+export function Sidebar({ variant = "victim" }) {
   const navigate = useNavigate();
   const location = useLocation();
   const isOpen = useSidebarOpen();
+  const menuItems = menuItemsByVariant[variant];
+  const paths = profilePathByVariant[variant];
 
   const closeSidebar = () => setSidebarOpenGlobal(false);
 
@@ -79,7 +95,7 @@ export function Sidebar() {
             className="sidebar-item logout"
             onClick={() => {
               closeSidebar();
-              navigate("/logout", {
+              navigate(paths.logout, {
                 state: { from: location.pathname },
               });
             }}
@@ -93,10 +109,11 @@ export function Sidebar() {
   );
 }
 
-export function Topbar({ title, subtitle }) {
+export function Topbar({ title, subtitle, variant = "victim", userName = "Sanjida Islam" }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [showDropdown, setShowDropdown] = useState(false);
+  const paths = profilePathByVariant[variant];
 
   return (
     <div className="topbar">
@@ -121,7 +138,7 @@ export function Topbar({ title, subtitle }) {
             <i className="fa-solid fa-user"></i>
           </div>
 
-          <span>Sanjida Islam</span>
+          <span>{userName}</span>
 
           <i className="fa-solid fa-chevron-down"></i>
         </div>
@@ -131,7 +148,7 @@ export function Topbar({ title, subtitle }) {
             <div
               className="dropdown-item"
               onClick={() => {
-                navigate("/profile");
+                navigate(paths.profile);
                 setShowDropdown(false);
               }}
             >
@@ -142,7 +159,7 @@ export function Topbar({ title, subtitle }) {
             <div
               className="dropdown-item"
               onClick={() => {
-                navigate("/password");
+                navigate(paths.password);
                 setShowDropdown(false);
               }}
             >
@@ -153,7 +170,7 @@ export function Topbar({ title, subtitle }) {
             <div
               className="dropdown-item dropdown-logout"
               onClick={() => {
-                navigate("/logout", {
+                navigate(paths.logout, {
                   state: { from: location.pathname },
                 });
                 setShowDropdown(false);

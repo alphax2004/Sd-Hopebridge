@@ -50,6 +50,22 @@
   border-radius: 7px;
 }
 
+.profile-extra-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.back-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 7px;
+  background: #f8b945;
+  cursor: pointer;
+  font-weight: bold;
+}
+
 /* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {

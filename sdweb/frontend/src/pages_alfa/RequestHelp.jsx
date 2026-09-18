@@ -49,6 +49,9 @@ export default function RequestHelp() {
   const [loading, setLoading] =
     useState(false);
 
+  // ==========================================
+  // HANDLE INPUT
+  // ==========================================
 
   function handleChange(e) {
     const {
@@ -60,77 +63,242 @@ export default function RequestHelp() {
       ...prev,
       [name]: value,
     }));
+
+    // Remove old error while typing
+    if (error) {
+      setError("");
+    }
   }
 
+  // ==========================================
+  // SELECT HELP TYPE
+  // ==========================================
 
   function handleTypeSelect(typeKey) {
+    if (loading) {
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       type: typeKey,
     }));
   }
 
+  // ==========================================
+  // VALIDATE FORM
+  // ==========================================
+
+  function validateForm() {
+    const items =
+      formData.items.trim();
+
+    const location =
+      formData.location.trim();
+
+    const contact =
+      formData.contact.trim();
+
+    // Required fields
+
+    if (!items) {
+      return "Please enter the items you need.";
+    }
+
+    if (!location) {
+      return "Please enter your location.";
+    }
+
+    if (!contact) {
+      return "Please enter your contact number.";
+    }
+
+    // Bangladesh phone validation
+    const cleanContact =
+      contact.replace(/\s|-/g, "");
+
+    const phonePattern =
+      /^01[3-9]\d{8}$/;
+
+    if (!phonePattern.test(cleanContact)) {
+      return "Please enter a valid Bangladesh contact number, for example 01XXXXXXXXX.";
+    }
+
+    // Items length
+
+    if (items.length < 2) {
+      return "Please provide a little more detail about the items needed.";
+    }
+
+    // Location length
+
+    if (location.length < 2) {
+      return "Please enter a valid location.";
+    }
+
+    return "";
+  }
+
+  // ==========================================
+  // SUBMIT REQUEST
+  // ==========================================
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (
-      !formData.items.trim() ||
-      !formData.location.trim() ||
-      !formData.contact.trim()
-    ) {
-      setError(
-        "Must fillup Items, Location, and Contact number."
-      );
+    // Prevent double submit
+    if (loading) {
+      return;
+    }
+
+    setError("");
+
+    // Validate
+    const validationError =
+      validateForm();
+
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     try {
       setLoading(true);
-      setError("");
+
+      const cleanContact =
+        formData.contact
+          .trim()
+          .replace(/\s|-/g, "");
+
+      const requestData = {
+        type: formData.type,
+        items: formData.items.trim(),
+        quantity:
+          formData.quantity.trim(),
+        urgency: formData.urgency,
+        location:
+          formData.location.trim(),
+        contact: cleanContact,
+        notes: formData.notes.trim(),
+      };
 
       const response = await fetch(
         `${API_URL}/api/requests`,
         {
           method: "POST",
+
           headers: {
             "Content-Type":
               "application/json",
+            Accept:
+              "application/json",
           },
+
           credentials: "include",
-          body: JSON.stringify(formData),
+
+          body: JSON.stringify(
+            requestData
+          ),
         }
       );
 
-      const data =
-        await response.json();
+      // ========================================
+      // SAFE RESPONSE
+      // ========================================
+
+      const contentType =
+        response.headers.get(
+          "content-type"
+        ) || "";
+
+      let data = null;
+
+      if (
+        contentType.includes(
+          "application/json"
+        )
+      ) {
+        data =
+          await response.json();
+      }
+
+      // ========================================
+      // SERVER ERROR
+      // ========================================
 
       if (!response.ok) {
-        setError(
-          data.error ||
-            "Failed to submit request"
-        );
+        if (response.status === 401) {
+          setError(
+            "Your session has expired. Please login again."
+          );
+        } else if (
+          response.status === 403
+        ) {
+          setError(
+            "You are not allowed to submit a request."
+          );
+        } else if (
+          response.status === 400
+        ) {
+          setError(
+            data?.error ||
+            data?.message ||
+            "Please check the information you entered."
+          );
+        } else {
+          setError(
+            data?.error ||
+            data?.message ||
+            "Failed to submit request. Please try again."
+          );
+        }
 
         return;
       }
 
+      // ========================================
+      // SUCCESS
+      // ========================================
+
       setSubmitted(true);
+
+      // Clear form after successful submission
+
+      setFormData({
+        type: "Food",
+        items: "",
+        quantity: "",
+        urgency: "Medium",
+        location: "",
+        contact: "",
+        notes: "",
+      });
+
+      // Go to dashboard
+      // Dashboard will show Pending status
 
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
 
     } catch (err) {
-      console.log(err);
+      console.log(
+        "REQUEST SUBMIT ERROR:",
+        err
+      );
 
       setError(
-        "Server error. Please try again."
+        "Unable to connect to server. Please make sure the backend is running."
       );
+
     } finally {
       setLoading(false);
     }
   }
 
+  // ==========================================
+  // UI
+  // ==========================================
 
   return (
     <div className="request-help-layout">
@@ -155,6 +323,10 @@ export default function RequestHelp() {
             </h3>
 
             <p>
+              Your request has been sent successfully.
+            </p>
+
+            <p>
               Redirecting you to the dashboard...
             </p>
 
@@ -166,6 +338,10 @@ export default function RequestHelp() {
             className="form-card"
             onSubmit={handleSubmit}
           >
+
+            {/* ==================================
+                TYPE OF HELP
+            ================================== */}
 
             <div className="field-group">
 
@@ -189,6 +365,18 @@ export default function RequestHelp() {
                         t.key
                       )
                     }
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (
+                        e.key === "Enter" ||
+                        e.key === " "
+                      ) {
+                        handleTypeSelect(
+                          t.key
+                        );
+                      }
+                    }}
                   >
 
                     <i
@@ -208,6 +396,10 @@ export default function RequestHelp() {
             </div>
 
 
+            {/* ==================================
+                ITEMS
+            ================================== */}
+
             <div className="field-group">
 
               <label>
@@ -222,12 +414,18 @@ export default function RequestHelp() {
                   placeholder="e.g. Rice, Dal, Oil, Salt"
                   value={formData.items}
                   onChange={handleChange}
+                  disabled={loading}
+                  maxLength={300}
                 />
 
               </div>
 
             </div>
 
+
+            {/* ==================================
+                QUANTITY + URGENCY
+            ================================== */}
 
             <div className="field-row">
 
@@ -245,6 +443,8 @@ export default function RequestHelp() {
                     placeholder="e.g. 4 items or 6 people"
                     value={formData.quantity}
                     onChange={handleChange}
+                    disabled={loading}
+                    maxLength={100}
                   />
 
                 </div>
@@ -264,6 +464,7 @@ export default function RequestHelp() {
                     name="urgency"
                     value={formData.urgency}
                     onChange={handleChange}
+                    disabled={loading}
                   >
 
                     <option value="High">
@@ -287,6 +488,10 @@ export default function RequestHelp() {
             </div>
 
 
+            {/* ==================================
+                LOCATION
+            ================================== */}
+
             <div className="field-group">
 
               <label>
@@ -303,12 +508,18 @@ export default function RequestHelp() {
                   placeholder="Village / Upazila / District"
                   value={formData.location}
                   onChange={handleChange}
+                  disabled={loading}
+                  maxLength={250}
                 />
 
               </div>
 
             </div>
 
+
+            {/* ==================================
+                CONTACT
+            ================================== */}
 
             <div className="field-group">
 
@@ -326,12 +537,18 @@ export default function RequestHelp() {
                   placeholder="01XXXXXXXXX"
                   value={formData.contact}
                   onChange={handleChange}
+                  disabled={loading}
+                  maxLength={20}
                 />
 
               </div>
 
             </div>
 
+
+            {/* ==================================
+                NOTES
+            ================================== */}
 
             <div className="field-group">
 
@@ -346,6 +563,8 @@ export default function RequestHelp() {
                   placeholder="Anything else NGOs should know..."
                   value={formData.notes}
                   onChange={handleChange}
+                  disabled={loading}
+                  maxLength={500}
                 ></textarea>
 
               </div>
@@ -353,12 +572,22 @@ export default function RequestHelp() {
             </div>
 
 
+            {/* ==================================
+                ERROR
+            ================================== */}
+
             {error && (
+
               <p className="error-text">
                 {error}
               </p>
+
             )}
 
+
+            {/* ==================================
+                SUBMIT
+            ================================== */}
 
             <button
               type="submit"

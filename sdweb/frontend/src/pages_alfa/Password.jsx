@@ -6,8 +6,9 @@ import "./Password.css";
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-export default function Password() {
+export default function Password({ variant = "victim" }) {
   const navigate = useNavigate();
+  const backPath = variant === "admin" ? "/admin/profile" : "/profile";
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -60,10 +61,11 @@ export default function Password() {
 
   return (
     <div className="password-page">
-      <Sidebar />
+      <Sidebar variant={variant} />
 
       <div className="password-main">
         <Topbar
+          variant={variant}
           title="Change Password"
           subtitle="Update your account password."
         />
@@ -126,7 +128,7 @@ export default function Password() {
           <button
             type="button"
             className="back-btn"
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate(backPath)}
           >
             Back to Profile
           </button>
