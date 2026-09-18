@@ -1,25 +1,45 @@
 import jwt from "jsonwebtoken";
 
+const cookieOptions = {
+  httpOnly: true,
+  secure:
+    process.env.NODE_ENV === "production",
+  sameSite:
+    process.env.NODE_ENV === "production"
+      ? "none"
+      : "lax",
+  path: "/",
+};
+
 const checkToken = (req, res, next) => {
-  const { token } = req.cookies;
+  const token = req.cookies?.token;
 
   if (!token) {
-    return res.status(401).json({ error: "Invalid token" });
+    return res.status(401).json({
+      error: "Invalid token",
+    });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, {}, (err, user) => {
-    if (err) {
-      res.clearCookie("token", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        path: "/",
-      });
-      return res.status(401).json({ error: "Invalid token" });
+  jwt.verify(
+    token,
+    process.env.JWT_SECRET,
+    (err, user) => {
+      if (err) {
+        res.clearCookie(
+          "token",
+          cookieOptions
+        );
+
+        return res.status(401).json({
+          error: "Invalid token",
+        });
+      }
+
+      req.user = user;
+
+      next();
     }
-    req.user = user; // { id, email }
-    next();
-  });
+  );
 };
 
 export default checkToken;

@@ -1,6 +1,7 @@
 import express from "express";
 
 import checkToken from "../middlewares/checkToken.js";
+import checkFirebaseToken from "../middlewares/firebaseToken.js";
 
 import {
   getAllUsers,
@@ -10,43 +11,43 @@ import {
   deleteUser,
 } from "../controller/userController.js";
 
-import {
-  sendVerificationEmail,
-  verifyEmail,
-} from "../controller/emailController.js";
+const router =
+  express.Router();
 
-const router = express.Router();
 
-router.post("/", createUser);
-
+// Registration
 router.post(
-  "/send-verification",
-  sendVerificationEmail
+  "/",
+  checkFirebaseToken,
+  createUser
 );
 
-router.get(
-  "/verify-email",
-  verifyEmail
-);
 
+// Logged-in profile
 router.get(
   "/profile",
   checkToken,
   getProfile
 );
 
+
+// All users
 router.get(
   "/",
   checkToken,
   getAllUsers
 );
 
+
+// Update user
 router.put(
   "/:id",
   checkToken,
   updateUser
 );
 
+
+// Delete user
 router.delete(
   "/:id",
   checkToken,

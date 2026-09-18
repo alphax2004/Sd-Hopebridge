@@ -1,43 +1,83 @@
 import express from "express";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
-import log from "./middlewares/logger.js";
-import authRouter from "./routes/auth.js";
-import usersRouter from "./routes/users.js";
 import mongoose from "mongoose";
 import cors from "cors";
 
-const app = express();
+import log from "./middlewares/logger.js";
+
+import authRouter from "./routes/auth.js";
+import usersRouter from "./routes/users.js";
+import requestsRouter from "./routes/requests.js";
+
+const app =
+  express();
+
+
+// ===============================
+// MIDDLEWARE
+// ===============================
 
 app.use(log);
 
-app.use(express.json());
+app.use(
+  express.json()
+);
 
-app.use(cookieParser());
+app.use(
+  cookieParser()
+);
+
 app.use(
   cors({
     credentials: true,
-    origin: process.env.ALLOWED_ORIGIN,
+    origin:
+      process.env.ALLOWED_ORIGIN,
   })
 );
 
+
+// ===============================
+// DATABASE
+// ===============================
+
 mongoose
-  .connect(process.env.DATABASE_URL)
+  .connect(
+    process.env.DATABASE_URL
+  )
   .then(() => {
-    console.log("Connected to database");
+    console.log(
+      "Connected to database"
+    );
   })
   .catch((err) => {
     console.log(
-      `Error connecting to database ${err}`
+      "Error connecting to database:",
+      err
     );
+
     process.exit(1);
   });
 
-app.get("/api/test", (req, res) => {
-  return res.json({
-    message: "Api is working",
-  });
-});
+
+// ===============================
+// TEST API
+// ===============================
+
+app.get(
+  "/api/test",
+  (req, res) => {
+    return res.json({
+      message:
+        "Api is working",
+    });
+  }
+);
+
+
+// ===============================
+// ROUTES
+// ===============================
 
 app.use(
   "/api/auth",
@@ -49,12 +89,26 @@ app.use(
   usersRouter
 );
 
-const PORT = process.env.PORT || 4000;
+app.use(
+  "/api/requests",
+  requestsRouter
+);
 
-app.listen(PORT, () => {
-  console.log(
-    `Server listening on port ${PORT}`
-  );
-});
+
+// ===============================
+// SERVER
+// ===============================
+
+const PORT =
+  process.env.PORT || 4000;
+
+app.listen(
+  PORT,
+  () => {
+    console.log(
+      `Server listening on port ${PORT}`
+    );
+  }
+);
 
 export default app;

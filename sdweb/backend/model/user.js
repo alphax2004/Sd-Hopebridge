@@ -16,9 +16,16 @@ const userSchema = new Schema(
       trim: true,
     },
 
-    password: {
+    firebaseUid: {
       type: String,
       required: true,
+      unique: true,
+      trim: true,
+    },
+
+    password: {
+      type: String,
+      default: "",
     },
 
     bloodGroup: {
@@ -51,16 +58,6 @@ const userSchema = new Schema(
     verified: {
       type: Boolean,
       default: false,
-    },
-
-    verificationToken: {
-      type: String,
-      default: "",
-    },
-
-    verificationTokenExpires: {
-      type: Date,
-      default: null,
     },
 
     role: {

@@ -7,9 +7,13 @@ import {
 
 import checkToken from "../middlewares/checkToken.js";
 
-const router = express.Router();
+const router =
+  express.Router();
 
-router.post("/login", login);
+router.post(
+  "/login",
+  login
+);
 
 router.post(
   "/logout",
