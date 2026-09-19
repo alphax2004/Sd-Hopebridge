@@ -4,7 +4,7 @@ import {
   reload,
 } from "firebase/auth";
 
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function EmailVerification() {

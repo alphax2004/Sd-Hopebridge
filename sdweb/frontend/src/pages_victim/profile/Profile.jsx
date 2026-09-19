@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Sidebar,
   Topbar,
-} from "./sidebar";
+} from "../sidebar/sidebar";
 import "./Profile.css";
 
 const API_URL =

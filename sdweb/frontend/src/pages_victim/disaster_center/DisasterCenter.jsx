@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sidebar, Topbar } from "./sidebar";
+import { Sidebar, Topbar } from "../sidebar";
 
 import"./DisasterCenter.css";
 const stats = [

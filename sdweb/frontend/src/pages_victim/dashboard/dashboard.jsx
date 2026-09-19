@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Sidebar, Topbar } from "./sidebar";
+import { Sidebar, Topbar } from "../sidebar";
 import "./dashboard.css";
 
 const API_URL =

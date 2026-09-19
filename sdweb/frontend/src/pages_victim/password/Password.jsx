@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sidebar, Topbar } from "./sidebar";
+import { Sidebar, Topbar } from "../sidebar/sidebar";
 import "./Password.css";
 
 const API_URL =
