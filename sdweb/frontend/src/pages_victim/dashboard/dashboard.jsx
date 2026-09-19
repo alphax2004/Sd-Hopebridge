@@ -24,7 +24,7 @@ export default function Dashboard() {
     return urgency === urgencyFilter.toLowerCase();
   });
 
-  // ==========================================
+ // ==========================================
   // LOAD USER REQUESTS
   // ==========================================
   const fetchRequestsData = useCallback(async () => {
@@ -43,14 +43,11 @@ export default function Dashboard() {
         data = await response.json().catch(() => null);
       }
       if (!response.ok) {
-        if (response.status === 401) {
-          setError("Your session has expired. Please login again.");
-        } else if (response.status === 403) {
-          setError("You are not allowed to view these requests.");
+        // 401 (Invalid token / Expired) বা 403 হলে কোনো এরর মেসেজ UI-তে দেখাবে না
+        if (response.status === 401 || response.status === 403) {
+          setError("");
         } else {
-          setError(
-            data?.error || data?.message || "Failed to load requests."
-          );
+          setError("Failed to load requests.");
         }
         setRequests([]);
         return;
@@ -65,14 +62,12 @@ export default function Dashboard() {
         setRequests(data.data);
         setError("");
       } else {
-        setError("Invalid request data received from server.");
+        setError("");
         setRequests([]);
       }
     } catch (err) {
       console.error("LOAD REQUESTS ERROR:", err);
-      setError(
-        "Unable to connect to server. Please check whether the backend is running."
-      );
+      setError("");
       setRequests([]);
     } finally {
       setLoading(false);
@@ -181,7 +176,7 @@ export default function Dashboard() {
               <div className="stat-label">Total Requests</div>
             </div>
             <div className="stat-value">{totalRequests}</div>
-            <div className="stat-note">All time requests</div>
+            <div className="stat-note">(All time requests)</div>
           </div>
           <div className="stat-card">
             <div className="stat-card-top">
@@ -191,7 +186,7 @@ export default function Dashboard() {
               <div className="stat-label">Pending Requests</div>
             </div>
             <div className="stat-value">{pendingRequests}</div>
-            <div className="stat-note">Waiting for approval</div>
+            <div className="stat-note">(Waiting for approval)</div>
           </div>
           <div className="stat-card">
             <div className="stat-card-top">
@@ -201,7 +196,7 @@ export default function Dashboard() {
               <div className="stat-label">Approved Requests</div>
             </div>
             <div className="stat-value">{approvedRequests}</div>
-            <div className="stat-note">Approved by NGO</div>
+            <div className="stat-note">(Approved by NGO)</div>
           </div>
         </div>
 

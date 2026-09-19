@@ -2,8 +2,8 @@ import User from "../model/user.js";
 import admin from "../firebaseAdmin.js";
 import jwt from "jsonwebtoken";
 
-const JWT_LIFETIME = "1h";
-const COOKIE_MAX_AGE = 60 * 60 * 1000;
+const JWT_LIFETIME = "24h";
+const COOKIE_MAX_AGE = 24*60 * 60 * 1000;
 
 
 // ==========================================
