@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { Sidebar, Topbar } from "../sidebar/sidebar";
 import "./dashboard.css";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
 export default function Dashboard() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [urgencyFilter, setUrgencyFilter] = useState("All");
+
   // ==========================================
   // FILTER REQUESTS
   // ==========================================
@@ -20,11 +23,13 @@ export default function Dashboard() {
     }
     return urgency === urgencyFilter.toLowerCase();
   });
+
   // ==========================================
   // LOAD USER REQUESTS
   // ==========================================
   const fetchRequestsData = useCallback(async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${API_URL}/api/requests/my`, {
         method: "GET",
         credentials: "include",
@@ -73,13 +78,7 @@ export default function Dashboard() {
       setLoading(false);
     }
   }, []);
-  // ==========================================
-  // REFRESH
-  // ==========================================
-  const handleRefresh = async () => {
-    setLoading(true);
-    await fetchRequestsData();
-  };
+
   // ==========================================
   // INITIAL LOAD
   // ==========================================
@@ -89,6 +88,7 @@ export default function Dashboard() {
     };
     loadData();
   }, [fetchRequestsData]);
+
   // ==========================================
   // STATISTICS
   // ==========================================
@@ -105,6 +105,7 @@ export default function Dashboard() {
     ).toLowerCase();
     return status === "approved";
   }).length;
+
   // ==========================================
   // APPROVED REQUEST COUNT BY DAY
   // ==========================================
@@ -127,6 +128,7 @@ export default function Dashboard() {
     const day = date.getDay();
     approvedBarData[day][1]++;
   });
+
   // ==========================================
   // Y-AXIS
   // ==========================================
@@ -138,6 +140,7 @@ export default function Dashboard() {
   for (let value = yAxisMax; value >= 0; value--) {
     yAxisValues.push(value);
   }
+
   // ==========================================
   // HELPER FUNCTIONS
   // ==========================================
@@ -148,6 +151,7 @@ export default function Dashboard() {
       ? "-"
       : date.toLocaleDateString();
   }
+
   function formatTime(dateValue) {
     if (!dateValue) return "-";
     const date = new Date(dateValue);
@@ -158,6 +162,7 @@ export default function Dashboard() {
           minute: "2-digit",
         });
   }
+
   return (
     <div className="dashboard-layout">
       <Sidebar />
@@ -166,16 +171,14 @@ export default function Dashboard() {
           title="Welcome back, Sanjida 👋"
           subtitle="Stay safe, stay informed. We are here to help you."
         />
-        {/* ==========================================
-            STAT CARDS
-        ========================================== */}
+        {/* STAT CARDS */}
         <div className="stat-cards">
           <div className="stat-card">
             <div className="stat-card-top">
               <div className="stat-icon">
                 <i className="fa-solid fa-clipboard-list"></i>
               </div>
-              <div lassName="stat-label">Total Requests</div>
+              <div className="stat-label">Total Requests</div>
             </div>
             <div className="stat-value">{totalRequests}</div>
             <div className="stat-note">All time requests</div>
@@ -201,24 +204,14 @@ export default function Dashboard() {
             <div className="stat-note">Approved by NGO</div>
           </div>
         </div>
-        {/* ==========================================
-            APPROVED REQUESTS OVER TIME
-        ========================================== */}
+
+        {/* APPROVED REQUESTS OVER TIME */}
         <div className="approved-request-section">
           <div className="approved-request-heading">
             <h2>Approved Requests Over Time</h2>
             <p>Number of approved requests submitted each day</p>
           </div>
           <div className="chart-card">
-            <div className="card-header">
-              <button
-                className="action-btn"
-                onClick={handleRefresh}
-                disabled={loading}
-              >
-                {loading ? "Loading..." : "Refresh"}
-              </button>
-            </div>
             <div className="graph-wrapper">
               <div className="graph-y-axis">
                 {yAxisValues.map((value) => (
@@ -268,16 +261,14 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-        {/* ==========================================
-            RECENT REQUESTS
-        ========================================== */}
+
+        {/* RECENT REQUESTS */}
         <div className="recent-request-section">
           <div className="recent-request-heading">
             <h2>Recent Requests</h2>
             <p>Complete details of your submitted help requests</p>
           </div>
           <div className="table-card">
-            {/* FILTER ONLY */}
             <div className="card-header">
               <div className="filter-wrapper">
                 <button
@@ -294,13 +285,14 @@ export default function Dashboard() {
                     <button
                       className={
                         urgencyFilter === "All"
-                          ? "active-filter": ""
+                          ? "active-filter"
+                          : ""
                       }
                       onClick={() => {
                         setUrgencyFilter("All");
                         setFilterOpen(false);
                       }}
-                >
+                    >
                       All
                     </button>
                     <button
@@ -331,7 +323,7 @@ export default function Dashboard() {
                     </button>
                     <button
                       className={
-                        urgencyFilter === "Low"? "active-filter": ""
+                        urgencyFilter === "Low" ? "active-filter" : ""
                       }
                       onClick={() => {
                         setUrgencyFilter("Low");
@@ -351,13 +343,6 @@ export default function Dashboard() {
             ) : error ? (
               <div className="table-message error-message">
                 {error}
-                <br />
-                <button
-                  className="action-btn"
-                  onClick={handleRefresh}
-                >
-                  Retry
-                </button>
               </div>
             ) : requests.length === 0 ? (
               <div className="table-message">
@@ -395,8 +380,8 @@ export default function Dashboard() {
                   </thead>
                   <tbody>
                     {filteredRequests.map((r) => {
-                      const status =r?.status ||r?.requestStatus ||"Pending";
-                      const urgency =r?.urgency ||r?.priority ||"Low";
+                      const status = r?.status || r?.requestStatus || "Pending";
+                      const urgency = r?.urgency || r?.priority || "Low";
                       return (
                         <tr
                           key={
@@ -421,12 +406,12 @@ export default function Dashboard() {
                                     : r?.type === "Medical"
                                     ? "fa-solid fa-kit-medical"
                                     : r?.type === "Water"
-                                    ? "fa-solid fa-droplet" 
+                                    ? "fa-solid fa-droplet"
                                     : "fa-solid fa-circle-info"
                                 }
                               ></i>
                               <span>
-                                {r?.type ||r?.need ||r?.requestType ||"-"}
+                                {r?.type || r?.need || r?.requestType || "-"}
                               </span>
                             </div>
                           </td>
@@ -454,7 +439,7 @@ export default function Dashboard() {
                             <div className="location-detail">
                               <i className="fa-solid fa-location-dot"></i>
                               <span>
-                                {r?.location ||r?.address ||   "-"}
+                                {r?.location || r?.address || "-"}
                               </span>
                             </div>
                           </td>
@@ -462,13 +447,13 @@ export default function Dashboard() {
                             <div className="contact-detail">
                               <i className="fa-solid fa-phone"></i>
                               <span>
-                                {r?.contact ||r?.phone || "-"}
+                                {r?.contact || r?.phone || "-"}
                               </span>
                             </div>
                           </td>
                           <td>
                             <div className="notes-detail">
-                              {r?.notes ||"No additional notes"}
+                              {r?.notes || "No additional notes"}
                             </div>
                           </td>
                           <td>

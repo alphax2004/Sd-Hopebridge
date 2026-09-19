@@ -31,7 +31,7 @@
   background: #ffffff;
   border: 1px solid #eee3d0;
   border-radius: 14px;
-  padding: 20px;
+  padding: 10px;
   transition: 0.2s ease;
   display: flex;
   align-items: center;
@@ -64,7 +64,7 @@
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: 23px;
   font-weight: 700;
   color: #000000;
 }
@@ -79,7 +79,7 @@
 
 .stat-note {
   font-size: 11px;
-  color: #1b1818;
+  color: #060505;
   margin-top: 4px;
 }
 
