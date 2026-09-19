@@ -348,6 +348,35 @@
   font-size: 11px;
   line-height: 1.5;
 }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-height: 120px;
+}
+
+.stat-card h4 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.stat-card h2 {
+  margin: 0 0 5px;
+  font-size: 28px;
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 13px;
+}
 
 
 /* =========================
