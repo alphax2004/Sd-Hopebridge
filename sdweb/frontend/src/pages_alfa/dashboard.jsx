@@ -3,8 +3,7 @@ import { Sidebar, Topbar } from "./sidebar";
 import "./dashboard.css";
 
 const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:4000";
+  import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export default function Dashboard() {
   const [requests, setRequests] = useState([]);
@@ -56,8 +55,8 @@ export default function Dashboard() {
         } else {
           setError(
             data?.error ||
-            data?.message ||
-            "Failed to load requests."
+              data?.message ||
+              "Failed to load requests."
           );
         }
 
@@ -67,10 +66,6 @@ export default function Dashboard() {
 
       // ========================================
       // BACKEND RESPONSE
-      // Supports:
-      // []
-      // { requests: [] }
-      // { data: [] }
       // ========================================
 
       if (Array.isArray(data)) {
@@ -86,31 +81,28 @@ export default function Dashboard() {
 
         setRequests([]);
       }
-
     } catch (err) {
-      console.log(
-        "LOAD REQUESTS ERROR:",
-        err
-      );
+      console.log("LOAD REQUESTS ERROR:", err);
 
       setError(
         "Unable to connect to server. Please check whether the backend is running."
       );
 
       setRequests([]);
-
     } finally {
       setLoading(false);
     }
   }, []);
 
   // ==========================================
-  // INITIAL LOAD AND AUTO REFRESH
-  // Every 10 seconds
+  // INITIAL LOAD + AUTO REFRESH
   // ==========================================
 
   useEffect(() => {
-    const initialLoad = setTimeout(loadRequests, 0);
+    const initialLoad = setTimeout(() => {
+      loadRequests();
+    }, 0);
+
     const interval = setInterval(() => {
       loadRequests();
     }, 10000);
@@ -131,8 +123,8 @@ export default function Dashboard() {
     (request) =>
       String(
         request?.status ||
-        request?.requestStatus ||
-        ""
+          request?.requestStatus ||
+          ""
       ).toLowerCase() === "pending"
   ).length;
 
@@ -140,16 +132,16 @@ export default function Dashboard() {
     (request) =>
       String(
         request?.status ||
-        request?.requestStatus ||
-        ""
+          request?.requestStatus ||
+          ""
       ).toLowerCase() === "approved"
   ).length;
 
   // ==========================================
-  // BAR CHART DATA
+  // APPROVED REQUEST COUNT BY DAY
   // ==========================================
 
-  const barData = [
+  const approvedBarData = [
     ["Sun", 0],
     ["Mon", 0],
     ["Tue", 0],
@@ -160,13 +152,22 @@ export default function Dashboard() {
   ];
 
   requests.forEach((request) => {
+    const status = String(
+      request?.status ||
+        request?.requestStatus ||
+        ""
+    ).toLowerCase();
+
+    // Only approved requests are counted
+    if (status !== "approved") {
+      return;
+    }
+
     if (!request?.createdAt) {
       return;
     }
 
-    const date = new Date(
-      request.createdAt
-    );
+    const date = new Date(request.createdAt);
 
     if (Number.isNaN(date.getTime())) {
       return;
@@ -174,16 +175,19 @@ export default function Dashboard() {
 
     const day = date.getDay();
 
-    if (barData[day]) {
-      barData[day][1]++;
-    }
+    // Each approved request = 1
+    // Quantity is NOT used here.
+    approvedBarData[day][1]++;
   });
+  // GRAPH SCALE
+// Graph will always show 0 to 5
+const yAxisMax = 5;
 
-  const maxBarValue = Math.max(
-    ...barData.map((item) => item[1]),
-    1
-  );
+const yAxisValues = [];
 
+for (let value = yAxisMax; value >= 0; value--) {
+  yAxisValues.push(value);
+}
   // ==========================================
   // MANUAL REFRESH
   // ==========================================
@@ -191,6 +195,45 @@ export default function Dashboard() {
   const handleRefresh = async () => {
     await loadRequests();
   };
+
+  // ==========================================
+  // FORMAT DATE
+  // ==========================================
+
+  function formatDate(dateValue) {
+    if (!dateValue) {
+      return "-";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return "-";
+    }
+
+    return date.toLocaleDateString();
+  }
+
+  // ==========================================
+  // FORMAT TIME
+  // ==========================================
+
+  function formatTime(dateValue) {
+    if (!dateValue) {
+      return "-";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return "-";
+    }
+
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
 
   // ==========================================
   // UI
@@ -203,6 +246,10 @@ export default function Dashboard() {
 
       <div className="main-content">
 
+        {/* ==================================
+            TOPBAR
+        ================================== */}
+
         <Topbar
           title="Welcome back, Sanjida 👋"
           subtitle="Stay safe, stay informed. We are here to help you."
@@ -213,6 +260,8 @@ export default function Dashboard() {
         ================================== */}
 
         <div className="stat-cards">
+
+          {/* TOTAL */}
 
           <div className="stat-card">
 
@@ -239,6 +288,8 @@ export default function Dashboard() {
           </div>
 
 
+          {/* PENDING */}
+
           <div className="stat-card">
 
             <div className="stat-card-top">
@@ -263,6 +314,8 @@ export default function Dashboard() {
 
           </div>
 
+
+          {/* APPROVED */}
 
           <div className="stat-card">
 
@@ -292,63 +345,135 @@ export default function Dashboard() {
 
 
         {/* ==================================
-            REQUEST CHART
+            APPROVED REQUESTS OVER TIME
         ================================== */}
 
-        <div className="chart-card">
+        <div className="approved-request-section">
 
-          <div className="card-header">
+          {/* OUTSIDE BOX HEADING */}
 
-            <h3>
-              Requests Over Time
-            </h3>
+          <div className="approved-request-heading">
 
-            <button
-              className="action-btn"
-              onClick={handleRefresh}
-              disabled={loading}
-            >
-              {loading
-                ? "Loading..."
-                : "Refresh"}
-            </button>
+            <h2>
+              Approved Requests Over Time
+            </h2>
+
+            <p>
+              Number of approved requests submitted each day
+            </p>
 
           </div>
 
 
-          <div className="bar-chart">
+          {/* GRAPH BOX */}
 
-            {barData.map((b) => {
+          <div className="chart-card">
 
-              const barHeight =
-                b[1] === 0
-                  ? 3
-                  : Math.max(
-                      (b[1] / maxBarValue) * 150,
-                      10
-                    );
+            <div className="card-header">
 
-              return (
-                <div
-                  className="bar-col"
-                  key={b[0]}
-                >
+              <button
+                className="action-btn"
+                onClick={handleRefresh}
+                disabled={loading}
+              >
+                {loading
+                  ? "Loading..."
+                  : "Refresh"}
+              </button>
 
-                  <div
-                    className="bar"
-                    style={{
-                      height: `${barHeight}px`,
-                    }}
-                    title={`${b[1]} request(s)`}
-                  />
+            </div>
 
-                  <span>
-                    {b[0]}
+
+            {/* GRAPH */}
+
+            <div className="graph-wrapper">
+
+              {/* Y AXIS */}
+
+              <div className="graph-y-axis">
+
+                {yAxisValues.map((value) => (
+                  <span key={value}>
+                    {value}
                   </span>
+                ))}
+
+              </div>
+
+
+              {/* GRAPH AREA */}
+
+              <div className="graph-area">
+
+                {/* GRID */}
+
+                <div className="graph-grid">
+
+                  {yAxisValues.map((value) => (
+                    <div
+                      className="graph-grid-line"
+                      key={value}
+                    ></div>
+                  ))}
 
                 </div>
-              );
-            })}
+
+
+                {/* BARS */}
+
+                <div className="graph-bars">
+
+                  {approvedBarData.map((item) => {
+
+                    const day = item[0];
+                    const count = item[1];
+
+                    const barHeight =
+                      count === 0
+                        ? 0
+                        : (count / yAxisMax) * 100;
+
+                    return (
+                      <div
+                        className="graph-bar-column"
+                        key={day}
+                      >
+
+                        {/* VALUE */}
+
+                        {count > 0 && (
+                          <span className="graph-bar-value">
+                            {count}
+                          </span>
+                        )}
+
+
+                        {/* BAR */}
+
+                        <div
+                          className="graph-bar"
+                          style={{
+                            height: `${barHeight}%`,
+                          }}
+                          title={`${count} approved request(s)`}
+                        ></div>
+
+
+                        {/* DAY */}
+
+                        <span className="graph-day">
+                          {day}
+                        </span>
+
+                      </div>
+                    );
+                  })}
+
+                </div>
+
+              </div>
+
+            </div>
 
           </div>
 
@@ -356,210 +481,321 @@ export default function Dashboard() {
 
 
         {/* ==================================
-            REQUEST TABLE
+            RECENT REQUESTS
         ================================== */}
 
-        <div className="table-card">
+        <div className="recent-request-section">
 
-          <div className="card-header">
+          {/* OUTSIDE BOX HEADING */}
 
-            <h3>
+          <div className="recent-request-heading">
+
+            <h2>
               Recent Requests
-            </h3>
+            </h2>
 
-            <button
-              className="action-btn"
-              onClick={handleRefresh}
-              disabled={loading}
-            >
-              {loading
-                ? "Loading..."
-                : "Refresh"}
-            </button>
+            <p>
+              Complete details of your submitted help requests
+            </p>
 
           </div>
 
 
-          {/* LOADING */}
+          {/* TABLE BOX */}
 
-          {loading ? (
+          <div className="table-card">
 
-            <div className="table-message">
-              Loading requests...
-            </div>
-
-
-          ) : error ? (
-
-            /* ERROR */
-
-            <div className="table-message error-message">
-
-              {error}
-
-              <br />
+            <div className="card-header">
 
               <button
                 className="action-btn"
                 onClick={handleRefresh}
+                disabled={loading}
               >
-                Retry
+                {loading
+                  ? "Loading..."
+                  : "Refresh"}
               </button>
 
             </div>
 
 
-          ) : requests.length === 0 ? (
+            {/* LOADING */}
 
-            /* NO REQUESTS */
+            {loading ? (
 
-            <div className="table-message">
-              No requests found.
-            </div>
-
-
-          ) : (
-
-            /* REQUEST TABLE */
-
-            <div className="responsive-table">
-
-              <table>
-
-                <thead>
-
-                  <tr>
-
-                    <th>
-                      Request ID
-                    </th>
-
-                    <th>
-                      Type
-                    </th>
-
-                    <th>
-                      Items
-                    </th>
-
-                    <th>
-                      Quantity
-                    </th>
-
-                    <th>
-                      Location
-                    </th>
-
-                    <th>
-                      Date
-                    </th>
-
-                    <th>
-                      Priority
-                    </th>
-
-                    <th>
-                      Status
-                    </th>
-
-                  </tr>
-
-                </thead>
+              <div className="table-message">
+                Loading requests...
+              </div>
 
 
-                <tbody>
+            ) : error ? (
 
-                  {requests.map((r) => {
+              <div className="table-message error-message">
 
-                    const status =
-                      r?.status ||
-                      r?.requestStatus ||
-                      "Pending";
+                {error}
 
-                    const urgency =
-                      r?.urgency ||
-                      r?.priority ||
-                      "Low";
+                <br />
 
-                    return (
-                      <tr
-                        key={
-                          r?._id ||
-                          `${r?.createdAt}-${r?.type}`
-                        }
-                      >
+                <button
+                  className="action-btn"
+                  onClick={handleRefresh}
+                >
+                  Retry
+                </button>
 
-                        <td>
-                          #
-                          {r?._id
-                            ?.slice(-6)
-                            .toUpperCase() ||
-                            "------"}
-                        </td>
+              </div>
 
 
-                        <td>
-                          {r?.type ||
-                            r?.need ||
-                            r?.requestType ||
-                            "-"}
-                        </td>
+            ) : requests.length === 0 ? (
+
+              <div className="table-message">
+
+                <i className="fa-solid fa-clipboard-list"></i>
+
+                <p>
+                  No requests found.
+                </p>
+
+                <span>
+                  Your submitted help requests will appear here.
+                </span>
+
+              </div>
 
 
-                        <td>
-                          {r?.items || "-"}
-                        </td>
+            ) : (
+
+              <div className="responsive-table">
+
+                <table>
+
+                  <thead>
+
+                    <tr>
+                      <th>Request ID</th>
+                      <th>Type</th>
+                      <th>Items / Requirement</th>
+                      <th>Quantity / People</th>
+                      <th>Urgency</th>
+                      <th>Location</th>
+                      <th>Contact</th>
+                      <th>Notes</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Status</th>
+                    </tr>
+
+                  </thead>
 
 
-                        <td>
-                          {r?.quantity || "-"}
-                        </td>
+                  <tbody>
+
+                    {requests.map((r) => {
+
+                      const status =
+                        r?.status ||
+                        r?.requestStatus ||
+                        "Pending";
+
+                      const urgency =
+                        r?.urgency ||
+                        r?.priority ||
+                        "Low";
+
+                      return (
+
+                        <tr
+                          key={
+                            r?._id ||
+                            `${r?.createdAt}-${r?.type}`
+                          }
+                        >
+
+                          {/* REQUEST ID */}
+
+                          <td>
+
+                            <span className="request-id">
+                              #
+                              {r?._id
+                                ?.slice(-6)
+                                .toUpperCase() ||
+                                "------"}
+                            </span>
+
+                          </td>
 
 
-                        <td>
-                          {r?.location ||
-                            r?.address ||
-                            "-"}
-                        </td>
+                          {/* TYPE */}
+
+                          <td>
+
+                            <div className="request-type">
+
+                              <i
+                                className={
+                                  r?.type === "Food"
+                                    ? "fa-solid fa-bowl-food"
+                                    : r?.type === "Shelter"
+                                    ? "fa-solid fa-house"
+                                    : r?.type === "Medical"
+                                    ? "fa-solid fa-kit-medical"
+                                    : r?.type === "Water"
+                                    ? "fa-solid fa-droplet"
+                                    : "fa-solid fa-circle-info"
+                                }
+                              ></i>
+
+                              <span>
+                                {r?.type ||
+                                  r?.need ||
+                                  r?.requestType ||
+                                  "-"}
+                              </span>
+
+                            </div>
+
+                          </td>
 
 
-                        <td>
-                          {r?.createdAt
-                            ? new Date(
-                                r.createdAt
-                              ).toLocaleDateString()
-                            : "-"}
-                        </td>
+                          {/* ITEMS */}
+
+                          <td>
+
+                            <div className="request-detail">
+
+                              <strong>
+                                {r?.items || "-"}
+                              </strong>
+
+                            </div>
+
+                          </td>
 
 
-                        <td>
-                          <span
-                            className={`status ${urgency}`}
-                          >
-                            {urgency}
-                          </span>
-                        </td>
+                          {/* QUANTITY */}
+
+                          <td>
+                            {r?.quantity || "-"}
+                          </td>
 
 
-                        <td>
-                          <span
-                            className={`status ${status}`}
-                          >
-                            {status}
-                          </span>
-                        </td>
+                          {/* URGENCY */}
 
-                      </tr>
-                    );
-                  })}
+                          <td>
 
-                </tbody>
+                            <span
+                              className={`status ${String(
+                                urgency
+                              ).toLowerCase()}`}
+                            >
+                              {urgency}
+                            </span>
 
-              </table>
+                          </td>
 
-            </div>
 
-          )}
+                          {/* LOCATION */}
+
+                          <td>
+
+                            <div className="location-detail">
+
+                              <i className="fa-solid fa-location-dot"></i>
+
+                              <span>
+                                {r?.location ||
+                                  r?.address ||
+                                  "-"}
+                              </span>
+
+                            </div>
+
+                          </td>
+
+
+                          {/* CONTACT */}
+
+                          <td>
+
+                            <div className="contact-detail">
+
+                              <i className="fa-solid fa-phone"></i>
+
+                              <span>
+                                {r?.contact ||
+                                  r?.phone ||
+                                  "-"}
+                              </span>
+
+                            </div>
+
+                          </td>
+
+
+                          {/* NOTES */}
+
+                          <td>
+
+                            <div className="notes-detail">
+
+                              {r?.notes
+                                ? r.notes
+                                : "No additional notes"}
+
+                            </div>
+
+                          </td>
+
+
+                          {/* DATE */}
+
+                          <td>
+                            {formatDate(
+                              r?.createdAt
+                            )}
+                          </td>
+
+
+                          {/* TIME */}
+
+                          <td>
+                            {formatTime(
+                              r?.createdAt
+                            )}
+                          </td>
+
+
+                          {/* STATUS */}
+
+                          <td>
+
+                            <span
+                              className={`status ${String(
+                                status
+                              ).toLowerCase()}`}
+                            >
+                              {status}
+                            </span>
+
+                          </td>
+
+                        </tr>
+
+                      );
+
+                    })}
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+            )}
+
+          </div>
 
         </div>
 

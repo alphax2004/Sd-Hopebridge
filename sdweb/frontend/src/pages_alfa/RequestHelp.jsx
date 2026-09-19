@@ -29,42 +29,32 @@ const helpTypes = [
 export default function RequestHelp() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] =
-    useState({
-      type: "Food",
-      items: "",
-      quantity: "",
-      urgency: "Medium",
-      location: "",
-      contact: "",
-      notes: "",
-    });
+  const [formData, setFormData] = useState({
+    type: "Food",
+    items: "",
+    quantity: "",
+    urgency: "Medium",
+    location: "",
+    contact: "",
+    notes: "",
+  });
 
-  const [error, setError] =
-    useState("");
-
-  const [submitted, setSubmitted] =
-    useState(false);
-
-  const [loading, setLoading] =
-    useState(false);
+  const [error, setError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // ==========================================
   // HANDLE INPUT
   // ==========================================
 
   function handleChange(e) {
-    const {
-      name,
-      value,
-    } = e.target;
+    const { name, value } = e.target;
 
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
 
-    // Remove old error while typing
     if (error) {
       setError("");
     }
@@ -82,7 +72,11 @@ export default function RequestHelp() {
     setFormData((prev) => ({
       ...prev,
       type: typeKey,
+      items: "",
+      quantity: "",
     }));
+
+    setError("");
   }
 
   // ==========================================
@@ -90,19 +84,28 @@ export default function RequestHelp() {
   // ==========================================
 
   function validateForm() {
-    const items =
-      formData.items.trim();
-
-    const location =
-      formData.location.trim();
-
-    const contact =
-      formData.contact.trim();
-
-    // Required fields
+    const items = formData.items.trim();
+    const location = formData.location.trim();
+    const contact = formData.contact.trim();
 
     if (!items) {
-      return "Please enter the items you need.";
+      if (formData.type === "Food") {
+        return "Please enter the food items you need.";
+      }
+
+      if (formData.type === "Shelter") {
+        return "Please select the shelter type you need.";
+      }
+
+      if (formData.type === "Medical") {
+        return "Please enter the medicine you need.";
+      }
+
+      if (formData.type === "Water") {
+        return "Please enter the amount of water you need.";
+      }
+
+      return "Please provide your requirement.";
     }
 
     if (!location) {
@@ -114,23 +117,17 @@ export default function RequestHelp() {
     }
 
     // Bangladesh phone validation
-    const cleanContact =
-      contact.replace(/\s|-/g, "");
+    const cleanContact = contact.replace(/\s|-/g, "");
 
-    const phonePattern =
-      /^01[3-9]\d{8}$/;
+    const phonePattern = /^01[3-9]\d{8}$/;
 
     if (!phonePattern.test(cleanContact)) {
       return "Please enter a valid Bangladesh contact number, for example 01XXXXXXXXX.";
     }
 
-    // Items length
-
     if (items.length < 2) {
-      return "Please provide a little more detail about the items needed.";
+      return "Please provide a little more detail about your requirement.";
     }
-
-    // Location length
 
     if (location.length < 2) {
       return "Please enter a valid location.";
@@ -146,16 +143,13 @@ export default function RequestHelp() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // Prevent double submit
     if (loading) {
       return;
     }
 
     setError("");
 
-    // Validate
-    const validationError =
-      validateForm();
+    const validationError = validateForm();
 
     if (validationError) {
       setError(validationError);
@@ -165,19 +159,16 @@ export default function RequestHelp() {
     try {
       setLoading(true);
 
-      const cleanContact =
-        formData.contact
-          .trim()
-          .replace(/\s|-/g, "");
+      const cleanContact = formData.contact
+        .trim()
+        .replace(/\s|-/g, "");
 
       const requestData = {
         type: formData.type,
         items: formData.items.trim(),
-        quantity:
-          formData.quantity.trim(),
+        quantity: formData.quantity.trim(),
         urgency: formData.urgency,
-        location:
-          formData.location.trim(),
+        location: formData.location.trim(),
         contact: cleanContact,
         notes: formData.notes.trim(),
       };
@@ -188,17 +179,13 @@ export default function RequestHelp() {
           method: "POST",
 
           headers: {
-            "Content-Type":
-              "application/json",
-            Accept:
-              "application/json",
+            "Content-Type": "application/json",
+            Accept: "application/json",
           },
 
           credentials: "include",
 
-          body: JSON.stringify(
-            requestData
-          ),
+          body: JSON.stringify(requestData),
         }
       );
 
@@ -207,19 +194,14 @@ export default function RequestHelp() {
       // ========================================
 
       const contentType =
-        response.headers.get(
-          "content-type"
-        ) || "";
+        response.headers.get("content-type") || "";
 
       let data = null;
 
       if (
-        contentType.includes(
-          "application/json"
-        )
+        contentType.includes("application/json")
       ) {
-        data =
-          await response.json();
+        data = await response.json();
       }
 
       // ========================================
@@ -231,25 +213,21 @@ export default function RequestHelp() {
           setError(
             "Your session has expired. Please login again."
           );
-        } else if (
-          response.status === 403
-        ) {
+        } else if (response.status === 403) {
           setError(
             "You are not allowed to submit a request."
           );
-        } else if (
-          response.status === 400
-        ) {
+        } else if (response.status === 400) {
           setError(
             data?.error ||
-            data?.message ||
-            "Please check the information you entered."
+              data?.message ||
+              "Please check the information you entered."
           );
         } else {
           setError(
             data?.error ||
-            data?.message ||
-            "Failed to submit request. Please try again."
+              data?.message ||
+              "Failed to submit request. Please try again."
           );
         }
 
@@ -262,8 +240,6 @@ export default function RequestHelp() {
 
       setSubmitted(true);
 
-      // Clear form after successful submission
-
       setFormData({
         type: "Food",
         items: "",
@@ -273,9 +249,6 @@ export default function RequestHelp() {
         contact: "",
         notes: "",
       });
-
-      // Go to dashboard
-      // Dashboard will show Pending status
 
       setTimeout(() => {
         navigate("/dashboard");
@@ -294,6 +267,162 @@ export default function RequestHelp() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // ==========================================
+  // DYNAMIC REQUIREMENT FIELD
+  // ==========================================
+
+  function renderRequirementField() {
+
+    // ============================
+    // FOOD
+    // ============================
+
+    if (formData.type === "Food") {
+      return (
+        <div className="field-group">
+
+          <label>
+            Food items needed
+          </label>
+
+          <div className="input-box">
+
+            <i className="fa-solid fa-bowl-food"></i>
+
+            <input
+              type="text"
+              name="items"
+              placeholder="e.g. Rice, Dal, Oil, Salt"
+              value={formData.items}
+              onChange={handleChange}
+              disabled={loading}
+              maxLength={300}
+            />
+
+          </div>
+
+        </div>
+      );
+    }
+
+    // ============================
+    // SHELTER
+    // ============================
+
+    if (formData.type === "Shelter") {
+      return (
+        <div className="field-group">
+
+          <label>
+            Shelter needed
+          </label>
+
+          <div className="input-box">
+
+            <i className="fa-solid fa-house"></i>
+
+            <select
+              name="items"
+              value={formData.items}
+              onChange={handleChange}
+              disabled={loading}
+            >
+
+              <option value="">
+                Select shelter type
+              </option>
+
+              <option value="Emergency shelter">
+                Emergency shelter
+              </option>
+
+              <option value="Family shelter">
+                Family shelter
+              </option>
+
+              <option value="Temporary shelter">
+                Temporary shelter
+              </option>
+
+              <option value="Evacuation center">
+                Evacuation center
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+      );
+    }
+
+    // ============================
+    // MEDICAL
+    // ============================
+
+    if (formData.type === "Medical") {
+      return (
+        <div className="field-group">
+
+          <label>
+            Medicine needed
+          </label>
+
+          <div className="input-box">
+
+            <i className="fa-solid fa-kit-medical"></i>
+
+            <input
+              type="text"
+              name="items"
+              placeholder="e.g. Paracetamol, ORS, Bandage"
+              value={formData.items}
+              onChange={handleChange}
+              disabled={loading}
+              maxLength={300}
+            />
+
+          </div>
+
+        </div>
+      );
+    }
+
+    // ============================
+    // WATER
+    // ============================
+
+    if (formData.type === "Water") {
+      return (
+        <div className="field-group">
+
+          <label>
+            Water quantity
+          </label>
+
+          <div className="input-box">
+
+            <i className="fa-solid fa-droplet"></i>
+
+            <input
+              type="text"
+              name="items"
+              placeholder="e.g. 20 liters"
+              value={formData.items}
+              onChange={handleChange}
+              disabled={loading}
+              maxLength={100}
+            />
+
+          </div>
+
+        </div>
+      );
+    }
+
+    return null;
   }
 
   // ==========================================
@@ -361,13 +490,12 @@ export default function RequestHelp() {
                         : ""
                     }`}
                     onClick={() =>
-                      handleTypeSelect(
-                        t.key
-                      )
+                      handleTypeSelect(t.key)
                     }
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
+
                       if (
                         e.key === "Enter" ||
                         e.key === " "
@@ -376,6 +504,7 @@ export default function RequestHelp() {
                           t.key
                         );
                       }
+
                     }}
                   >
 
@@ -397,30 +526,10 @@ export default function RequestHelp() {
 
 
             {/* ==================================
-                ITEMS
+                DYNAMIC REQUIREMENT
             ================================== */}
 
-            <div className="field-group">
-
-              <label>
-                Items needed
-              </label>
-
-              <div className="input-box">
-
-                <input
-                  type="text"
-                  name="items"
-                  placeholder="e.g. Rice, Dal, Oil, Salt"
-                  value={formData.items}
-                  onChange={handleChange}
-                  disabled={loading}
-                  maxLength={300}
-                />
-
-              </div>
-
-            </div>
+            {renderRequirementField()}
 
 
             {/* ==================================
