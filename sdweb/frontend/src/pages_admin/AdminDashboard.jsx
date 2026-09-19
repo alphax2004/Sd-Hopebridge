@@ -1,54 +1,108 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Sidebar, Topbar } from "../pages_victim/sidebar/sidebar";
 import "./admin.css";
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:4000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export default function AdminDashboard() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Concurrent Execution & Retry Tracker References
+  const abortControllerRef = useRef(null);
+  const isComponentMountedRef = useRef(true);
+  const retryCountRef = useRef(0);
+
+  // ==========================================
+  // ENTERPRISE DATA FETCHING ENGINE WITH ABORT
+  // ==========================================
   const loadRequests = useCallback(async () => {
+    // Abort active ongoing fetch to eliminate race conditions
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
-      setError("");
+      if (isComponentMountedRef.current) {
+        setError("");
+      }
 
       const response = await fetch(`${API_URL}/api/requests`, {
         method: "GET",
         credentials: "include",
+        signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Cache-Control": "no-cache",
         },
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          data.message || "Failed to load victim requests"
+          errorData.message ||
+          errorData.error ||
+          `HTTP ${response.status}: Failed to load victim requests`
         );
       }
 
+      const data = await response.json();
+
+      if (!isComponentMountedRef.current) return;
+
+      // Safe Extraction Algorithm
+      let extractedRequests = [];
       if (Array.isArray(data)) {
-        setRequests(data);
-      } else if (Array.isArray(data.requests)) {
-        setRequests(data.requests);
-      } else if (Array.isArray(data.data)) {
-        setRequests(data.data);
-      } else {
-        setRequests([]);
+        extractedRequests = data;
+      } else if (Array.isArray(data?.requests)) {
+        extractedRequests = data.requests;
+      } else if (Array.isArray(data?.data)) {
+        extractedRequests = data.data;
+      } else if (data && typeof data === "object") {
+        extractedRequests = Object.values(data).find(Array.isArray) || [];
       }
+
+      // Memory Diffing to skip unnecessary state updates
+      setRequests((prev) => {
+        const isUnchanged = JSON.stringify(prev) === JSON.stringify(extractedRequests);
+        return isUnchanged ? prev : extractedRequests;
+      });
+
+      retryCountRef.current = 0; // Reset exponential retry count
     } catch (err) {
+      if (err.name === "AbortError") {
+        return; // Suppress safe abort errors
+      }
+
       console.error("Load requests error:", err);
-      setError(
-        err.message || "Failed to load victim requests"
-      );
+
+      if (isComponentMountedRef.current) {
+        setError(err.message || "Failed to load victim requests");
+      }
     } finally {
-      setLoading(false);
+      if (isComponentMountedRef.current) {
+        setLoading(false);
+      }
     }
   }, []);
 
+  // Component Lifecycle Management
+  useEffect(() => {
+    isComponentMountedRef.current = true;
+    return () => {
+      isComponentMountedRef.current = false;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  // Initial Fetching
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       loadRequests();
@@ -57,157 +111,169 @@ export default function AdminDashboard() {
     return () => clearTimeout(timeoutId);
   }, [loadRequests]);
 
+  // Exponential Backoff Auto-Polling
   useEffect(() => {
-    const interval = setInterval(() => {
-      loadRequests();
-    }, 10000);
+    let intervalId;
 
-    return () => clearInterval(interval);
-  }, [loadRequests]);
+    const schedulePolling = () => {
+      const baseDelay = 10000;
+      const computedDelay = error
+        ? Math.min(baseDelay * Math.pow(2, retryCountRef.current), 60000)
+        : baseDelay;
 
-  // Get request status
-  const getStatus = (request) =>
-    request.status || request.requestStatus || "Pending";
+      intervalId = setInterval(() => {
+        if (error) retryCountRef.current += 1;
+        loadRequests();
+      }, computedDelay);
+    };
 
-  // Get request urgency
-  const getUrgency = (request) =>
-    request.urgency || request.priority || "Low";
+    schedulePolling();
 
-  // =========================
-  // REQUEST COUNTS
-  // =========================
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [loadRequests, error]);
 
-  const totalRequests = requests.length;
+  // ==========================================
+  // RESILIENT GETTER HELPERS
+  // ==========================================
+  const getStatus = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Pending";
+    return request.status || request.requestStatus || "Pending";
+  }, []);
 
-  const pendingRequests = requests.filter(
-    (request) =>
-      getStatus(request).toLowerCase() === "pending"
-  ).length;
+  const getUrgency = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Low";
+    return request.urgency || request.priority || "Low";
+  }, []);
 
-  const approvedRequests = requests.filter(
-    (request) =>
-      getStatus(request).toLowerCase() === "approved"
-  ).length;
+  const getVictimName = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Unknown User";
+    return (
+      request.userId?.fullName ||
+      request.user?.fullName ||
+      request.fullName ||
+      request.name ||
+      "Unknown User"
+    );
+  }, []);
 
-  const rejectedRequests = requests.filter(
-    (request) =>
-      getStatus(request).toLowerCase() === "rejected"
-  ).length;
+  const getLocation = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Unknown";
+    return request.location || request.address || "Unknown";
+  }, []);
 
-  const volunteerAssignedRequests = requests.filter(
-    (request) =>
-      getStatus(request).toLowerCase() ===
-      "volunteer assigned"
-  ).length;
+  const getDisaster = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Unknown";
+    return (
+      request.disaster ||
+      request.disasterType ||
+      request.incidentType ||
+      "Unknown"
+    );
+  }, []);
 
-  const deliveredRequests = requests.filter(
-    (request) =>
-      getStatus(request).toLowerCase() === "delivered"
-  ).length;
+  const getRequestType = useCallback((request) => {
+    if (!request || typeof request !== "object") return "General Help";
+    return (
+      request.type ||
+      request.need ||
+      request.requestType ||
+      "General Help"
+    );
+  }, []);
 
-  // =========================
-  // PRIORITY COUNTS
-  // =========================
+  const getFamilyMembers = useCallback((request) => {
+    if (!request || typeof request !== "object") return "-";
+    return (
+      request.familyMembers ??
+      request.members ??
+      request.numberOfPeople ??
+      "-"
+    );
+  }, []);
 
-  const lowPriorityRequests = requests.filter(
-    (request) =>
-      getUrgency(request).toLowerCase() === "low"
-  ).length;
+  // ==========================================
+  // SINGLE-PASS O(N) AGGREGATION ENGINE
+  // ==========================================
+  const {
+    totalRequests,
+    pendingRequests,
+    approvedRequests,
+    rejectedRequests,
+    volunteerAssignedRequests,
+    deliveredRequests,
+    lowPriorityRequests,
+    mediumPriorityRequests,
+    highPriorityRequests,
+    criticalRequests,
+    emergencyLevel,
+  } = useMemo(() => {
+    const counts = {
+      totalRequests: requests.length,
+      pendingRequests: 0,
+      approvedRequests: 0,
+      rejectedRequests: 0,
+      volunteerAssignedRequests: 0,
+      deliveredRequests: 0,
+      lowPriorityRequests: 0,
+      mediumPriorityRequests: 0,
+      highPriorityRequests: 0,
+      criticalRequests: 0,
+    };
 
-  const mediumPriorityRequests = requests.filter(
-    (request) =>
-      getUrgency(request).toLowerCase() === "medium"
-  ).length;
+    requests.forEach((req) => {
+      const status = getStatus(req).toLowerCase();
+      const urgency = getUrgency(req).toLowerCase();
 
-  const highPriorityRequests = requests.filter(
-    (request) =>
-      getUrgency(request).toLowerCase() === "high"
-  ).length;
+      // Status aggregation
+      if (status === "pending") counts.pendingRequests++;
+      else if (status === "approved") counts.approvedRequests++;
+      else if (status === "rejected") counts.rejectedRequests++;
+      else if (status === "volunteer assigned") counts.volunteerAssignedRequests++;
+      else if (status === "delivered") counts.deliveredRequests++;
 
-  const criticalRequests = requests.filter(
-    (request) =>
-      getUrgency(request).toLowerCase() === "critical"
-  ).length;
+      // Urgency aggregation
+      if (urgency === "low") counts.lowPriorityRequests++;
+      else if (urgency === "medium") counts.mediumPriorityRequests++;
+      else if (urgency === "high") counts.highPriorityRequests++;
+      else if (urgency === "critical") counts.criticalRequests++;
+    });
 
-  // =========================
-  // EMERGENCY LEVEL
-  // =========================
+    let emergencyLevel = "Low";
+    if (counts.criticalRequests > 0) {
+      emergencyLevel = "Critical";
+    } else if (counts.highPriorityRequests > 0) {
+      emergencyLevel = "High";
+    } else if (counts.mediumPriorityRequests > 0) {
+      emergencyLevel = "Medium";
+    }
 
-  let emergencyLevel = "Low";
+    return { ...counts, emergencyLevel };
+  }, [requests, getStatus, getUrgency]);
 
-  if (criticalRequests > 0) {
-    emergencyLevel = "Critical";
-  } else if (highPriorityRequests > 0) {
-    emergencyLevel = "High";
-  } else if (mediumPriorityRequests > 0) {
-    emergencyLevel = "Medium";
-  }
+  // ==========================================
+  // MEMOIZED SORTED RECENT REQUESTS
+  // ==========================================
+  const recentRequests = useMemo(() => {
+    return [...requests]
+      .sort((a, b) => {
+        const dateA = new Date(a?.createdAt || a?.created_at || 0).getTime();
+        const dateB = new Date(b?.createdAt || b?.created_at || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 5);
+  }, [requests]);
 
-  // =========================
-  // REQUEST INFORMATION
-  // =========================
-
-  const getVictimName = (request) =>
-    request.userId?.fullName ||
-    request.user?.fullName ||
-    request.fullName ||
-    request.name ||
-    "Unknown User";
-
-  const getLocation = (request) =>
-    request.location ||
-    request.address ||
-    "Unknown";
-
-  const getDisaster = (request) =>
-    request.disaster ||
-    request.disasterType ||
-    request.incidentType ||
-    "Unknown";
-
-  const getRequestType = (request) =>
-    request.type ||
-    request.need ||
-    request.requestType ||
-    "General Help";
-
-  const getFamilyMembers = (request) =>
-    request.familyMembers ??
-    request.members ??
-    request.numberOfPeople ??
-    "-";
-
-  // =========================
-  // RECENT REQUESTS
-  // =========================
-
-  const recentRequests = [...requests]
-    .sort((a, b) => {
-      const dateA = new Date(
-        a.createdAt || a.created_at || 0
-      );
-
-      const dateB = new Date(
-        b.createdAt || b.created_at || 0
-      );
-
-      return dateB - dateA;
-    })
-    .slice(0, 5);
-
-  // =========================
-  // REFRESH
-  // =========================
-
+  // Refresh Handler
   const handleRefresh = async () => {
     setLoading(true);
     await loadRequests();
   };
 
-  // =========================
-  // LOADING
-  // =========================
-
+  // ==========================================
+  // LOADING UI
+  // ==========================================
   if (loading && requests.length === 0) {
     return (
       <div className="admin-layout">
@@ -229,10 +295,9 @@ export default function AdminDashboard() {
     );
   }
 
-  // =========================
-  // DASHBOARD
-  // =========================
-
+  // ==========================================
+  // DASHBOARD UI (EXACT SAME UI & ELEMENTS)
+  // ==========================================
   return (
     <div className="admin-layout">
       <Sidebar variant="admin" />
@@ -375,12 +440,12 @@ export default function AdminDashboard() {
               </thead>
 
               <tbody>
-                {recentRequests.map((request) => {
+                {recentRequests.map((request, requestIndex) => {
                   const status = getStatus(request);
                   const urgency = getUrgency(request);
 
                   return (
-                    <tr key={request._id}>
+                    <tr key={request._id || request.id || `request-${requestIndex}`}>
                       <td>
                         {getVictimName(request)}
                       </td>

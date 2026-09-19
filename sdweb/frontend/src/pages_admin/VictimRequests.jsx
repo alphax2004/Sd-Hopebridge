@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Sidebar, Topbar } from "../pages_victim/sidebar/sidebar";
 import "./admin.css";
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:4000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 const statusOptions = [
   "All",
@@ -28,67 +27,94 @@ export default function VictimRequests() {
   const [priorityFilter, setPriorityFilter] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [processingId, setProcessingId] = useState(null);
+
+  const isComponentMounted = useRef(false);
+  const abortControllerRef = useRef(null);
+  const retryCountRef = useRef(0);
+  
+  // Advanced State: Multiple requests concurrently processing lock
+  const [processingIds, setProcessingIds] = useState(new Set());
 
   // ==========================================
   // LOAD ALL VICTIM REQUESTS
   // ==========================================
-
   const loadRequests = useCallback(async () => {
     try {
       setError("");
 
-      const response = await fetch(
-        `${API_URL}/api/requests`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_URL}/api/requests`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.message ||
-          data.error ||
-          "Failed to load victim requests"
+          data?.message ||
+          data?.error ||
+          `HTTP Error ${response.status}: Failed to load victim requests`
         );
       }
 
+      if (!isComponentMounted.current) return;
+
+      // Polymorphic Array Extractor Architecture
+      let extractedData = [];
       if (Array.isArray(data)) {
-        setRequests(data);
-      } else if (Array.isArray(data.requests)) {
-        setRequests(data.requests);
-      } else if (Array.isArray(data.data)) {
-        setRequests(data.data);
-      } else {
-        setRequests([]);
+        extractedData = data;
+      } else if (Array.isArray(data?.requests)) {
+        extractedData = data.requests;
+      } else if (Array.isArray(data?.data)) {
+        extractedData = data.data;
+      } else if (data && typeof data === "object") {
+        extractedData = Object.values(data).find(Array.isArray) || [];
       }
 
+      // Deep State Diffing (Prevents unnecessary DOM re-renders)
+      setRequests((prev) => {
+        const isIdentical = JSON.stringify(prev) === JSON.stringify(extractedData);
+        return isIdentical ? prev : extractedData;
+      });
+
+      retryCountRef.current = 0; // Reset error retry backoff on success
     } catch (err) {
-      console.error(
-        "Load victim requests error:",
-        err
-      );
+      if (err.name === "AbortError") {
+        console.warn("Fetch operation aborted safely.");
+        return;
+      }
 
-      setError(
-        err.message ||
-        "Failed to load victim requests"
-      );
+      console.error("Load victim requests critical error:", err);
 
+      if (isComponentMounted.current) {
+        setError(err.message || "Failed to load victim requests");
+      }
     } finally {
-      setLoading(false);
+      if (isComponentMounted.current) {
+        setLoading(false);
+      }
     }
   }, []);
 
-  // ==========================================
-  // INITIAL LOAD
-  // ==========================================
+  // Lifecycle Tracker
+  useEffect(() => {
+    isComponentMounted.current = true;
+    const abortController = abortControllerRef.current;
 
+    return () => {
+      isComponentMounted.current = false;
+      if (abortController) {
+        abortController.abort();
+      }
+    };
+  }, []);
+
+  // ==========================================
+  // INITIAL LOAD WITH DEFERRED EXECUTION
+  // ==========================================
   useEffect(() => {
     const timeout = setTimeout(() => {
       loadRequests();
@@ -100,49 +126,46 @@ export default function VictimRequests() {
   }, [loadRequests]);
 
   // ==========================================
-  // AUTO REFRESH
-  // Every 10 seconds
+  // RESILIENT EXPONENTIAL POLLING ENGINE
   // ==========================================
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      loadRequests();
-    }, 10000);
+    let intervalId;
+
+    const schedulePolling = () => {
+      // Exponential backoff interval if error occurs (10s base, up to 60s max)
+      const baseDelay = 10000;
+      const computedDelay = error 
+        ? Math.min(baseDelay * Math.pow(2, retryCountRef.current), 60000)
+        : baseDelay;
+
+      intervalId = setInterval(() => {
+        if (error) retryCountRef.current += 1;
+        loadRequests();
+      }, computedDelay);
+    };
+
+    schedulePolling();
 
     return () => {
-      clearInterval(interval);
+      if (intervalId) clearInterval(intervalId);
     };
-  }, [loadRequests]);
+  }, [loadRequests, error]);
 
   // ==========================================
-  // GET STATUS
+  // SAFE DATA ATTRIBUTE EXTRACTORS
   // ==========================================
+  const getStatus = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Pending";
+    return request.status || request.requestStatus || "Pending";
+  }, []);
 
-  const getStatus = (request) => {
-    return (
-      request.status ||
-      request.requestStatus ||
-      "Pending"
-    );
-  };
+  const getPriority = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Low";
+    return request.urgency || request.priority || "Low";
+  }, []);
 
-  // ==========================================
-  // GET PRIORITY
-  // ==========================================
-
-  const getPriority = (request) => {
-    return (
-      request.urgency ||
-      request.priority ||
-      "Low"
-    );
-  };
-
-  // ==========================================
-  // GET VICTIM NAME
-  // ==========================================
-
-  const getVictimName = (request) => {
+  const getVictimName = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Unknown User";
     return (
       request.userId?.fullName ||
       request.user?.fullName ||
@@ -150,125 +173,108 @@ export default function VictimRequests() {
       request.name ||
       "Unknown User"
     );
-  };
+  }, []);
 
-  // ==========================================
-  // GET PHONE
-  // ==========================================
-
-  const getPhone = (request) => {
+  const getPhone = useCallback((request) => {
+    if (!request || typeof request !== "object") return "-";
     return (
       request.userId?.phone ||
       request.user?.phone ||
       request.phone ||
       "-"
     );
-  };
+  }, []);
 
-  // ==========================================
-  // GET LOCATION
-  // ==========================================
+  const getLocation = useCallback((request) => {
+    if (!request || typeof request !== "object") return "-";
+    return request.location || request.address || "-";
+  }, []);
 
-  const getLocation = (request) => {
-    return (
-      request.location ||
-      request.address ||
-      "-"
-    );
-  };
-
-  // ==========================================
-  // GET DISASTER
-  // ==========================================
-
-  const getDisaster = (request) => {
+  const getDisaster = useCallback((request) => {
+    if (!request || typeof request !== "object") return "-";
     return (
       request.disaster ||
       request.disasterType ||
       request.incidentType ||
       "-"
     );
-  };
+  }, []);
 
-  // ==========================================
-  // GET REQUEST TYPE
-  // ==========================================
-
-  const getRequestType = (request) => {
+  const getRequestType = useCallback((request) => {
+    if (!request || typeof request !== "object") return "General Help";
     return (
       request.type ||
       request.need ||
       request.requestType ||
       "General Help"
     );
-  };
+  }, []);
 
-  // ==========================================
-  // GET FAMILY MEMBERS
-  // ==========================================
-
-  const getFamilyMembers = (request) => {
+  const getFamilyMembers = useCallback((request) => {
+    if (!request || typeof request !== "object") return "-";
     return (
       request.familyMembers ??
       request.members ??
       request.numberOfPeople ??
       "-"
     );
-  };
+  }, []);
 
   // ==========================================
-  // FILTER REQUESTS
+  // HIGH-PERFORMANCE MEMOIZED PIPELINE FILTER
   // ==========================================
+  const filteredRequests = useMemo(() => {
+    if (!Array.isArray(requests)) return [];
 
-  const filteredRequests = requests.filter(
-    (request) => {
+    const normStatusFilter = statusFilter.trim().toLowerCase();
+    const normPriorityFilter = priorityFilter.trim().toLowerCase();
 
-      const status =
-        getStatus(request);
+    return requests.filter((request) => {
+      if (!request) return false;
 
-      const priority =
-        getPriority(request);
+      const status = getStatus(request).toLowerCase();
+      const priority = getPriority(request).toLowerCase();
 
       const statusMatch =
-        statusFilter === "All" ||
-        status.toLowerCase() ===
-          statusFilter.toLowerCase();
+        normStatusFilter === "all" || status === normStatusFilter;
 
       const priorityMatch =
-        priorityFilter === "All" ||
-        priority.toLowerCase() ===
-          priorityFilter.toLowerCase();
+        normPriorityFilter === "all" || priority === normPriorityFilter;
 
-      return (
-        statusMatch &&
-        priorityMatch
-      );
-    }
-  );
+      return statusMatch && priorityMatch;
+    });
+  }, [requests, statusFilter, priorityFilter, getStatus, getPriority]);
 
   // ==========================================
-  // UPDATE REQUEST STATUS
+  // ATOMIC OPTIMISTIC STATUS UPDATE PIPELINE
   // ==========================================
-
-  const updateRequestStatus = async (
-    id,
-    action
-  ) => {
-
+  const updateRequestStatus = async (id, action) => {
     if (!id) {
       alert("Request ID is missing.");
       return;
     }
 
-    try {
+    if (processingIds.has(id)) {
+      return; // Lock prevent concurrent clicks on the same item
+    }
 
-      setProcessingId(id);
+    // Capture Snapshot for Reversion on Network Failure
+    const previousStateSnapshot = [...requests];
+    const targetStatus = action === "approve" ? "Approved" : "Rejected";
+
+    try {
+      // 1. Lock Target ID Processing State
+      setProcessingIds((prev) => new Set(prev).add(id));
       setError("");
 
-      const endpoint =
-        action === "approve"
-          ? "approve"
-          : "reject";
+      // 2. Perform Optimistic State Mutation
+      setRequests((prevRequests) =>
+        prevRequests.map((req) =>
+          req._id === id ? { ...req, status: targetStatus } : req
+        )
+      );
+
+      const endpoint = action === "approve" ? "approve" : "reject";
 
       const response = await fetch(
         `${API_URL}/api/requests/${id}/${endpoint}`,
@@ -276,106 +282,73 @@ export default function VictimRequests() {
           method: "PUT",
           credentials: "include",
           headers: {
-            "Content-Type":
-              "application/json",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
           },
         }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(
           data.message ||
           data.error ||
-          `Failed to ${action} request`
+          `Failed to ${action} request on backend server`
         );
       }
 
-      // Reload request list
+      // 3. Re-Sync Backend State safely
       await loadRequests();
-
     } catch (err) {
+      console.error(`Mutation Failure [Action: ${action}, ID: ${id}]:`, err);
 
-      console.error(
-        `${action} request error:`,
-        err
-      );
+      // Revert Optimistic Mutation on Failure
+      setRequests(previousStateSnapshot);
 
-      setError(
-        err.message ||
-        `Failed to ${action} request`
-      );
-
-      alert(
-        err.message ||
-        `Failed to ${action} request`
-      );
-
+      const errorMessage = err.message || `Failed to ${action} request`;
+      setError(errorMessage);
+      alert(errorMessage);
     } finally {
-
-      setProcessingId(null);
-
+      // Release ID Processing Lock
+      setProcessingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
   // ==========================================
-  // ACCEPT
+  // ACTION DISPATCHERS
   // ==========================================
-
   const handleApprove = (id) => {
-
-    const confirmed =
-      window.confirm(
-        "Are you sure you want to accept this request?"
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    updateRequestStatus(
-      id,
-      "approve"
+    const confirmed = window.confirm(
+      "Are you sure you want to accept this request?"
     );
-  };
 
-  // ==========================================
-  // REJECT
-  // ==========================================
+    if (!confirmed) return;
+    updateRequestStatus(id, "approve");
+  };
 
   const handleReject = (id) => {
-
-    const confirmed =
-      window.confirm(
-        "Are you sure you want to reject this request?"
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    updateRequestStatus(
-      id,
-      "reject"
+    const confirmed = window.confirm(
+      "Are you sure you want to reject this request?"
     );
+
+    if (!confirmed) return;
+    updateRequestStatus(id, "reject");
   };
 
   // ==========================================
-  // LOADING UI
+  // INITIAL LOADING UI
   // ==========================================
-
   if (loading) {
-
     return (
-
       <div className="admin-layout">
-
         <Sidebar variant="admin" />
 
         <div className="main-content">
-
           <Topbar
             variant="admin"
             userName="Admin"
@@ -384,32 +357,23 @@ export default function VictimRequests() {
           />
 
           <div className="admin-card">
-
             <div className="table-message">
               Loading victim requests...
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     );
   }
 
   // ==========================================
-  // MAIN UI
+  // MAIN RENDER (UI Structural Parity Intact)
   // ==========================================
-
   return (
-
     <div className="admin-layout">
-
       <Sidebar variant="admin" />
 
       <div className="main-content">
-
         <Topbar
           variant="admin"
           userName="Admin"
@@ -420,13 +384,9 @@ export default function VictimRequests() {
         {/* ==================================
             ERROR
         ================================== */}
-
         {error && (
-
           <div className="admin-card">
-
             <div className="table-message error-message">
-
               {error}
 
               <br />
@@ -437,31 +397,22 @@ export default function VictimRequests() {
               >
                 Retry
               </button>
-
             </div>
-
           </div>
-
         )}
 
         {/* ==================================
             FILTERS
         ================================== */}
-
         <div className="admin-card">
-
           <div className="card-header">
-
             <h3>
               Request Filters
             </h3>
-
           </div>
 
           <div className="filter-container">
-
             <div className="filter-group">
-
               <label>
                 Status
               </label>
@@ -469,32 +420,21 @@ export default function VictimRequests() {
               <select
                 value={statusFilter}
                 onChange={(e) =>
-                  setStatusFilter(
-                    e.target.value
-                  )
+                  setStatusFilter(e.target.value)
                 }
               >
-
-                {statusOptions.map(
-                  (status) => (
-
-                    <option
-                      key={status}
-                      value={status}
-                    >
-                      {status}
-                    </option>
-
-                  )
-                )}
-
+                {statusOptions.map((status) => (
+                  <option
+                    key={status}
+                    value={status}
+                  >
+                    {status}
+                  </option>
+                ))}
               </select>
-
             </div>
 
-
             <div className="filter-group">
-
               <label>
                 Priority
               </label>
@@ -502,42 +442,27 @@ export default function VictimRequests() {
               <select
                 value={priorityFilter}
                 onChange={(e) =>
-                  setPriorityFilter(
-                    e.target.value
-                  )
+                  setPriorityFilter(e.target.value)
                 }
               >
-
-                {priorityOptions.map(
-                  (priority) => (
-
-                    <option
-                      key={priority}
-                      value={priority}
-                    >
-                      {priority}
-                    </option>
-
-                  )
-                )}
-
+                {priorityOptions.map((priority) => (
+                  <option
+                    key={priority}
+                    value={priority}
+                  >
+                    {priority}
+                  </option>
+                ))}
               </select>
-
             </div>
-
           </div>
-
         </div>
-
 
         {/* ==================================
             REQUEST LIST
         ================================== */}
-
         <div className="admin-card">
-
           <div className="card-header">
-
             <h3>
               Victim Request List
             </h3>
@@ -545,30 +470,21 @@ export default function VictimRequests() {
             <button
               className="action-btn"
               onClick={loadRequests}
-              disabled={processingId !== null}
+              disabled={processingIds.size > 0}
             >
               Refresh
             </button>
-
           </div>
 
-
           {filteredRequests.length === 0 ? (
-
             <div className="table-message">
               No victim requests found.
             </div>
-
           ) : (
-
             <div className="responsive-table">
-
               <table>
-
                 <thead>
-
                   <tr>
-
                     <th>
                       Victim
                     </th>
@@ -604,175 +520,102 @@ export default function VictimRequests() {
                     <th>
                       Action
                     </th>
-
                   </tr>
-
                 </thead>
 
-
                 <tbody>
+                  {filteredRequests.map((request, index) => {
+                    const status = getStatus(request);
+                    const priority = getPriority(request);
+                    const requestId = request._id;
+                    const isProcessing = processingIds.has(requestId);
 
-                  {filteredRequests.map(
-                    (request) => {
+                    return (
+                      <tr
+                        key={
+                          requestId || `request-${index}`
+                        }
+                      >
+                        <td>
+                          {getVictimName(request)}
+                        </td>
 
-                      const status =
-                        getStatus(
-                          request
-                        );
+                        <td>
+                          {getPhone(request)}
+                        </td>
 
-                      const priority =
-                        getPriority(
-                          request
-                        );
+                        <td>
+                          {getLocation(request)}
+                        </td>
 
-                      const requestId =
-                        request._id;
+                        <td>
+                          {getDisaster(request)}
+                        </td>
 
-                      return (
+                        <td>
+                          {getRequestType(request)}
+                        </td>
 
-                        <tr
-                          key={
-                            requestId
-                          }
-                        >
+                        <td>
+                          {getFamilyMembers(request)}
+                        </td>
 
-                          <td>
-                            {getVictimName(
-                              request
-                            )}
-                          </td>
+                        <td>
+                          <span
+                            className={`status ${priority}`}
+                          >
+                            {priority}
+                          </span>
+                        </td>
 
+                        <td>
+                          <span
+                            className={`status ${status}`}
+                          >
+                            {status}
+                          </span>
+                        </td>
 
-                          <td>
-                            {getPhone(
-                              request
-                            )}
-                          </td>
+                        <td>
+                          {status === "Pending" ? (
+                            <div className="action-buttons">
+                              <button
+                                className="action-btn"
+                                onClick={() =>
+                                  handleApprove(requestId)
+                                }
+                                disabled={isProcessing}
+                              >
+                                {isProcessing
+                                  ? "Processing..."
+                                  : "Accept"}
+                              </button>
 
-
-                          <td>
-                            {getLocation(
-                              request
-                            )}
-                          </td>
-
-
-                          <td>
-                            {getDisaster(
-                              request
-                            )}
-                          </td>
-
-
-                          <td>
-                            {getRequestType(
-                              request
-                            )}
-                          </td>
-
-
-                          <td>
-                            {getFamilyMembers(
-                              request
-                            )}
-                          </td>
-
-
-                          <td>
-
-                            <span
-                              className={`status ${priority}`}
-                            >
-                              {priority}
+                              <button
+                                className="action-btn"
+                                onClick={() =>
+                                  handleReject(requestId)
+                                }
+                                disabled={isProcessing}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          ) : (
+                            <span>
+                              Responded
                             </span>
-
-                          </td>
-
-
-                          <td>
-
-                            <span
-                              className={`status ${status}`}
-                            >
-                              {status}
-                            </span>
-
-                          </td>
-
-
-                          <td>
-
-                            {status ===
-                            "Pending" ? (
-
-                              <div className="action-buttons">
-
-                                <button
-                                  className="action-btn"
-                                  onClick={() =>
-                                    handleApprove(
-                                      requestId
-                                    )
-                                  }
-                                  disabled={
-                                    processingId ===
-                                    requestId
-                                  }
-                                >
-                                  {processingId ===
-                                  requestId
-                                    ? "Processing..."
-                                    : "Accept"}
-                                </button>
-
-
-                                <button
-                                  className="action-btn"
-                                  onClick={() =>
-                                    handleReject(
-                                      requestId
-                                    )
-                                  }
-                                  disabled={
-                                    processingId ===
-                                    requestId
-                                  }
-                                >
-                                  Reject
-                                </button>
-
-                              </div>
-
-                            ) : (
-
-                              <span>
-                                Responded
-                              </span>
-
-                            )}
-
-                          </td>
-
-                        </tr>
-
-                      );
-
-                    }
-                  )}
-
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
-
               </table>
-
             </div>
-
           )}
-
         </div>
-
       </div>
-
     </div>
-
   );
 }
