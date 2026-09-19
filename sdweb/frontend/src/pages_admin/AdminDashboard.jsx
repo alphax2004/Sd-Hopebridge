@@ -2,22 +2,120 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Sidebar, Topbar } from "../pages_victim/sidebar/sidebar";
 import "./admin.css";
 
+// Environment Dynamic Configuration Engine
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const POLLING_INTERVAL_MS = 10000;
+const MAX_BACKOFF_DELAY_MS = 60000;
+const CACHE_TTL_MS = 30000;
+
+// Enterprise In-Memory Cache Store for Instant Hydration
+const globalRequestCache = {
+  data: null,
+  timestamp: 0,
+};
 
 export default function AdminDashboard() {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Core State Engine
+  const [requests, setRequests] = useState(() => globalRequestCache.data || []);
+  const [loading, setLoading] = useState(!globalRequestCache.data);
   const [error, setError] = useState("");
 
-  // Concurrent Execution & Retry Tracker References
+  // Enterprise Concurrency & Execution Control References
   const abortControllerRef = useRef(null);
   const isComponentMountedRef = useRef(true);
   const retryCountRef = useRef(0);
+  const pollingTimerRef = useRef(null);
+
+  // ==========================================
+  // SAFE DATA EXTRACTION & TRANSFORM ENGINE
+  // ==========================================
+  const extractRequestsData = useCallback((responseData) => {
+    if (!responseData) return [];
+    if (Array.isArray(responseData)) return responseData;
+    if (Array.isArray(responseData.requests)) return responseData.requests;
+    if (Array.isArray(responseData.data)) return responseData.data;
+    if (Array.isArray(responseData.items)) return responseData.items;
+    
+    if (typeof responseData === "object") {
+      const nestedArray = Object.values(responseData).find(Array.isArray);
+      return nestedArray || [];
+    }
+    return [];
+  }, []);
+
+  // ==========================================
+  // RESILIENT GETTER HELPERS WITH FALLBACKS
+  // ==========================================
+  const getStatus = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Pending";
+    return request.status || request.requestStatus || request.state || "Pending";
+  }, []);
+
+  const getUrgency = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Low";
+    return request.urgency || request.priority || request.urgencyLevel || "Low";
+  }, []);
+
+  const getVictimName = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Unknown User";
+    return (
+      request.userId?.fullName ||
+      request.user?.fullName ||
+      request.fullName ||
+      request.userName ||
+      request.name ||
+      "Unknown User"
+    );
+  }, []);
+
+  const getLocation = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Unknown";
+    return (
+      request.location ||
+      request.address ||
+      request.victimAddress ||
+      request.district ||
+      "Unknown"
+    );
+  }, []);
+
+  const getDisaster = useCallback((request) => {
+    if (!request || typeof request !== "object") return "Unknown";
+    return (
+      request.disaster ||
+      request.disasterType ||
+      request.incidentType ||
+      request.eventType ||
+      "Unknown"
+    );
+  }, []);
+
+  const getRequestType = useCallback((request) => {
+    if (!request || typeof request !== "object") return "General Help";
+    return (
+      request.type ||
+      request.need ||
+      request.requestType ||
+      request.category ||
+      "General Help"
+    );
+  }, []);
+
+  const getFamilyMembers = useCallback((request) => {
+    if (!request || typeof request !== "object") return "-";
+    return (
+      request.familyMembers ??
+      request.members ??
+      request.numberOfPeople ??
+      request.personCount ??
+      "-"
+    );
+  }, []);
 
   // ==========================================
   // ENTERPRISE DATA FETCHING ENGINE WITH ABORT
   // ==========================================
-  const loadRequests = useCallback(async () => {
+  const loadRequests = useCallback(async (isSilentBackground = false) => {
     // Abort active ongoing fetch to eliminate race conditions
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -28,7 +126,9 @@ export default function AdminDashboard() {
 
     try {
       if (isComponentMountedRef.current) {
-        setError("");
+        if (!isSilentBackground) {
+          setError("");
+        }
       }
 
       const response = await fetch(`${API_URL}/api/requests`, {
@@ -39,6 +139,7 @@ export default function AdminDashboard() {
           "Content-Type": "application/json",
           "Accept": "application/json",
           "Cache-Control": "no-cache",
+          "Pragma": "no-cache",
         },
       });
 
@@ -51,150 +152,113 @@ export default function AdminDashboard() {
         );
       }
 
-      const data = await response.json();
+      const rawData = await response.json();
 
       if (!isComponentMountedRef.current) return;
 
-      // Safe Extraction Algorithm
-      let extractedRequests = [];
-      if (Array.isArray(data)) {
-        extractedRequests = data;
-      } else if (Array.isArray(data?.requests)) {
-        extractedRequests = data.requests;
-      } else if (Array.isArray(data?.data)) {
-        extractedRequests = data.data;
-      } else if (data && typeof data === "object") {
-        extractedRequests = Object.values(data).find(Array.isArray) || [];
-      }
+      const extractedRequests = extractRequestsData(rawData);
 
-      // Memory Diffing to skip unnecessary state updates
+      // Hydrate Global In-Memory Cache Store
+      globalRequestCache.data = extractedRequests;
+      globalRequestCache.timestamp = Date.now();
+
+      // Deep Memory Diffing to skip unneeded renders
       setRequests((prev) => {
         const isUnchanged = JSON.stringify(prev) === JSON.stringify(extractedRequests);
         return isUnchanged ? prev : extractedRequests;
       });
 
-      retryCountRef.current = 0; // Reset exponential retry count
+      retryCountRef.current = 0; // Reset exponential backoff retry counter
     } catch (err) {
       if (err.name === "AbortError") {
-        return; // Suppress safe abort errors
+        return; // Suppress safe abort controller errors
       }
 
-      console.error("Load requests error:", err);
+      console.error("Critical Load Requests Failure:", err);
 
       if (isComponentMountedRef.current) {
-        setError(err.message || "Failed to load victim requests");
+        // Retain cached data on network error if available
+        if (requests.length === 0) {
+          setError(err.message || "Failed to load victim requests");
+        }
       }
     } finally {
       if (isComponentMountedRef.current) {
         setLoading(false);
       }
     }
-  }, []);
+  }, [extractRequestsData, requests.length]);
 
-  // Component Lifecycle Management
+  // ==========================================
+  // COMPONENT LIFECYCLE MANAGEMENT
+  // ==========================================
   useEffect(() => {
     isComponentMountedRef.current = true;
+
     return () => {
       isComponentMountedRef.current = false;
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+      if (pollingTimerRef.current) {
+        clearTimeout(pollingTimerRef.current);
+      }
     };
   }, []);
 
-  // Initial Fetching
+  // Initial Fetching with Cache Validity Checker
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      loadRequests();
-    }, 0);
+    const isCacheFresh =
+      globalRequestCache.data &&
+      Date.now() - globalRequestCache.timestamp < CACHE_TTL_MS;
 
-    return () => clearTimeout(timeoutId);
+    if (!isCacheFresh) {
+      const timeoutId = setTimeout(() => {
+        loadRequests(false);
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
+    }
   }, [loadRequests]);
 
-  // Exponential Backoff Auto-Polling
+  // Self-Healing Exponential Backoff Auto-Polling Loop
   useEffect(() => {
-    let intervalId;
+    let isSubscribed = true;
 
-    const schedulePolling = () => {
-      const baseDelay = 10000;
+    const scheduleNextPoll = () => {
       const computedDelay = error
-        ? Math.min(baseDelay * Math.pow(2, retryCountRef.current), 60000)
-        : baseDelay;
+        ? Math.min(
+            POLLING_INTERVAL_MS * Math.pow(2, retryCountRef.current),
+            MAX_BACKOFF_DELAY_MS
+          )
+        : POLLING_INTERVAL_MS;
 
-      intervalId = setInterval(() => {
-        if (error) retryCountRef.current += 1;
-        loadRequests();
+      pollingTimerRef.current = setTimeout(async () => {
+        if (!isSubscribed) return;
+
+        if (error) {
+          retryCountRef.current += 1;
+        }
+
+        await loadRequests(true);
+        if (isSubscribed) {
+          scheduleNextPoll();
+        }
       }, computedDelay);
     };
 
-    schedulePolling();
+    scheduleNextPoll();
 
     return () => {
-      if (intervalId) clearInterval(intervalId);
+      isSubscribed = false;
+      if (pollingTimerRef.current) {
+        clearTimeout(pollingTimerRef.current);
+      }
     };
   }, [loadRequests, error]);
 
   // ==========================================
-  // RESILIENT GETTER HELPERS
-  // ==========================================
-  const getStatus = useCallback((request) => {
-    if (!request || typeof request !== "object") return "Pending";
-    return request.status || request.requestStatus || "Pending";
-  }, []);
-
-  const getUrgency = useCallback((request) => {
-    if (!request || typeof request !== "object") return "Low";
-    return request.urgency || request.priority || "Low";
-  }, []);
-
-  const getVictimName = useCallback((request) => {
-    if (!request || typeof request !== "object") return "Unknown User";
-    return (
-      request.userId?.fullName ||
-      request.user?.fullName ||
-      request.fullName ||
-      request.name ||
-      "Unknown User"
-    );
-  }, []);
-
-  const getLocation = useCallback((request) => {
-    if (!request || typeof request !== "object") return "Unknown";
-    return request.location || request.address || "Unknown";
-  }, []);
-
-  const getDisaster = useCallback((request) => {
-    if (!request || typeof request !== "object") return "Unknown";
-    return (
-      request.disaster ||
-      request.disasterType ||
-      request.incidentType ||
-      "Unknown"
-    );
-  }, []);
-
-  const getRequestType = useCallback((request) => {
-    if (!request || typeof request !== "object") return "General Help";
-    return (
-      request.type ||
-      request.need ||
-      request.requestType ||
-      "General Help"
-    );
-  }, []);
-
-  const getFamilyMembers = useCallback((request) => {
-    if (!request || typeof request !== "object") return "-";
-    return (
-      request.familyMembers ??
-      request.members ??
-      request.numberOfPeople ??
-      "-"
-    );
-  }, []);
-
-  // ==========================================
-  // SINGLE-PASS O(N) AGGREGATION ENGINE
+  // SINGLE-PASS O(N) HIGH PERFORMANCE AGGREGATION ENGINE
   // ==========================================
   const {
     totalRequests,
@@ -222,7 +286,8 @@ export default function AdminDashboard() {
       criticalRequests: 0,
     };
 
-    requests.forEach((req) => {
+    for (let i = 0; i < requests.length; i++) {
+      const req = requests[i];
       const status = getStatus(req).toLowerCase();
       const urgency = getUrgency(req).toLowerCase();
 
@@ -230,45 +295,52 @@ export default function AdminDashboard() {
       if (status === "pending") counts.pendingRequests++;
       else if (status === "approved") counts.approvedRequests++;
       else if (status === "rejected") counts.rejectedRequests++;
-      else if (status === "volunteer assigned") counts.volunteerAssignedRequests++;
-      else if (status === "delivered") counts.deliveredRequests++;
+      else if (status === "volunteer assigned" || status === "assigned") counts.volunteerAssignedRequests++;
+      else if (status === "delivered" || status === "completed") counts.deliveredRequests++;
 
       // Urgency aggregation
       if (urgency === "low") counts.lowPriorityRequests++;
       else if (urgency === "medium") counts.mediumPriorityRequests++;
       else if (urgency === "high") counts.highPriorityRequests++;
       else if (urgency === "critical") counts.criticalRequests++;
-    });
-
-    let emergencyLevel = "Low";
-    if (counts.criticalRequests > 0) {
-      emergencyLevel = "Critical";
-    } else if (counts.highPriorityRequests > 0) {
-      emergencyLevel = "High";
-    } else if (counts.mediumPriorityRequests > 0) {
-      emergencyLevel = "Medium";
     }
 
-    return { ...counts, emergencyLevel };
+    // Dynamic Emergency Level Calculator
+    let computedEmergencyLevel = "Low";
+    if (counts.criticalRequests > 0) {
+      computedEmergencyLevel = "Critical";
+    } else if (counts.highPriorityRequests > 0) {
+      computedEmergencyLevel = "High";
+    } else if (counts.mediumPriorityRequests > 0) {
+      computedEmergencyLevel = "Medium";
+    }
+
+    return { ...counts, emergencyLevel: computedEmergencyLevel };
   }, [requests, getStatus, getUrgency]);
 
   // ==========================================
-  // MEMOIZED SORTED RECENT REQUESTS
+  // OPTIMIZED MEMOIZED SORTED RECENT REQUESTS
   // ==========================================
   const recentRequests = useMemo(() => {
+    if (!requests || requests.length === 0) return [];
+
     return [...requests]
       .sort((a, b) => {
-        const dateA = new Date(a?.createdAt || a?.created_at || 0).getTime();
-        const dateB = new Date(b?.createdAt || b?.created_at || 0).getTime();
+        const dateA = new Date(
+          a?.createdAt || a?.created_at || a?.timestamp || 0
+        ).getTime();
+        const dateB = new Date(
+          b?.createdAt || b?.created_at || b?.timestamp || 0
+        ).getTime();
         return dateB - dateA;
       })
       .slice(0, 5);
   }, [requests]);
 
-  // Refresh Handler
+  // Refresh Trigger Handler
   const handleRefresh = async () => {
     setLoading(true);
-    await loadRequests();
+    await loadRequests(false);
   };
 
   // ==========================================
