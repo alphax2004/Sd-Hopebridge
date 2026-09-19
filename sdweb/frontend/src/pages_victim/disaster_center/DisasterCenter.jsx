@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Sidebar, Topbar } from "../sidebar";
-
+import { Sidebar, Topbar } from "../sidebar/sidebar";
 import"./DisasterCenter.css";
 const stats = [
   ["fa-triangle-exclamation", "Active Disasters", 6],

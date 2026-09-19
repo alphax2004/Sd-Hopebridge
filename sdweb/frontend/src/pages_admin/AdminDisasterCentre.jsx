@@ -1,4 +1,4 @@
-import { Sidebar, Topbar } from "../pages_alfa/sidebar";
+import { Sidebar, Topbar } from "../pages_victim/sidebar/sidebar";
 import "./admin.css";
 
 const shelters = [

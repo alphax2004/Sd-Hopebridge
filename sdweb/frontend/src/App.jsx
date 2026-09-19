@@ -1,15 +1,15 @@
 import { Routes, Route } from "react-router-dom";
 
-import LandingPage from "./pages_alfa/landingpage";
-import Login from "./pages_alfa/login";
-import Register from "./pages_alfa/register";
-import EmailVerification from "./pages_alfa/EmailVerification";
-import Dashboard from "./pages_alfa/dashboard";
-import RequestHelp from "./pages_alfa/RequestHelp";
-import Profile from "./pages_alfa/Profile";
-import Password from "./pages_alfa/Password";
-import DisasterCenter from "./pages_alfa/DisasterCenter";
-import Logout from "./pages_alfa/logout";
+import LandingPage from "./pages_victim/landingpage/landingpage";
+import Login from "./pages_victim/login/login";
+import Register from "./pages_victim/register/register";
+import EmailVerification from "./pages_victim/emailverification/EmailVerification";
+import Dashboard from "./pages_victim/dashboard/dashboard";
+import RequestHelp from "./pages_victim/requesthelp/RequestHelp";
+import Profile from "./pages_victim/profile/Profile";
+import Password from "./pages_victim/password/Password";
+import DisasterCenter from "./pages_victim/disaster_center/DisasterCenter";
+import Logout from "./pages_victim/logout/logout";
 
 import AdminDashboard from "./pages_admin/AdminDashboard";
 import VictimRequests from "./pages_admin/VictimRequests";
@@ -76,47 +76,19 @@ export default function App() {
       `}</style>
 
       <Routes>
+        {/* Victim */}
         <Route path="/" element={<LandingPage />} />
-
         <Route path="/login" element={<Login />} />
-
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<EmailVerification />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/request-help" element={<RequestHelp />} />
+        <Route path="/disaster-center" element={<DisasterCenter />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/password" element={<Password />} />
+        <Route path="/logout" element={<Logout />} />
 
-        <Route
-          path="/verify-email"
-          element={<EmailVerification />}
-        />
-
-        <Route
-          path="/dashboard"
-          element={<Dashboard />}
-        />
-
-        <Route
-          path="/request-help"
-          element={<RequestHelp />}
-        />
-
-        <Route
-          path="/disaster-center"
-          element={<DisasterCenter />}
-        />
-
-        <Route
-          path="/profile"
-          element={<Profile />}
-        />
-
-        <Route
-          path="/password"
-          element={<Password />}
-        />
-
-        <Route
-          path="/logout"
-          element={<Logout />}
-        />
-
+        {/* Admin */}
         <Route
           path="/admin/dashboard"
           element={
@@ -171,10 +143,8 @@ export default function App() {
           }
         />
 
-        <Route
-          path="*"
-          element={<LandingPage />}
-        />
+        {/* Unknown route */}
+        <Route path="*" element={<LandingPage />} />
       </Routes>
     </div>
   );
