@@ -10,10 +10,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // =====================================================
-  // LOAD REQUESTS FROM BACKEND
-  // =====================================================
-
   const loadRequests = useCallback(async () => {
     try {
       setError("");
@@ -34,11 +30,6 @@ export default function AdminDashboard() {
         );
       }
 
-      // Backend response can be:
-      // []
-      // { requests: [] }
-      // { data: [] }
-
       if (Array.isArray(data)) {
         setRequests(data);
       } else if (Array.isArray(data.requests)) {
@@ -50,7 +41,6 @@ export default function AdminDashboard() {
       }
     } catch (err) {
       console.error("Load requests error:", err);
-
       setError(
         err.message || "Failed to load victim requests"
       );
@@ -59,60 +49,33 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  // =====================================================
-  // FIRST LOAD
-  // =====================================================
-
   useEffect(() => {
-    const timeout = setTimeout(loadRequests, 0);
+    const timeoutId = setTimeout(() => {
+      loadRequests();
+    }, 0);
 
-    return () => {
-      clearTimeout(timeout);
-    };
+    return () => clearTimeout(timeoutId);
   }, [loadRequests]);
-
-  // =====================================================
-  // AUTO REFRESH
-  // Every 10 seconds
-  // =====================================================
 
   useEffect(() => {
     const interval = setInterval(() => {
       loadRequests();
     }, 10000);
 
-    return () => {
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, [loadRequests]);
 
-  // =====================================================
-  // GET STATUS
-  // =====================================================
+  // Get request status
+  const getStatus = (request) =>
+    request.status || request.requestStatus || "Pending";
 
-  const getStatus = (request) => {
-    return (
-      request.status ||
-      request.requestStatus ||
-      "Pending"
-    );
-  };
+  // Get request urgency
+  const getUrgency = (request) =>
+    request.urgency || request.priority || "Low";
 
-  // =====================================================
-  // GET PRIORITY / URGENCY
-  // =====================================================
-
-  const getUrgency = (request) => {
-    return (
-      request.urgency ||
-      request.priority ||
-      "Low"
-    );
-  };
-
-  // =====================================================
-  // STATUS COUNT
-  // =====================================================
+  // =========================
+  // REQUEST COUNTS
+  // =========================
 
   const totalRequests = requests.length;
 
@@ -142,9 +105,9 @@ export default function AdminDashboard() {
       getStatus(request).toLowerCase() === "delivered"
   ).length;
 
-  // =====================================================
-  // PRIORITY COUNT
-  // =====================================================
+  // =========================
+  // PRIORITY COUNTS
+  // =========================
 
   const lowPriorityRequests = requests.filter(
     (request) =>
@@ -166,9 +129,9 @@ export default function AdminDashboard() {
       getUrgency(request).toLowerCase() === "critical"
   ).length;
 
-  // =====================================================
+  // =========================
   // EMERGENCY LEVEL
-  // =====================================================
+  // =========================
 
   let emergencyLevel = "Low";
 
@@ -180,74 +143,43 @@ export default function AdminDashboard() {
     emergencyLevel = "Medium";
   }
 
-  // =====================================================
-  // GET VICTIM NAME
-  // =====================================================
+  // =========================
+  // REQUEST INFORMATION
+  // =========================
 
-  const getVictimName = (request) => {
-    return (
-      request.userId?.fullName ||
-      request.user?.fullName ||
-      request.fullName ||
-      request.name ||
-      "Unknown User"
-    );
-  };
+  const getVictimName = (request) =>
+    request.userId?.fullName ||
+    request.user?.fullName ||
+    request.fullName ||
+    request.name ||
+    "Unknown User";
 
-  // =====================================================
-  // GET LOCATION
-  // =====================================================
+  const getLocation = (request) =>
+    request.location ||
+    request.address ||
+    "Unknown";
 
-  const getLocation = (request) => {
-    return (
-      request.location ||
-      request.address ||
-      "Unknown"
-    );
-  };
+  const getDisaster = (request) =>
+    request.disaster ||
+    request.disasterType ||
+    request.incidentType ||
+    "Unknown";
 
-  // =====================================================
-  // GET DISASTER
-  // =====================================================
+  const getRequestType = (request) =>
+    request.type ||
+    request.need ||
+    request.requestType ||
+    "General Help";
 
-  const getDisaster = (request) => {
-    return (
-      request.disaster ||
-      request.disasterType ||
-      request.incidentType ||
-      "Unknown"
-    );
-  };
+  const getFamilyMembers = (request) =>
+    request.familyMembers ??
+    request.members ??
+    request.numberOfPeople ??
+    "-";
 
-  // =====================================================
-  // GET REQUEST TYPE
-  // =====================================================
-
-  const getRequestType = (request) => {
-    return (
-      request.type ||
-      request.need ||
-      request.requestType ||
-      "General Help"
-    );
-  };
-
-  // =====================================================
-  // GET FAMILY MEMBERS
-  // =====================================================
-
-  const getFamilyMembers = (request) => {
-    return (
-      request.familyMembers ??
-      request.members ??
-      request.numberOfPeople ??
-      "-"
-    );
-  };
-
-  // =====================================================
+  // =========================
   // RECENT REQUESTS
-  // =====================================================
+  // =========================
 
   const recentRequests = [...requests]
     .sort((a, b) => {
@@ -263,18 +195,18 @@ export default function AdminDashboard() {
     })
     .slice(0, 5);
 
-  // =====================================================
-  // MANUAL REFRESH
-  // =====================================================
+  // =========================
+  // REFRESH
+  // =========================
 
   const handleRefresh = async () => {
     setLoading(true);
     await loadRequests();
   };
 
-  // =====================================================
-  // LOADING SCREEN
-  // =====================================================
+  // =========================
+  // LOADING
+  // =========================
 
   if (loading && requests.length === 0) {
     return (
@@ -297,17 +229,15 @@ export default function AdminDashboard() {
     );
   }
 
-  // =====================================================
-  // MAIN DASHBOARD
-  // =====================================================
+  // =========================
+  // DASHBOARD
+  // =========================
 
   return (
     <div className="admin-layout">
-
       <Sidebar variant="admin" />
 
       <div className="main-content">
-
         <Topbar
           variant="admin"
           userName="Admin"
@@ -315,10 +245,7 @@ export default function AdminDashboard() {
           subtitle="Monitor disaster relief activities and victim requests."
         />
 
-        {/* ==========================================
-            ERROR
-        ========================================== */}
-
+        {/* ERROR */}
         {error && (
           <div className="admin-card">
             <p>{error}</p>
@@ -333,76 +260,75 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* ==========================================
-            MAIN STATISTICS
-        ========================================== */}
+        {/* =========================
+            STAT CARDS
+        ========================= */}
 
         <div className="stats-grid">
 
+          {/* 1. Total Requests */}
           <div className="stat-card">
             <h4>Total Requests</h4>
             <h2>{totalRequests}</h2>
-            <p>All victim requests</p>
+            <p>All requests</p>
           </div>
 
+          {/* 2. Pending Requests */}
           <div className="stat-card">
             <h4>Pending Requests</h4>
             <h2>{pendingRequests}</h2>
-            <p>Waiting for approval</p>
+            <p>Awaiting approval</p>
           </div>
 
+          {/* 3. Approved */}
           <div className="stat-card">
             <h4>Approved</h4>
             <h2>{approvedRequests}</h2>
             <p>Accepted requests</p>
           </div>
 
+          {/* 4. Rejected */}
           <div className="stat-card">
             <h4>Rejected</h4>
             <h2>{rejectedRequests}</h2>
             <p>Rejected requests</p>
           </div>
 
-        </div>
-
-        {/* ==========================================
-            RELIEF STATISTICS
-        ========================================== */}
-
-        <div className="stats-grid">
-
+          {/* 5. Volunteer Assigned */}
           <div className="stat-card">
             <h4>Volunteer Assigned</h4>
             <h2>{volunteerAssignedRequests}</h2>
-            <p>Requests assigned to volunteers</p>
+            <p>Assigned to volunteer</p>
           </div>
 
+          {/* 6. Delivered */}
           <div className="stat-card">
             <h4>Delivered</h4>
             <h2>{deliveredRequests}</h2>
             <p>Successfully delivered</p>
           </div>
 
+          {/* 7. High Priority */}
           <div className="stat-card">
             <h4>High Priority</h4>
             <h2>{highPriorityRequests}</h2>
-            <p>High urgency requests</p>
+            <p>High urgency</p>
           </div>
 
+          {/* 8. Critical */}
           <div className="stat-card">
             <h4>Critical</h4>
             <h2>{criticalRequests}</h2>
-            <p>Critical urgency requests</p>
+            <p>Critical urgency</p>
           </div>
 
         </div>
 
-        {/* ==========================================
+        {/* =========================
             EMERGENCY OVERVIEW
-        ========================================== */}
+        ========================= */}
 
         <div className="admin-card">
-
           <h3>Emergency Overview</h3>
 
           <p>
@@ -425,224 +351,235 @@ export default function AdminDashboard() {
           <p>
             Critical: {criticalRequests}
           </p>
-
         </div>
 
-        {/* ==========================================
-            RECENT REQUESTS
-        ========================================== */}
+        {/* =========================
+            RECENT VICTIM REQUESTS
+        ========================= */}
 
         <div className="admin-card">
-
           <h3>Recent Victim Requests</h3>
 
-          <table>
-
-            <thead>
-              <tr>
-                <th>Victim</th>
-                <th>Location</th>
-                <th>Disaster</th>
-                <th>Request</th>
-                <th>Members</th>
-                <th>Priority</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-
-            <tbody>
-
-              {recentRequests.map((request) => {
-
-                const status = getStatus(request);
-                const urgency = getUrgency(request);
-
-                return (
-                  <tr key={request._id}>
-
-                    <td>
-                      {getVictimName(request)}
-                    </td>
-
-                    <td>
-                      {getLocation(request)}
-                    </td>
-
-                    <td>
-                      {getDisaster(request)}
-                    </td>
-
-                    <td>
-                      {getRequestType(request)}
-                    </td>
-
-                    <td>
-                      {getFamilyMembers(request)}
-                    </td>
-
-                    <td>
-                      <span
-                        className={`badge ${urgency}`}
-                      >
-                        {urgency}
-                      </span>
-                    </td>
-
-                    <td>
-                      <span
-                        className={`badge ${status}`}
-                      >
-                        {status}
-                      </span>
-                    </td>
-
-                  </tr>
-                );
-              })}
-
-              {recentRequests.length === 0 && (
+          <div style={{ overflowX: "auto" }}>
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="7">
-                    No victim requests found.
-                  </td>
+                  <th>Victim</th>
+                  <th>Location</th>
+                  <th>Disaster</th>
+                  <th>Request</th>
+                  <th>Members</th>
+                  <th>Priority</th>
+                  <th>Status</th>
                 </tr>
-              )}
+              </thead>
 
-            </tbody>
+              <tbody>
+                {recentRequests.map((request) => {
+                  const status = getStatus(request);
+                  const urgency = getUrgency(request);
 
-          </table>
+                  return (
+                    <tr key={request._id}>
+                      <td>
+                        {getVictimName(request)}
+                      </td>
 
+                      <td>
+                        {getLocation(request)}
+                      </td>
+
+                      <td>
+                        {getDisaster(request)}
+                      </td>
+
+                      <td>
+                        {getRequestType(request)}
+                      </td>
+
+                      <td>
+                        {getFamilyMembers(request)}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`badge ${urgency}`}
+                        >
+                          {urgency}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className={`badge ${status}`}
+                        >
+                          {status}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+
+                {recentRequests.length === 0 && (
+                  <tr>
+                    <td colSpan="7">
+                      No victim requests found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        {/* ==========================================
+        {/* =========================
             PRIORITY BREAKDOWN
-        ========================================== */}
+        ========================= */}
 
         <div className="admin-card">
-
           <h3>Priority Breakdown</h3>
 
-          <table>
+          <div style={{ overflowX: "auto" }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Priority</th>
+                  <th>Total Requests</th>
+                </tr>
+              </thead>
 
-            <thead>
-              <tr>
-                <th>Priority</th>
-                <th>Total Requests</th>
-              </tr>
-            </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span className="badge Low">
+                      Low
+                    </span>
+                  </td>
 
-            <tbody>
+                  <td>
+                    {lowPriorityRequests}
+                  </td>
+                </tr>
 
-              <tr>
-                <td>
-                  <span className="badge Low">
-                    Low
-                  </span>
-                </td>
-                <td>{lowPriorityRequests}</td>
-              </tr>
+                <tr>
+                  <td>
+                    <span className="badge Medium">
+                      Medium
+                    </span>
+                  </td>
 
-              <tr>
-                <td>
-                  <span className="badge Medium">
-                    Medium
-                  </span>
-                </td>
-                <td>{mediumPriorityRequests}</td>
-              </tr>
+                  <td>
+                    {mediumPriorityRequests}
+                  </td>
+                </tr>
 
-              <tr>
-                <td>
-                  <span className="badge High">
-                    High
-                  </span>
-                </td>
-                <td>{highPriorityRequests}</td>
-              </tr>
+                <tr>
+                  <td>
+                    <span className="badge High">
+                      High
+                    </span>
+                  </td>
 
-              <tr>
-                <td>
-                  <span className="badge Critical">
-                    Critical
-                  </span>
-                </td>
-                <td>{criticalRequests}</td>
-              </tr>
+                  <td>
+                    {highPriorityRequests}
+                  </td>
+                </tr>
 
-            </tbody>
+                <tr>
+                  <td>
+                    <span className="badge Critical">
+                      Critical
+                    </span>
+                  </td>
 
-          </table>
-
+                  <td>
+                    {criticalRequests}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        {/* ==========================================
-            STATUS BREAKDOWN
-        ========================================== */}
+        {/* =========================
+            REQUEST STATUS
+        ========================= */}
 
         <div className="admin-card">
-
           <h3>Request Status</h3>
 
-          <table>
+          <div style={{ overflowX: "auto" }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
 
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>Total</th>
-              </tr>
-            </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span className="badge Pending">
+                      Pending
+                    </span>
+                  </td>
 
-            <tbody>
+                  <td>
+                    {pendingRequests}
+                  </td>
+                </tr>
 
-              <tr>
-                <td>
-                  <span className="badge Pending">
-                    Pending
-                  </span>
-                </td>
-                <td>{pendingRequests}</td>
-              </tr>
+                <tr>
+                  <td>
+                    <span className="badge Approved">
+                      Approved
+                    </span>
+                  </td>
 
-              <tr>
-                <td>
-                  <span className="badge Approved">
-                    Approved
-                  </span>
-                </td>
-                <td>{approvedRequests}</td>
-              </tr>
+                  <td>
+                    {approvedRequests}
+                  </td>
+                </tr>
 
-              <tr>
-                <td>
-                  <span className="badge Rejected">
-                    Rejected
-                  </span>
-                </td>
-                <td>{rejectedRequests}</td>
-              </tr>
+                <tr>
+                  <td>
+                    <span className="badge Rejected">
+                      Rejected
+                    </span>
+                  </td>
 
-              <tr>
-                <td>
-                  <span className="badge Volunteer Assigned">
-                    Volunteer Assigned
-                  </span>
-                </td>
-                <td>{volunteerAssignedRequests}</td>
-              </tr>
+                  <td>
+                    {rejectedRequests}
+                  </td>
+                </tr>
 
-              <tr>
-                <td>
-                  <span className="badge Delivered">
-                    Delivered
-                  </span>
-                </td>
-                <td>{deliveredRequests}</td>
-              </tr>
+                <tr>
+                  <td>
+                    <span className="badge Volunteer Assigned">
+                      Volunteer Assigned
+                    </span>
+                  </td>
 
-            </tbody>
+                  <td>
+                    {volunteerAssignedRequests}
+                  </td>
+                </tr>
 
-          </table>
+                <tr>
+                  <td>
+                    <span className="badge Delivered">
+                      Delivered
+                    </span>
+                  </td>
 
+                  <td>
+                    {deliveredRequests}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
       </div>
