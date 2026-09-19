@@ -125,7 +125,7 @@ export default function RequestHelp() {
       return "Please enter a valid Bangladesh contact number, for example 01XXXXXXXXX.";
     }
 
-    if (items.length < 2) {
+    if (items.length < 1) {
       return "Please provide a little more detail about your requirement.";
     }
 
@@ -158,11 +158,9 @@ export default function RequestHelp() {
 
     try {
       setLoading(true);
-
       const cleanContact = formData.contact
         .trim()
         .replace(/\s|-/g, "");
-
       const requestData = {
         type: formData.type,
         items: formData.items.trim(),
@@ -172,42 +170,33 @@ export default function RequestHelp() {
         contact: cleanContact,
         notes: formData.notes.trim(),
       };
-
       const response = await fetch(
         `${API_URL}/api/requests`,
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-
           credentials: "include",
 
           body: JSON.stringify(requestData),
         }
       );
-
       // ========================================
       // SAFE RESPONSE
       // ========================================
-
       const contentType =
         response.headers.get("content-type") || "";
-
       let data = null;
-
       if (
         contentType.includes("application/json")
       ) {
         data = await response.json();
       }
-
       // ========================================
       // SERVER ERROR
       // ========================================
-
       if (!response.ok) {
         if (response.status === 401) {
           setError(
@@ -230,16 +219,12 @@ export default function RequestHelp() {
               "Failed to submit request. Please try again."
           );
         }
-
         return;
       }
-
       // ========================================
       // SUCCESS
       // ========================================
-
       setSubmitted(true);
-
       setFormData({
         type: "Food",
         items: "",
@@ -249,48 +234,36 @@ export default function RequestHelp() {
         contact: "",
         notes: "",
       });
-
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
-
     } catch (err) {
       console.log(
         "REQUEST SUBMIT ERROR:",
         err
       );
-
       setError(
         "Unable to connect to server. Please make sure the backend is running."
       );
-
     } finally {
       setLoading(false);
     }
   }
-
   // ==========================================
   // DYNAMIC REQUIREMENT FIELD
   // ==========================================
-
   function renderRequirementField() {
-
     // ============================
     // FOOD
     // ============================
-
     if (formData.type === "Food") {
       return (
         <div className="field-group">
-
           <label>
             Food items needed
           </label>
-
           <div className="input-box">
-
             <i className="fa-solid fa-bowl-food"></i>
-
             <input
               type="text"
               name="items"
@@ -300,80 +273,58 @@ export default function RequestHelp() {
               disabled={loading}
               maxLength={300}
             />
-
           </div>
-
         </div>
       );
     }
-
     // ============================
     // SHELTER
     // ============================
-
     if (formData.type === "Shelter") {
       return (
         <div className="field-group">
-
           <label>
             Shelter needed
           </label>
-
           <div className="input-box">
-
             <i className="fa-solid fa-house"></i>
-
             <select
               name="items"
               value={formData.items}
               onChange={handleChange}
               disabled={loading}
             >
-
               <option value="">
                 Select shelter type
               </option>
-
               <option value="Emergency shelter">
                 Emergency shelter
               </option>
-
               <option value="Family shelter">
                 Family shelter
               </option>
-
               <option value="Temporary shelter">
                 Temporary shelter
               </option>
-
               <option value="Evacuation center">
                 Evacuation center
               </option>
-
             </select>
-
           </div>
-
         </div>
       );
     }
-
     // ============================
     // MEDICAL
     // ============================
-
     if (formData.type === "Medical") {
       return (
         <div className="field-group">
-
           <label>
             Medicine needed
           </label>
-
           <div className="input-box">
-
             <i className="fa-solid fa-kit-medical"></i>
-
             <input
               type="text"
               name="items"
@@ -383,29 +334,21 @@ export default function RequestHelp() {
               disabled={loading}
               maxLength={300}
             />
-
           </div>
-
         </div>
       );
     }
-
     // ============================
     // WATER
     // ============================
-
     if (formData.type === "Water") {
       return (
         <div className="field-group">
-
           <label>
             Water quantity
           </label>
-
           <div className="input-box">
-
             <i className="fa-solid fa-droplet"></i>
-
             <input
               type="text"
               name="items"
@@ -415,73 +358,50 @@ export default function RequestHelp() {
               disabled={loading}
               maxLength={100}
             />
-
           </div>
-
         </div>
       );
     }
-
     return null;
   }
-
   // ==========================================
   // UI
   // ==========================================
-
   return (
     <div className="request-help-layout">
-
       <Sidebar current="requestHelp" />
-
       <div className="main-content">
-
         <Topbar
           title="Request Help"
           subtitle="Fill out the form below - we'll route it to nearby NGOs."
         />
-
         {submitted ? (
-
           <div className="success-card">
-
             <i className="fa-solid fa-circle-check"></i>
-
             <h3>
               Request submitted!
             </h3>
-
             <p>
               Your request has been sent successfully.
             </p>
-
             <p>
               Redirecting you to the dashboard...
             </p>
-
           </div>
-
         ) : (
-
           <form
             className="form-card"
             onSubmit={handleSubmit}
           >
-
             {/* ==================================
                 TYPE OF HELP
             ================================== */}
-
             <div className="field-group">
-
               <label>
                 Type of help
               </label>
-
               <div className="type-grid">
-
                 {helpTypes.map((t) => (
-
                   <div
                     key={t.key}
                     className={`type-card ${
@@ -491,61 +411,29 @@ export default function RequestHelp() {
                     }`}
                     onClick={() =>
                       handleTypeSelect(t.key)
-                    }
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-
-                      if (
-                        e.key === "Enter" ||
-                        e.key === " "
-                      ) {
-                        handleTypeSelect(
-                          t.key
-                        );
-                      }
-
-                    }}
+                    }                 
                   >
-
-                    <i
-                      className={`fa-solid ${t.icon}`}
-                    ></i>
-
+                    <i className={`fa-solid ${t.icon}`}></i>
                     <span>
                       {t.key}
                     </span>
-
                   </div>
-
                 ))}
-
-              </div>
-
+             </div>
             </div>
-
-
             {/* ==================================
                 DYNAMIC REQUIREMENT
             ================================== */}
-
             {renderRequirementField()}
-
-
             {/* ==================================
                 QUANTITY + URGENCY
             ================================== */}
-
             <div className="field-row">
-
               <div className="field-group">
-
                 <label>
                   Quantity / people affected
                 </label>
-
                 <div className="input-box">
-
                   <input
                     type="text"
                     name="quantity"
@@ -555,62 +443,41 @@ export default function RequestHelp() {
                     disabled={loading}
                     maxLength={100}
                   />
-
                 </div>
-
               </div>
-
-
-              <div className="field-group">
-
+            <div className="field-group">
                 <label>
                   Urgency
                 </label>
-
                 <div className="input-box">
-
                   <select
                     name="urgency"
                     value={formData.urgency}
                     onChange={handleChange}
                     disabled={loading}
                   >
-
                     <option value="High">
                       High
                     </option>
-
                     <option value="Medium">
                       Medium
                     </option>
-
                     <option value="Low">
                       Low
                     </option>
-
                   </select>
-
                 </div>
-
               </div>
-
             </div>
-
-
             {/* ==================================
                 LOCATION
             ================================== */}
-
             <div className="field-group">
-
               <label>
                 Location
               </label>
-
               <div className="input-box">
-
                 <i className="fa-solid fa-location-dot"></i>
-
                 <input
                   type="text"
                   name="location"
@@ -620,26 +487,17 @@ export default function RequestHelp() {
                   disabled={loading}
                   maxLength={250}
                 />
-
               </div>
-
             </div>
-
-
             {/* ==================================
                 CONTACT
             ================================== */}
-
             <div className="field-group">
-
               <label>
                 Contact number
               </label>
-
               <div className="input-box">
-
                 <i className="fa-solid fa-phone"></i>
-
                 <input
                   type="text"
                   name="contact"
@@ -649,24 +507,16 @@ export default function RequestHelp() {
                   disabled={loading}
                   maxLength={20}
                 />
-
               </div>
-
             </div>
-
-
             {/* ==================================
                 NOTES
             ================================== */}
-
             <div className="field-group">
-
               <label>
                 Additional notes (optional)
               </label>
-
               <div className="input-box textarea-box">
-
                 <textarea
                   name="notes"
                   placeholder="Anything else NGOs should know..."
@@ -675,49 +525,32 @@ export default function RequestHelp() {
                   disabled={loading}
                   maxLength={500}
                 ></textarea>
-
               </div>
-
             </div>
-
-
             {/* ==================================
                 ERROR
             ================================== */}
-
             {error && (
-
               <p className="error-text">
                 {error}
               </p>
-
             )}
-
-
             {/* ==================================
                 SUBMIT
             ================================== */}
-
             <button
               type="submit"
               className="submit-btn"
               disabled={loading}
             >
-
               <i className="fa-solid fa-paper-plane"></i>
-
               {loading
                 ? "Submitting..."
                 : " Submit request"}
-
             </button>
-
           </form>
-
         )}
-
       </div>
-
     </div>
   );
 }
