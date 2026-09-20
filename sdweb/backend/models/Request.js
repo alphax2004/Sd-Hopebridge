@@ -73,6 +73,7 @@ const requestSchema =
 
     {
       timestamps: true,
+      versionKey: false,
     }
   );
 
