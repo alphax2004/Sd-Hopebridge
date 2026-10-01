@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Sidebar, Topbar } from "../pages_victim/sidebar/sidebar";
-import "./admin.css";
+import { Sidebar, Topbar } from "../../pages_victim/sidebar/sidebar";
+import "../admin.css";
+import "./VictimRequests.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 

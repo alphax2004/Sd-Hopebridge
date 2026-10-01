@@ -1,63 +1,89 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Sidebar, Topbar } from "../pages_victim/sidebar/sidebar";
-import "./admin.css";
+import { Sidebar, Topbar } from "../../pages_victim/sidebar/sidebar";
+import "../admin.css";
+import "./AdminDashboard.css";
 
-// Environment Dynamic Configuration Engine
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 const POLLING_INTERVAL_MS = 10000;
 const MAX_BACKOFF_DELAY_MS = 60000;
 const CACHE_TTL_MS = 30000;
 
-// Enterprise In-Memory Cache Store for Instant Hydration
 const globalRequestCache = {
   data: null,
   timestamp: 0,
 };
 
 export default function AdminDashboard() {
-  // Core State Engine
-  const [requests, setRequests] = useState(() => globalRequestCache.data || []);
+  const [requests, setRequests] = useState(
+    () => globalRequestCache.data || []
+  );
   const [loading, setLoading] = useState(!globalRequestCache.data);
   const [error, setError] = useState("");
 
-  // Enterprise Concurrency & Execution Control References
   const abortControllerRef = useRef(null);
   const isComponentMountedRef = useRef(true);
   const retryCountRef = useRef(0);
   const pollingTimerRef = useRef(null);
 
-  // ==========================================
-  // SAFE DATA EXTRACTION & TRANSFORM ENGINE
-  // ==========================================
   const extractRequestsData = useCallback((responseData) => {
     if (!responseData) return [];
+
     if (Array.isArray(responseData)) return responseData;
-    if (Array.isArray(responseData.requests)) return responseData.requests;
-    if (Array.isArray(responseData.data)) return responseData.data;
-    if (Array.isArray(responseData.items)) return responseData.items;
-    
+
+    if (Array.isArray(responseData.requests)) {
+      return responseData.requests;
+    }
+
+    if (Array.isArray(responseData.data)) {
+      return responseData.data;
+    }
+
+    if (Array.isArray(responseData.items)) {
+      return responseData.items;
+    }
+
     if (typeof responseData === "object") {
-      const nestedArray = Object.values(responseData).find(Array.isArray);
+      const nestedArray = Object.values(responseData).find(
+        Array.isArray
+      );
+
       return nestedArray || [];
     }
+
     return [];
   }, []);
 
-  // ==========================================
-  // RESILIENT GETTER HELPERS WITH FALLBACKS
-  // ==========================================
   const getStatus = useCallback((request) => {
-    if (!request || typeof request !== "object") return "Pending";
-    return request.status || request.requestStatus || request.state || "Pending";
+    if (!request || typeof request !== "object") {
+      return "Pending";
+    }
+
+    return (
+      request.status ||
+      request.requestStatus ||
+      request.state ||
+      "Pending"
+    );
   }, []);
 
   const getUrgency = useCallback((request) => {
-    if (!request || typeof request !== "object") return "Low";
-    return request.urgency || request.priority || request.urgencyLevel || "Low";
+    if (!request || typeof request !== "object") {
+      return "Low";
+    }
+
+    return (
+      request.urgency ||
+      request.priority ||
+      request.urgencyLevel ||
+      "Low"
+    );
   }, []);
 
   const getVictimName = useCallback((request) => {
-    if (!request || typeof request !== "object") return "Unknown User";
+    if (!request || typeof request !== "object") {
+      return "Unknown User";
+    }
+
     return (
       request.userId?.fullName ||
       request.user?.fullName ||
@@ -69,7 +95,10 @@ export default function AdminDashboard() {
   }, []);
 
   const getLocation = useCallback((request) => {
-    if (!request || typeof request !== "object") return "Unknown";
+    if (!request || typeof request !== "object") {
+      return "Unknown";
+    }
+
     return (
       request.location ||
       request.address ||
@@ -80,7 +109,10 @@ export default function AdminDashboard() {
   }, []);
 
   const getDisaster = useCallback((request) => {
-    if (!request || typeof request !== "object") return "Unknown";
+    if (!request || typeof request !== "object") {
+      return "Unknown";
+    }
+
     return (
       request.disaster ||
       request.disasterType ||
@@ -91,7 +123,10 @@ export default function AdminDashboard() {
   }, []);
 
   const getRequestType = useCallback((request) => {
-    if (!request || typeof request !== "object") return "General Help";
+    if (!request || typeof request !== "object") {
+      return "General Help";
+    }
+
     return (
       request.type ||
       request.need ||
@@ -102,7 +137,10 @@ export default function AdminDashboard() {
   }, []);
 
   const getFamilyMembers = useCallback((request) => {
-    if (!request || typeof request !== "object") return "-";
+    if (!request || typeof request !== "object") {
+      return "-";
+    }
+
     return (
       request.familyMembers ??
       request.members ??
@@ -112,101 +150,99 @@ export default function AdminDashboard() {
     );
   }, []);
 
-  // ==========================================
-  // ENTERPRISE DATA FETCHING ENGINE WITH ABORT
-  // ==========================================
-  const loadRequests = useCallback(async (isSilentBackground = false) => {
-    // Abort active ongoing fetch to eliminate race conditions
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+  const loadRequests = useCallback(
+    async (isSilentBackground = false) => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
 
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
 
-    try {
-      if (isComponentMountedRef.current) {
+      try {
         if (!isSilentBackground) {
           setError("");
         }
-      }
 
-      const response = await fetch(`${API_URL}/api/requests`, {
-        method: "GET",
-        credentials: "include",
-        signal: controller.signal,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Cache-Control": "no-cache",
-          "Pragma": "no-cache",
-        },
-      });
+        const response = await fetch(`${API_URL}/api/requests`, {
+          method: "GET",
+          credentials: "include",
+          signal: controller.signal,
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message ||
-          errorData.error ||
-          `HTTP ${response.status}: Failed to load victim requests`
-        );
-      }
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
 
-      const rawData = await response.json();
+          throw new Error(
+            errorData.message ||
+              errorData.error ||
+              `HTTP ${response.status}: Failed to load victim requests`
+          );
+        }
 
-      if (!isComponentMountedRef.current) return;
+        const rawData = await response.json();
 
-      const extractedRequests = extractRequestsData(rawData);
+        if (!isComponentMountedRef.current) return;
 
-      // Hydrate Global In-Memory Cache Store
-      globalRequestCache.data = extractedRequests;
-      globalRequestCache.timestamp = Date.now();
+        const extractedRequests = extractRequestsData(rawData);
 
-      // Deep Memory Diffing to skip unneeded renders
-      setRequests((prev) => {
-        const isUnchanged = JSON.stringify(prev) === JSON.stringify(extractedRequests);
-        return isUnchanged ? prev : extractedRequests;
-      });
+        globalRequestCache.data = extractedRequests;
+        globalRequestCache.timestamp = Date.now();
 
-      retryCountRef.current = 0; // Reset exponential backoff retry counter
-    } catch (err) {
-      if (err.name === "AbortError") {
-        return; // Suppress safe abort controller errors
-      }
+        setRequests((prev) => {
+          const isUnchanged =
+            JSON.stringify(prev) ===
+            JSON.stringify(extractedRequests);
 
-      console.error("Critical Load Requests Failure:", err);
+          return isUnchanged ? prev : extractedRequests;
+        });
 
-      if (isComponentMountedRef.current) {
-        // Retain cached data on network error if available
-        if (requests.length === 0) {
-          setError(err.message || "Failed to load victim requests");
+        retryCountRef.current = 0;
+      } catch (err) {
+        if (err.name === "AbortError") {
+          return;
+        }
+
+        console.error("Load Requests Error:", err);
+
+        if (isComponentMountedRef.current) {
+          if (requests.length === 0) {
+            setError(
+              err.message || "Failed to load victim requests"
+            );
+          }
+        }
+      } finally {
+        if (isComponentMountedRef.current) {
+          setLoading(false);
         }
       }
-    } finally {
-      if (isComponentMountedRef.current) {
-        setLoading(false);
-      }
-    }
-  }, [extractRequestsData, requests.length]);
+    },
+    [extractRequestsData, requests.length]
+  );
 
-  // ==========================================
-  // COMPONENT LIFECYCLE MANAGEMENT
-  // ==========================================
   useEffect(() => {
     isComponentMountedRef.current = true;
 
     return () => {
       isComponentMountedRef.current = false;
+
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+
       if (pollingTimerRef.current) {
         clearTimeout(pollingTimerRef.current);
       }
     };
   }, []);
 
-  // Initial Fetching with Cache Validity Checker
   useEffect(() => {
     const isCacheFresh =
       globalRequestCache.data &&
@@ -221,14 +257,14 @@ export default function AdminDashboard() {
     }
   }, [loadRequests]);
 
-  // Self-Healing Exponential Backoff Auto-Polling Loop
   useEffect(() => {
     let isSubscribed = true;
 
     const scheduleNextPoll = () => {
       const computedDelay = error
         ? Math.min(
-            POLLING_INTERVAL_MS * Math.pow(2, retryCountRef.current),
+            POLLING_INTERVAL_MS *
+              Math.pow(2, retryCountRef.current),
             MAX_BACKOFF_DELAY_MS
           )
         : POLLING_INTERVAL_MS;
@@ -241,6 +277,7 @@ export default function AdminDashboard() {
         }
 
         await loadRequests(true);
+
         if (isSubscribed) {
           scheduleNextPoll();
         }
@@ -251,15 +288,13 @@ export default function AdminDashboard() {
 
     return () => {
       isSubscribed = false;
+
       if (pollingTimerRef.current) {
         clearTimeout(pollingTimerRef.current);
       }
     };
   }, [loadRequests, error]);
 
-  // ==========================================
-  // SINGLE-PASS O(N) HIGH PERFORMANCE AGGREGATION ENGINE
-  // ==========================================
   const {
     totalRequests,
     pendingRequests,
@@ -288,25 +323,41 @@ export default function AdminDashboard() {
 
     for (let i = 0; i < requests.length; i++) {
       const req = requests[i];
+
       const status = getStatus(req).toLowerCase();
       const urgency = getUrgency(req).toLowerCase();
 
-      // Status aggregation
-      if (status === "pending") counts.pendingRequests++;
-      else if (status === "approved") counts.approvedRequests++;
-      else if (status === "rejected") counts.rejectedRequests++;
-      else if (status === "volunteer assigned" || status === "assigned") counts.volunteerAssignedRequests++;
-      else if (status === "delivered" || status === "completed") counts.deliveredRequests++;
+      if (status === "pending") {
+        counts.pendingRequests++;
+      } else if (status === "approved") {
+        counts.approvedRequests++;
+      } else if (status === "rejected") {
+        counts.rejectedRequests++;
+      } else if (
+        status === "volunteer assigned" ||
+        status === "assigned"
+      ) {
+        counts.volunteerAssignedRequests++;
+      } else if (
+        status === "delivered" ||
+        status === "completed"
+      ) {
+        counts.deliveredRequests++;
+      }
 
-      // Urgency aggregation
-      if (urgency === "low") counts.lowPriorityRequests++;
-      else if (urgency === "medium") counts.mediumPriorityRequests++;
-      else if (urgency === "high") counts.highPriorityRequests++;
-      else if (urgency === "critical") counts.criticalRequests++;
+      if (urgency === "low") {
+        counts.lowPriorityRequests++;
+      } else if (urgency === "medium") {
+        counts.mediumPriorityRequests++;
+      } else if (urgency === "high") {
+        counts.highPriorityRequests++;
+      } else if (urgency === "critical") {
+        counts.criticalRequests++;
+      }
     }
 
-    // Dynamic Emergency Level Calculator
     let computedEmergencyLevel = "Low";
+
     if (counts.criticalRequests > 0) {
       computedEmergencyLevel = "Critical";
     } else if (counts.highPriorityRequests > 0) {
@@ -315,37 +366,43 @@ export default function AdminDashboard() {
       computedEmergencyLevel = "Medium";
     }
 
-    return { ...counts, emergencyLevel: computedEmergencyLevel };
+    return {
+      ...counts,
+      emergencyLevel: computedEmergencyLevel,
+    };
   }, [requests, getStatus, getUrgency]);
 
-  // ==========================================
-  // OPTIMIZED MEMOIZED SORTED RECENT REQUESTS
-  // ==========================================
   const recentRequests = useMemo(() => {
-    if (!requests || requests.length === 0) return [];
+    if (!requests || requests.length === 0) {
+      return [];
+    }
 
     return [...requests]
       .sort((a, b) => {
         const dateA = new Date(
-          a?.createdAt || a?.created_at || a?.timestamp || 0
+          a?.createdAt ||
+            a?.created_at ||
+            a?.timestamp ||
+            0
         ).getTime();
+
         const dateB = new Date(
-          b?.createdAt || b?.created_at || b?.timestamp || 0
+          b?.createdAt ||
+            b?.created_at ||
+            b?.timestamp ||
+            0
         ).getTime();
+
         return dateB - dateA;
       })
       .slice(0, 5);
   }, [requests]);
 
-  // Refresh Trigger Handler
   const handleRefresh = async () => {
     setLoading(true);
     await loadRequests(false);
   };
 
-  // ==========================================
-  // LOADING UI
-  // ==========================================
   if (loading && requests.length === 0) {
     return (
       <div className="admin-layout">
@@ -367,14 +424,12 @@ export default function AdminDashboard() {
     );
   }
 
-  // ==========================================
-  // DASHBOARD UI (EXACT SAME UI & ELEMENTS)
-  // ==========================================
   return (
     <div className="admin-layout">
       <Sidebar variant="admin" />
 
       <div className="main-content">
+
         <Topbar
           variant="admin"
           userName="Admin"
@@ -384,7 +439,7 @@ export default function AdminDashboard() {
 
         {/* ERROR */}
         {error && (
-          <div className="admin-card">
+          <div className="admin-card error-card">
             <p>{error}</p>
 
             <button
@@ -403,60 +458,34 @@ export default function AdminDashboard() {
 
         <div className="stats-grid">
 
-          {/* 1. Total Requests */}
-          <div className="stat-card">
+          <div className="stat-card stat-total">
             <h4>Total Requests</h4>
             <h2>{totalRequests}</h2>
             <p>All requests</p>
           </div>
 
-          {/* 2. Pending Requests */}
-          <div className="stat-card">
+          <div className="stat-card stat-pending">
             <h4>Pending Requests</h4>
             <h2>{pendingRequests}</h2>
             <p>Awaiting approval</p>
           </div>
 
-          {/* 3. Approved */}
-          <div className="stat-card">
+          <div className="stat-card stat-approved">
             <h4>Approved</h4>
             <h2>{approvedRequests}</h2>
             <p>Accepted requests</p>
           </div>
 
-          {/* 4. Rejected */}
-          <div className="stat-card">
+          <div className="stat-card stat-rejected">
             <h4>Rejected</h4>
             <h2>{rejectedRequests}</h2>
             <p>Rejected requests</p>
           </div>
 
-          {/* 5. Volunteer Assigned */}
-          <div className="stat-card">
-            <h4>Volunteer Assigned</h4>
-            <h2>{volunteerAssignedRequests}</h2>
-            <p>Assigned to volunteer</p>
-          </div>
-
-          {/* 6. Delivered */}
-          <div className="stat-card">
-            <h4>Delivered</h4>
-            <h2>{deliveredRequests}</h2>
-            <p>Successfully delivered</p>
-          </div>
-
-          {/* 7. High Priority */}
-          <div className="stat-card">
+          <div className="stat-card stat-high">
             <h4>High Priority</h4>
             <h2>{highPriorityRequests}</h2>
             <p>High urgency</p>
-          </div>
-
-          {/* 8. Critical */}
-          <div className="stat-card">
-            <h4>Critical</h4>
-            <h2>{criticalRequests}</h2>
-            <p>Critical urgency</p>
           </div>
 
         </div>
@@ -465,40 +494,47 @@ export default function AdminDashboard() {
             EMERGENCY OVERVIEW
         ========================= */}
 
-        <div className="admin-card">
+        <div className="emergency-overview">
+
           <h3>Emergency Overview</h3>
 
-          <p>
-            Current Emergency Level:{" "}
-            <strong>{emergencyLevel}</strong>
-          </p>
+          <div className="emergency-boxes">
 
-          <p>
-            Low Priority: {lowPriorityRequests}
-          </p>
+            <div className="emergency-box level-box">
+              <span>Emergency Level</span>
+              <strong>{emergencyLevel}</strong>
+            </div>
 
-          <p>
-            Medium Priority: {mediumPriorityRequests}
-          </p>
+            <div className="emergency-box low-box">
+              <span>Low Priority</span>
+              <strong>{lowPriorityRequests}</strong>
+            </div>
 
-          <p>
-            High Priority: {highPriorityRequests}
-          </p>
+            <div className="emergency-box medium-box">
+              <span>Medium Priority</span>
+              <strong>{mediumPriorityRequests}</strong>
+            </div>
 
-          <p>
-            Critical: {criticalRequests}
-          </p>
+            <div className="emergency-box high-box">
+              <span>High Priority</span>
+              <strong>{highPriorityRequests}</strong>
+            </div>
+
+          </div>
+
         </div>
 
         {/* =========================
             RECENT VICTIM REQUESTS
         ========================= */}
 
-        <div className="admin-card">
+        <div className="admin-card table-card">
+
           <h3>Recent Victim Requests</h3>
 
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-wrapper">
             <table>
+
               <thead>
                 <tr>
                   <th>Victim</th>
@@ -512,44 +548,33 @@ export default function AdminDashboard() {
               </thead>
 
               <tbody>
+
                 {recentRequests.map((request, requestIndex) => {
                   const status = getStatus(request);
                   const urgency = getUrgency(request);
 
                   return (
-                    <tr key={request._id || request.id || `request-${requestIndex}`}>
-                      <td>
-                        {getVictimName(request)}
-                      </td>
+                    <tr
+                      key={
+                        request._id ||
+                        request.id ||
+                        `request-${requestIndex}`
+                      }
+                    >
+                      <td>{getVictimName(request)}</td>
+                      <td>{getLocation(request)}</td>
+                      <td>{getDisaster(request)}</td>
+                      <td>{getRequestType(request)}</td>
+                      <td>{getFamilyMembers(request)}</td>
 
                       <td>
-                        {getLocation(request)}
-                      </td>
-
-                      <td>
-                        {getDisaster(request)}
-                      </td>
-
-                      <td>
-                        {getRequestType(request)}
-                      </td>
-
-                      <td>
-                        {getFamilyMembers(request)}
-                      </td>
-
-                      <td>
-                        <span
-                          className={`badge ${urgency}`}
-                        >
+                        <span className={`badge ${urgency}`}>
                           {urgency}
                         </span>
                       </td>
 
                       <td>
-                        <span
-                          className={`badge ${status}`}
-                        >
+                        <span className={`badge ${status}`}>
                           {status}
                         </span>
                       </td>
@@ -559,25 +584,30 @@ export default function AdminDashboard() {
 
                 {recentRequests.length === 0 && (
                   <tr>
-                    <td colSpan="7">
+                    <td colSpan="7" className="empty-table">
                       No victim requests found.
                     </td>
                   </tr>
                 )}
+
               </tbody>
+
             </table>
           </div>
+
         </div>
 
         {/* =========================
             PRIORITY BREAKDOWN
         ========================= */}
 
-        <div className="admin-card">
+        <div className="admin-card table-card">
+
           <h3>Priority Breakdown</h3>
 
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-wrapper">
             <table>
+
               <thead>
                 <tr>
                   <th>Priority</th>
@@ -586,40 +616,26 @@ export default function AdminDashboard() {
               </thead>
 
               <tbody>
+
                 <tr>
                   <td>
-                    <span className="badge Low">
-                      Low
-                    </span>
+                    <span className="badge Low">Low</span>
                   </td>
-
-                  <td>
-                    {lowPriorityRequests}
-                  </td>
+                  <td>{lowPriorityRequests}</td>
                 </tr>
 
                 <tr>
                   <td>
-                    <span className="badge Medium">
-                      Medium
-                    </span>
+                    <span className="badge Medium">Medium</span>
                   </td>
-
-                  <td>
-                    {mediumPriorityRequests}
-                  </td>
+                  <td>{mediumPriorityRequests}</td>
                 </tr>
 
                 <tr>
                   <td>
-                    <span className="badge High">
-                      High
-                    </span>
+                    <span className="badge High">High</span>
                   </td>
-
-                  <td>
-                    {highPriorityRequests}
-                  </td>
+                  <td>{highPriorityRequests}</td>
                 </tr>
 
                 <tr>
@@ -628,25 +644,27 @@ export default function AdminDashboard() {
                       Critical
                     </span>
                   </td>
-
-                  <td>
-                    {criticalRequests}
-                  </td>
+                  <td>{criticalRequests}</td>
                 </tr>
+
               </tbody>
+
             </table>
           </div>
+
         </div>
 
         {/* =========================
             REQUEST STATUS
         ========================= */}
 
-        <div className="admin-card">
+        <div className="admin-card table-card">
+
           <h3>Request Status</h3>
 
-          <div style={{ overflowX: "auto" }}>
+          <div className="table-wrapper">
             <table>
+
               <thead>
                 <tr>
                   <th>Status</th>
@@ -655,16 +673,14 @@ export default function AdminDashboard() {
               </thead>
 
               <tbody>
+
                 <tr>
                   <td>
                     <span className="badge Pending">
                       Pending
                     </span>
                   </td>
-
-                  <td>
-                    {pendingRequests}
-                  </td>
+                  <td>{pendingRequests}</td>
                 </tr>
 
                 <tr>
@@ -673,10 +689,7 @@ export default function AdminDashboard() {
                       Approved
                     </span>
                   </td>
-
-                  <td>
-                    {approvedRequests}
-                  </td>
+                  <td>{approvedRequests}</td>
                 </tr>
 
                 <tr>
@@ -685,22 +698,16 @@ export default function AdminDashboard() {
                       Rejected
                     </span>
                   </td>
-
-                  <td>
-                    {rejectedRequests}
-                  </td>
+                  <td>{rejectedRequests}</td>
                 </tr>
 
                 <tr>
                   <td>
-                    <span className="badge Volunteer Assigned">
+                    <span className="badge Volunteer-Assigned">
                       Volunteer Assigned
                     </span>
                   </td>
-
-                  <td>
-                    {volunteerAssignedRequests}
-                  </td>
+                  <td>{volunteerAssignedRequests}</td>
                 </tr>
 
                 <tr>
@@ -709,14 +716,14 @@ export default function AdminDashboard() {
                       Delivered
                     </span>
                   </td>
-
-                  <td>
-                    {deliveredRequests}
-                  </td>
+                  <td>{deliveredRequests}</td>
                 </tr>
+
               </tbody>
+
             </table>
           </div>
+
         </div>
 
       </div>

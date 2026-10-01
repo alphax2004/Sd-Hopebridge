@@ -1,5 +1,5 @@
-import { Sidebar, Topbar } from "../pages_victim/sidebar/sidebar";
-import "./admin.css";
+import { Sidebar, Topbar } from "../../pages_victim/sidebar/sidebar";
+import "../admin.css";
 
 const resources = [
   ["Food", 75],

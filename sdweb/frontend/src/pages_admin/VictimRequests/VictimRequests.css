@@ -1,0 +1,222 @@
+/* ================================
+   VICTIM REQUESTS
+================================ */
+
+.filter-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-group label {
+  font-size: 13px;
+}
+
+.filter-group select {
+  min-width: 150px;
+  padding: 9px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  outline: none;
+}
+
+.filter-group select:focus {
+  border-color: #f0a00c;
+}
+
+
+/* ================================
+   CARD HEADER
+================================ */
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+
+/* ================================
+   TABLE
+================================ */
+
+.responsive-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.responsive-table table {
+  width: 100%;
+  min-width: 950px;
+  border-collapse: collapse;
+}
+
+.responsive-table th {
+  background: #f6e9cc;
+  padding: 12px 10px;
+  text-align: left;
+  font-size: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.responsive-table td {
+  padding: 12px 10px;
+  font-size: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.responsive-table tbody tr:hover {
+  background: #fffaf0;
+}
+
+
+/* ================================
+   STATUS / PRIORITY
+================================ */
+
+.status {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: bold;
+  background: #eee;
+}
+
+
+/* Priority */
+
+.status.Low {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+
+.status.Medium {
+  background: #fff3cd;
+  color: #9a7500;
+}
+
+.status.High {
+  background: #ffe5c2;
+  color: #c66a00;
+}
+
+.status.Critical {
+  background: #ffdede;
+  color: #c0392b;
+}
+
+
+/* Status */
+
+.status.Pending {
+  background: #fff3cd;
+  color: #9a7500;
+}
+
+.status.Approved {
+  background: #e5f5e9;
+  color: #34804b;
+}
+
+.status.Rejected {
+  background: #ffe3e0;
+  color: #c0392b;
+}
+
+.status.Delivered {
+  background: #e3f0ff;
+  color: #3c6d9f;
+}
+
+.status.Volunteer.Assigned {
+  background: #eee5ff;
+  color: #7045a5;
+}
+
+
+/* ================================
+   BUTTONS
+================================ */
+
+.action-btn {
+  border: none;
+  background: #f0a00c;
+  color: black;
+  padding: 8px 13px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background: #d98e00;
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+
+/* ================================
+   MESSAGE
+================================ */
+
+.table-message {
+  padding: 25px;
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+}
+
+.error-message {
+  color: #c0392b;
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 768px) {
+  .filter-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    justify-content: space-between;
+  }
+
+  .filter-group select {
+    flex: 1;
+  }
+
+  .card-header {
+    align-items: flex-start;
+    gap: 10px;
+  }
+}

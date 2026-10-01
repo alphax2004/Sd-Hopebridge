@@ -9,6 +9,7 @@ import log from "./middlewares/logger.js";
 import authRouter from "./routes/auth.js";
 import usersRouter from "./routes/users.js";
 import requestsRouter from "./routes/requests.js";
+import disasterCentreRouter from "./routes/disasterCentreRoutes.js";
 
 const app =
   express();
@@ -92,6 +93,11 @@ app.use(
 app.use(
   "/api/requests",
   requestsRouter
+);
+
+app.use(
+  "/api/disaster-centre",
+  disasterCentreRouter
 );
 
 

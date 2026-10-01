@@ -11,10 +11,10 @@ import Password from "./pages_victim/password/Password";
 import DisasterCenter from "./pages_victim/disaster_center/DisasterCenter";
 import Logout from "./pages_victim/logout/logout";
 
-import AdminDashboard from "./pages_admin/AdminDashboard";
-import VictimRequests from "./pages_admin/VictimRequests";
-import ReliefManagement from "./pages_admin/ReliefManagement";
-import AdminDisasterCentre from "./pages_admin/AdminDisasterCentre";
+import AdminDashboard from "./pages_admin/AdminDashboard/AdminDashboard";
+import VictimRequests from "./pages_admin/VictimRequests/VictimRequests";
+import ReliefManagement from "./pages_admin/ReliefManagement/ReliefManagement";
+import AdminDisasterCentre from "./pages_admin/AdminDisasterCentre/AdminDisasterCentre";
 import AdminProfile from "./pages_admin/AdminProfile";
 import AdminPassword from "./pages_admin/AdminPassword";
 import RequireAdmin from "./pages_admin/RequireAdmin";
@@ -143,7 +143,6 @@ export default function App() {
           }
         />
 
-        {/* Unknown route */}
         <Route path="*" element={<LandingPage />} />
       </Routes>
     </div>
