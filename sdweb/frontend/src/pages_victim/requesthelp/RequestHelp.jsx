@@ -404,7 +404,7 @@ export default function RequestHelp() {
                 {helpTypes.map((t) => (
                   <div
                     key={t.key}
-                    className={`type-card ${
+                    className={`type-card ${t.key.toLowerCase()}-card ${
                       formData.type === t.key
                         ? "active"
                         : ""

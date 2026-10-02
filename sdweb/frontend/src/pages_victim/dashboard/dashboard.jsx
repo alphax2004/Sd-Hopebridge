@@ -168,35 +168,43 @@ export default function Dashboard() {
         />
         {/* STAT CARDS */}
         <div className="stat-cards">
-          <div className="stat-card">
+          <div className="stat-card total-card">
             <div className="stat-card-top">
-              <div className="stat-icon">
+              <div className="stat-icon total-icon">
                 <i className="fa-solid fa-clipboard-list"></i>
               </div>
-              <div className="stat-label">Total Requests</div>
+              <span className="stat-label">Total Requests</span>
             </div>
-            <div className="stat-value">{totalRequests}</div>
-            <div className="stat-note">(All time requests)</div>
+            <div className="stat-body">
+              <span className="stat-value">{totalRequests}</span>
+              <span className="stat-note">All time submitted requests</span>
+            </div>
           </div>
-          <div className="stat-card">
+
+          <div className="stat-card pending-card">
             <div className="stat-card-top">
-              <div className="stat-icon">
+              <div className="stat-icon pending-icon">
                 <i className="fa-solid fa-clock"></i>
               </div>
-              <div className="stat-label">Pending Requests</div>
+              <span className="stat-label">Pending Requests</span>
             </div>
-            <div className="stat-value">{pendingRequests}</div>
-            <div className="stat-note">(Waiting for approval)</div>
+            <div className="stat-body">
+              <span className="stat-value">{pendingRequests}</span>
+              <span className="stat-note">Waiting for approval</span>
+            </div>
           </div>
-          <div className="stat-card">
+
+          <div className="stat-card approved-card">
             <div className="stat-card-top">
-              <div className="stat-icon">
+              <div className="stat-icon approved-icon">
                 <i className="fa-solid fa-circle-check"></i>
               </div>
-              <div className="stat-label">Approved Requests</div>
+              <span className="stat-label">Approved Requests</span>
             </div>
-            <div className="stat-value">{approvedRequests}</div>
-            <div className="stat-note">(Approved by NGO)</div>
+            <div className="stat-body">
+              <span className="stat-value">{approvedRequests}</span>
+              <span className="stat-note">Approved by NGO</span>
+            </div>
           </div>
         </div>
 
@@ -259,118 +267,85 @@ export default function Dashboard() {
 
         {/* RECENT REQUESTS */}
         <div className="recent-request-section">
-          <div className="recent-request-heading">
-            <h2>Recent Requests</h2>
-            <p>Complete details of your submitted help requests</p>
-          </div>
-          <div className="table-card">
-            <div className="card-header">
-              <div className="filter-wrapper">
-                <button
-                  className="action-btn"
-                  onClick={() =>
-                    setFilterOpen(!filterOpen)
-                  }
-                >
-                  <i className="fa-solid fa-filter"></i>
-                  Filter
-                </button>
-                {filterOpen && (
-                  <div className="filter-dropdown">
-                    <button
-                      className={
-                        urgencyFilter === "All"
-                          ? "active-filter"
-                          : ""
-                      }
-                      onClick={() => {
-                        setUrgencyFilter("All");
-                        setFilterOpen(false);
-                      }}
-                    >
-                      All
-                    </button>
-                    <button
-                      className={
-                        urgencyFilter === "High"
-                          ? "active-filter"
-                          : ""
-                      }
-                      onClick={() => {
-                        setUrgencyFilter("High");
-                        setFilterOpen(false);
-                      }}
-                    >
-                      High
-                    </button>
-                    <button
-                      className={
-                        urgencyFilter === "Medium"
-                          ? "active-filter"
-                          : ""
-                      }
-                      onClick={() => {
-                        setUrgencyFilter("Medium");
-                        setFilterOpen(false);
-                      }}
-                    >
-                      Medium
-                    </button>
-                    <button
-                      className={
-                        urgencyFilter === "Low" ? "active-filter" : ""
-                      }
-                      onClick={() => {
-                        setUrgencyFilter("Low");
-                        setFilterOpen(false);
-                      }}
-                    >
-                      Low
-                    </button>
-                  </div>
-                )}
-              </div>
+          <div className="recent-request-header-row">
+            <div className="recent-request-heading">
+              <h2>Recent Requests</h2>
+              <p>Complete details of your submitted help requests</p>
             </div>
+
+            <div className="filter-wrapper">
+              <button
+                className="action-btn"
+                onClick={() => setFilterOpen(!filterOpen)}
+                aria-label="Filter requests"
+              >
+                <i className="fa-solid fa-filter"></i>
+                <span>Filter: {urgencyFilter}</span>
+                <i
+                  className={`fa-solid fa-chevron-${filterOpen ? "up" : "down"}`}
+                  style={{ fontSize: "10px", marginLeft: "4px" }}
+                ></i>
+              </button>
+
+              {filterOpen && (
+                <div className="filter-dropdown">
+                  {["All", "High", "Medium", "Low"].map((filterOpt) => (
+                    <button
+                      key={filterOpt}
+                      className={urgencyFilter === filterOpt ? "active-filter" : ""}
+                      onClick={() => {
+                        setUrgencyFilter(filterOpt);
+                        setFilterOpen(false);
+                      }}
+                    >
+                      {filterOpt === "All" ? "All Urgencies" : `${filterOpt} Urgency`}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="table-card">
             {loading ? (
               <div className="table-message">
-                Loading requests...
+                <i className="fa-solid fa-spinner fa-spin"></i>
+                <p>Loading requests...</p>
+                <span>Please wait while we fetch your requests.</span>
               </div>
             ) : error ? (
               <div className="table-message error-message">
-                {error}
+                <i className="fa-solid fa-triangle-exclamation"></i>
+                <p>{error}</p>
               </div>
             ) : requests.length === 0 ? (
               <div className="table-message">
                 <i className="fa-solid fa-clipboard-list"></i>
                 <p>No requests found.</p>
-                <span>
-                  Your submitted help requests will appear here.
-                </span>
+                <span>Your submitted help requests will appear here.</span>
               </div>
             ) : filteredRequests.length === 0 ? (
               <div className="table-message">
                 <i className="fa-solid fa-filter"></i>
                 <p>No {urgencyFilter.toLowerCase()} urgency requests found.</p>
-                <span>
-                  Try selecting another filter.
-                </span>
+                <span>Try selecting another filter.</span>
               </div>
             ) : (
               <div className="responsive-table">
                 <table>
                   <thead>
                     <tr>
-                      <th>Request ID</th>
-                      <th>Type</th>
-                      <th>Items / Requirement</th>
-                      <th>Quantity / People</th>
-                      <th>Urgency</th>
-                      <th>Location</th>
-                      <th>Contact</th>
-                      <th>Notes</th>
-                      <th>Date</th>
-                      <th>Time</th>
-                      <th>Status</th>
+                      <th className="col-id">Request ID</th>
+                      <th className="col-type">Type</th>
+                      <th className="col-items">Items / Need</th>
+                      <th className="col-qty">Quantity / People</th>
+                      <th className="col-urgency">Urgency</th>
+                      <th className="col-location">Location</th>
+                      <th className="col-contact">Contact</th>
+                      <th className="col-notes">Notes</th>
+                      <th className="col-date">Date</th>
+                      <th className="col-time">Time</th>
+                      <th className="col-status">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -384,13 +359,12 @@ export default function Dashboard() {
                             `${r?.createdAt}-${r?.type}`
                           }
                         >
-                          <td>
+                          <td className="col-id">
                             <span className="request-id">
-                              #
-                              {r?._id?.slice(-6).toUpperCase() || "------"}
+                              #{r?._id?.slice(-6).toUpperCase() || "------"}
                             </span>
                           </td>
-                          <td>
+                          <td className="col-type">
                             <div className="request-type">
                               <i
                                 className={
@@ -410,18 +384,17 @@ export default function Dashboard() {
                               </span>
                             </div>
                           </td>
-                          <td>
+                          <td className="col-items">
                             <div className="request-detail">
                               <strong>
                                 {r?.items || "-"}
                               </strong>
                             </div>
                           </td>
-
-                          <td>
+                          <td className="col-qty quantity-cell">
                             {r?.quantity || "-"}
                           </td>
-                          <td>
+                          <td className="col-urgency text-center">
                             <span
                               className={`status ${String(
                                 urgency
@@ -430,7 +403,7 @@ export default function Dashboard() {
                               {urgency}
                             </span>
                           </td>
-                          <td>
+                          <td className="col-location">
                             <div className="location-detail">
                               <i className="fa-solid fa-location-dot"></i>
                               <span>
@@ -438,7 +411,7 @@ export default function Dashboard() {
                               </span>
                             </div>
                           </td>
-                          <td>
+                          <td className="col-contact">
                             <div className="contact-detail">
                               <i className="fa-solid fa-phone"></i>
                               <span>
@@ -446,18 +419,18 @@ export default function Dashboard() {
                               </span>
                             </div>
                           </td>
-                          <td>
+                          <td className="col-notes">
                             <div className="notes-detail">
                               {r?.notes || "No additional notes"}
                             </div>
                           </td>
-                          <td>
+                          <td className="col-date date-cell">
                             {formatDate(r?.createdAt)}
                           </td>
-                          <td>
+                          <td className="col-time time-cell">
                             {formatTime(r?.createdAt)}
                           </td>
-                          <td>
+                          <td className="col-status text-center">
                             <span
                               className={`status ${String(
                                 status
