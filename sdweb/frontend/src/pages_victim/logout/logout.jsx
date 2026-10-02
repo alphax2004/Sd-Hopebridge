@@ -1,11 +1,13 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import"./logout.css";
+import { useAuth } from "../../context";
+import "./logout.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export default function Logout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const auth = useAuth();
   const cameFrom = location.state?.from || "/dashboard";
 
   const handleLogout = async () => {
@@ -17,6 +19,9 @@ export default function Logout() {
     } catch {
       // network error হলেও frontend থেকে user কে বের করে দেই
     } finally {
+      if (auth?.logoutUser) {
+        auth.logoutUser();
+      }
       navigate("/", { replace: true });
     }
   };
