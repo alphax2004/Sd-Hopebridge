@@ -1,5 +1,6 @@
 import { useState, useSyncExternalStore } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../context";
 import "./sidebar.css";
 
 const menuItemsByVariant = {
@@ -112,8 +113,10 @@ export function Sidebar({ variant = "victim" }) {
 export function Topbar({ title, subtitle, variant = "victim", userName = "Sanjida Islam" }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const auth = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const paths = profilePathByVariant[variant];
+  const displayedName = auth?.user?.fullName || userName;
 
   return (
     <div className="topbar">
@@ -138,7 +141,7 @@ export function Topbar({ title, subtitle, variant = "victim", userName = "Sanjid
             <i className="fa-solid fa-user"></i>
           </div>
 
-          <span>{userName}</span>
+          <span>{displayedName}</span>
 
           <i className="fa-solid fa-chevron-down"></i>
         </div>

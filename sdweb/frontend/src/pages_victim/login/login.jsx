@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../context";
 
 import {
   signInWithEmailAndPassword,
@@ -18,6 +19,8 @@ const API_URL =
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const authContext = useAuth();
 
   const [email, setEmail] =
     useState("");
@@ -234,18 +237,33 @@ export default function Login() {
       // STEP 11: Role-based navigation
       // ========================================
 
+      if (authContext?.loginUser) {
+        authContext.loginUser(data.user);
+      }
+
+      const fromPath = location.state?.from?.pathname;
+      if (fromPath) {
+        const isAdminPath = fromPath.startsWith("/admin");
+        if (
+          (userRole === "admin" && isAdminPath) ||
+          (userRole !== "admin" && !isAdminPath)
+        ) {
+          navigate(fromPath, { replace: true });
+          return;
+        }
+      }
+
       if (
         userRole === "admin"
       ) {
-
         navigate(
-          "/admin/dashboard"
+          "/admin/dashboard",
+          { replace: true }
         );
-
       } else {
-
         navigate(
-          "/dashboard"
+          "/dashboard",
+          { replace: true }
         );
       }
 

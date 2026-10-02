@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context";
 import {
   Sidebar,
   Topbar,
@@ -12,6 +13,7 @@ const API_URL =
 
 export default function Profile({ variant = "victim" }) {
   const navigate = useNavigate();
+  const auth = useAuth();
 
   const [formData, setFormData] =
     useState({
@@ -158,6 +160,9 @@ export default function Profile({ variant = "victim" }) {
         }
 
         if (data.user) {
+          if (auth?.updateUser) {
+            auth.updateUser(data.user);
+          }
           setFormData({
             id:
               data.user._id ||

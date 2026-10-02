@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import LandingPage from "./pages_victim/landingpage/landingpage";
 import Login from "./pages_victim/login/login";
@@ -17,170 +19,175 @@ import ReliefManagement from "./pages_admin/ReliefManagement/ReliefManagement";
 import AdminDisasterCentre from "./pages_admin/AdminDisasterCentre/AdminDisasterCentre";
 import AdminProfile from "./pages_admin/AdminProfile";
 import AdminPassword from "./pages_admin/AdminPassword";
-import RequireAdmin from "./pages_admin/RequireAdmin";
 
 export default function App() {
   return (
-    <div className="app-container">
-      <style>{`
-        :root {
-          --text-color: #000;
-          --primary-orange: rgb(240, 160, 12);
-          --card-bg: #f6e9cc;
-          --cream-bg: #fbf3e3;
-        }
+    <AuthProvider>
+      <div className="app-container">
+        <style>{`
+          :root {
+            --text-color: #000;
+            --primary-orange: rgb(240, 160, 12);
+            --card-bg: #f6e9cc;
+            --cream-bg: #fbf3e3;
+          }
 
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
+          * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
 
-        html,
-        body,
-        #root {
-          margin: 0;
-          padding: 0;
-          width: 100%;
-          min-height: 100vh;
-        }
+          html,
+          body,
+          #root {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+          }
 
-        body {
-          font-family: Arial, sans-serif;
-          color: var(--text-color);
-        }
+          body {
+            font-family: Arial, sans-serif;
+            color: var(--text-color);
+          }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        p,
-        label,
-        a,
-        span {
-          color: var(--text-color);
-          font-weight: bold;
-        }
+          h1,
+          h2,
+          h3,
+          h4,
+          p,
+          label,
+          a,
+          span {
+            color: var(--text-color);
+            font-weight: bold;
+          }
 
-        button {
-          font-family: Arial, sans-serif;
-          color: black;
-          font-weight: bold;
-          cursor: pointer;
-        }
+          button {
+            font-family: Arial, sans-serif;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+          }
 
-        .app-container {
-          width: 100%;
-          min-height: 100vh;
-        }
-      `}</style>
+          .app-container {
+            width: 100%;
+            min-height: 100vh;
+          }
+        `}</style>
 
-      <Routes>
-        {/* Victim */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify-email" element={<EmailVerification />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/request-help" element={<RequestHelp />} />
-        <Route path="/disaster-center" element={<DisasterCenter />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/password" element={<Password />} />
-        <Route path="/logout" element={<Logout />} />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/verify-email" element={<EmailVerification />} />
 
-        {/* Admin */}
-        <Route
-          path="/admin/dashboard"
-          element={
-            <RequireAdmin>
-              <AdminDashboard />
-            </RequireAdmin>
+          {/* Protected User / Victim Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
             }
-        />
-
-        <Route
-          path="/admin/victim-requests"
-          element={
-            <RequireAdmin>
-              <VictimRequests />
-            </RequireAdmin>
-          }
-        />
-
-        <Route
-          path="/admin/relief-management"
-          element={
-            <RequireAdmin>
-              <ReliefManagement />
-            </RequireAdmin>
-          }
+          />
+          <Route
+            path="/request-help"
+            element={
+              <ProtectedRoute>
+                <RequestHelp />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/disaster-center"
+            element={
+              <ProtectedRoute>
+                <DisasterCenter />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/password"
+            element={
+              <ProtectedRoute>
+                <Password />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/logout"
+            element={
+              <ProtectedRoute>
+                <Logout />
+              </ProtectedRoute>
+            }
           />
 
-        <Route
-          path="/admin/disaster-centre"
-          element={
-            <RequireAdmin>
-              <AdminDisasterCentre />
-            </RequireAdmin>
-          }
-        />
+          {/* Protected Admin Routes */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/victim-requests"
+            element={
+              <ProtectedRoute requireAdmin>
+                <VictimRequests />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/relief-management"
+            element={
+              <ProtectedRoute requireAdmin>
+                <ReliefManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/disaster-centre"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminDisasterCentre />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/profile"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/password"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminPassword />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/profile"
-          element={
-            <RequireAdmin>
-              <AdminProfile />
-            </RequireAdmin>
-          }
-        />
-
-        <Route
-          path="/admin/password"
-          element={
-            <RequireAdmin>
-              <AdminPassword />
-            </RequireAdmin>
-          }
-        />
-
-        <Route path="*" element={<LandingPage />} />
-      </Routes>
-    </div>
+          {/* Fallback */}
+          <Route path="*" element={<LandingPage />} />
+        </Routes>
+      </div>
+    </AuthProvider>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
