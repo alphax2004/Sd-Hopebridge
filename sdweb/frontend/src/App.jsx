@@ -95,7 +95,7 @@ export default function App() {
             <RequireAdmin>
               <AdminDashboard />
             </RequireAdmin>
-          }
+            }
         />
 
         <Route
@@ -114,7 +114,7 @@ export default function App() {
               <ReliefManagement />
             </RequireAdmin>
           }
-        />
+          />
 
         <Route
           path="/admin/disaster-centre"
@@ -148,3 +148,39 @@ export default function App() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
