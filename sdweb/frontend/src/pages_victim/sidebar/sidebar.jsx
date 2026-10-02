@@ -13,7 +13,6 @@ const menuItemsByVariant = {
   admin: [
     { path: "/admin/dashboard", label: "Admin Dashboard", icon: "fa-grip" },
     { path: "/admin/victim-requests", label: "Victim Requests", icon: "fa-hand-holding-heart" },
-    { path: "/admin/relief-management", label: "Relief Management", icon: "fa-boxes-stacked" },
     { path: "/admin/disaster-centre", label: "Disaster Centre", icon: "fa-triangle-exclamation" },
     { path: "/admin/profile", label: "Admin Profile", icon: "fa-user" },
   ],
