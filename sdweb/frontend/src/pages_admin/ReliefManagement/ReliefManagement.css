@@ -1,0 +1,120 @@
+.relief-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.relief-card-sub {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 18px;
+  font-weight: normal;
+}
+
+.resources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.progress-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.progress-percentage {
+  color: #d97706;
+  font-weight: 700;
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  background: #fef3c7;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+.average-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid #ebdcc5;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.average-badge {
+  background: #fef3c7;
+  color: #b45309;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.relief-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #ebdcc5;
+  border-radius: 12px;
+}
+
+.relief-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.relief-card th {
+  background: #fdf8ee;
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #ebdcc5;
+  text-align: left;
+}
+
+.relief-card td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #374151;
+  border-bottom: 1px solid #f3ebe0;
+  vertical-align: middle;
+}
+
+.relief-card tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.item-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.item-name i {
+  color: #d97706;
+  width: 18px;
+  text-align: center;
+}
