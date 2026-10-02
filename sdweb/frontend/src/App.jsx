@@ -15,7 +15,6 @@ import Logout from "./pages_victim/logout/logout";
 
 import AdminDashboard from "./pages_admin/AdminDashboard/AdminDashboard";
 import VictimRequests from "./pages_admin/VictimRequests/VictimRequests";
-import ReliefManagement from "./pages_admin/ReliefManagement/ReliefManagement";
 import AdminDisasterCentre from "./pages_admin/AdminDisasterCentre/AdminDisasterCentre";
 import AdminProfile from "./pages_admin/AdminProfile";
 import AdminPassword from "./pages_admin/AdminPassword";
@@ -24,6 +23,7 @@ export default function App() {
   return (
     <AuthProvider>
       <div className="app-container">
+
         <style>{`
           :root {
             --text-color: #000;
@@ -78,11 +78,16 @@ export default function App() {
         `}</style>
 
         <Routes>
+
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/verify-email" element={<EmailVerification />} />
+          <Route
+            path="/verify-email"
+            element={<EmailVerification />}
+          />
+
 
           {/* Protected User / Victim Routes */}
           <Route
@@ -93,6 +98,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/request-help"
             element={
@@ -101,6 +107,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/disaster-center"
             element={
@@ -109,6 +116,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/profile"
             element={
@@ -117,6 +125,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/password"
             element={
@@ -125,6 +134,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/logout"
             element={
@@ -133,6 +143,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
 
           {/* Protected Admin Routes */}
           <Route
@@ -143,6 +154,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/victim-requests"
             element={
@@ -151,14 +163,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/admin/relief-management"
-            element={
-              <ProtectedRoute requireAdmin>
-                <ReliefManagement />
-              </ProtectedRoute>
-            }
-          />
+
           <Route
             path="/admin/disaster-centre"
             element={
@@ -167,6 +172,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/profile"
             element={
@@ -175,6 +181,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/password"
             element={
@@ -184,9 +191,15 @@ export default function App() {
             }
           />
 
+
           {/* Fallback */}
-          <Route path="*" element={<LandingPage />} />
+          <Route
+            path="*"
+            element={<LandingPage />}
+          />
+
         </Routes>
+
       </div>
     </AuthProvider>
   );
