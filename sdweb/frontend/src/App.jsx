@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CarbonFootprintDisplay from "./components/CarbonFootprintDisplay";
 
 import LandingPage from "./pages_victim/landingpage/landingpage";
 import Login from "./pages_victim/login/login";
@@ -375,6 +376,8 @@ export default function App() {
           />
 
         </Routes>
+
+        <CarbonFootprintDisplay />
 
       </div>
     </AuthProvider>

@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 
 import log from "./middlewares/logger.js";
+import carbonFootprintMiddleware from "./middlewares/CarbonFootprint.js";
 
 import authRouter from "./routes/auth.js";
 import usersRouter from "./routes/users.js";
@@ -24,6 +25,8 @@ app.use(log);
 app.use(
   express.json()
 );
+
+app.use(carbonFootprintMiddleware);
 
 app.use(
   cookieParser()
