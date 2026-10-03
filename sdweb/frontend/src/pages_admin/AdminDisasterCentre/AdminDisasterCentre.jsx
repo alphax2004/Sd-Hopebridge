@@ -11,25 +11,32 @@ export default function AdminDisasterCentre() {
   const [data, setData] = useState(empty);
   const [show, setShow] = useState("");
   const [form, setForm] = useState({
-    title: "", type: "Flood", location: "", severity: "Medium",
-    description: "", icon: "fa-droplet"
+    title: "",
+    type: "Flood",
+    location: "",
+    severity: "Medium",
+    description: "",
+    icon: "fa-droplet",
   });
 
   const [shelter, setShelter] = useState({
-    name: "", location: "", capacity: "", occupied: ""
+    name: "",
+    location: "",
+    capacity: "",
+    occupied: "",
   });
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const res = await fetch(`${API_URL}/api/disaster-centre`, {
-          credentials: "include"
+          credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to load");
         const result = await res.json();
         setData({
           disasters: result.disasters || [],
-          shelters: result.shelters || []
+          shelters: result.shelters || [],
         });
       } catch (error) {
         console.error("Failed to load disaster centre:", error);
@@ -46,13 +53,13 @@ export default function AdminDisasterCentre() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(next)
+        body: JSON.stringify(next),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Save failed");
       setData({
         disasters: result.data.disasters || [],
-        shelters: result.data.shelters || []
+        shelters: result.data.shelters || [],
       });
     } catch (error) {
       console.error("Save failed:", error);
@@ -63,57 +70,73 @@ export default function AdminDisasterCentre() {
     if (!form.title.trim() || !form.location.trim()) return;
 
     persist({
-      ...data,
-      disasters: [...data.disasters, {
-        ...form,
-        title: form.title.trim(),
-        location: form.location.trim(),
-        description: form.description.trim(),
-        active: true
-      }]
+      disasters: [
+        ...data.disasters,
+        {
+          title: form.title.trim(),
+          type: form.type,
+          location: form.location.trim(),
+          severity: form.severity,
+          description: form.description.trim(),
+          icon: form.icon,
+          active: true,
+        },
+      ],
+      shelters: data.shelters,
+    });
+    setForm({
+      title: "",
+      type: "Flood",
+      location: "",
+      severity: "Medium",
+      description: "",
+      icon: "fa-droplet",
     });
 
-    setForm({
-      title: "", type: "Flood", location: "", severity: "Medium",
-      description: "", icon: "fa-droplet"
-    });
     setShow("");
   };
-
   const addShelter = () => {
     if (!shelter.name.trim() || !shelter.location.trim()) return;
-
-    const capacity = Number(shelter.capacity) || 0;
-    const occupied = Math.min(Number(shelter.occupied) || 0, capacity);
-
     persist({
-      ...data,
-      shelters: [...data.shelters, {
-        name: shelter.name.trim(),
-        location: shelter.location.trim(),
-        capacity, occupied
-      }]
+      disasters: data.disasters,
+      shelters: [
+        ...data.shelters,
+        {
+          name: shelter.name.trim(),
+          location: shelter.location.trim(),
+          capacity: shelter.capacity,
+          occupied: shelter.occupied,
+        },
+      ],
+    });
+    setShelter({
+      name: "",
+      location: "",
+      capacity: "",
+      occupied: "",
     });
 
-    setShelter({
-      name: "", location: "", capacity: "", occupied: ""
-    });
     setShow("");
   };
   const changeType = (e) => {
     const type = e.target.value;
+
     const icons = {
       Flood: "fa-droplet",
       Cyclone: "fa-wind",
       Fire: "fa-fire",
-      Landslide: "fa-mountain"
+      Landslide: "fa-mountain",
     };
-    setForm({ ...form, type, icon: icons[type] });
+    setForm({
+      title: form.title,
+      type: type,
+      location: form.location,
+      severity: form.severity,
+      description: form.description,
+      icon: icons[type],
+    });
   };
-
-  
-
-  const active = data.disasters.filter(x => x.active).length;
+  const active = data.disasters.filter((x) => x.active).length;
 
   return (
     <div className="admin-layout">
@@ -133,23 +156,20 @@ export default function AdminDisasterCentre() {
               <span />
               LIVE UPDATES
             </span>
-            <h2>Stay informed. Stay safe.</h2>
+            <div className="hero-title">
+              <h2>Stay informed. Stay safe.</h2>
+              <i className="fa-solid fa-shield-heart hero-icon" />
+            </div>
             <p>Check current disaster alerts and emergency shelters.</p>
           </div>
         </div>
-
-       
-
         <div className="admin-stat-cards">
-          <Stat icon="fa-triangle-exclamation" title="Active Alerts" value={active} />
+          <Stat
+            icon="fa-triangle-exclamation"
+            title="Active Alerts"
+            value={active}
+          />
           <Stat icon="fa-house" title="Shelters" value={data.shelters.length} />
-          {/* <Stat
-            icon="fa-clock"
-            title="Last Checked"
-            value={new Date().toLocaleTimeString([], {
-              hour: "2-digit", minute: "2-digit"
-            })}
-          /> */}
         </div>
 
         <Section
@@ -163,7 +183,7 @@ export default function AdminDisasterCentre() {
               <input
                 placeholder="Alert title"
                 value={form.title}
-                onChange={e => setForm({ ...form, title: e.target.value })}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
               />
 
               <select value={form.type} onChange={changeType}>
@@ -176,12 +196,12 @@ export default function AdminDisasterCentre() {
               <input
                 placeholder="Location"
                 value={form.location}
-                onChange={e => setForm({ ...form, location: e.target.value })}
+                onChange={(e) => setForm({ ...form, location: e.target.value })}
               />
 
               <select
                 value={form.severity}
-                onChange={e => setForm({ ...form, severity: e.target.value })}
+                onChange={(e) => setForm({ ...form, severity: e.target.value })}
               >
                 <option>High</option>
                 <option>Medium</option>
@@ -191,7 +211,9 @@ export default function AdminDisasterCentre() {
               <textarea
                 placeholder="Short description"
                 value={form.description}
-                onChange={e => setForm({ ...form, description: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
+                }
               />
 
               <button className="form-save" onClick={addAlert}>
@@ -220,9 +242,6 @@ export default function AdminDisasterCentre() {
                   </p>
                   <small>{x.description}</small>
                 </div>
-
-                
-                
               </div>
             ))}
           </div>
@@ -230,7 +249,7 @@ export default function AdminDisasterCentre() {
 
         <Section
           title="Emergency Shelters"
-          sub="Current shelter capacity"
+          sub="Information visible to victims"
           button="Add Shelter"
           click={() => setShow(show === "shelter" ? "" : "shelter")}
         >
@@ -239,13 +258,27 @@ export default function AdminDisasterCentre() {
               <input
                 placeholder="Shelter name"
                 value={shelter.name}
-                onChange={e => setShelter({ ...shelter, name: e.target.value })}
+                onChange={(e) =>
+                  setShelter({
+                    name: e.target.value,
+                    location: shelter.location,
+                    capacity: shelter.capacity,
+                    occupied: shelter.occupied,
+                  })
+                }
               />
 
               <input
                 placeholder="Location"
                 value={shelter.location}
-                onChange={e => setShelter({ ...shelter, location: e.target.value })}
+                onChange={(e) =>
+                  setShelter({
+                    name: shelter.name,
+                    location: e.target.value,
+                    capacity: shelter.capacity,
+                    occupied: shelter.occupied,
+                  })
+                }
               />
 
               <input
@@ -253,7 +286,14 @@ export default function AdminDisasterCentre() {
                 min="0"
                 placeholder="Capacity"
                 value={shelter.capacity}
-                onChange={e => setShelter({ ...shelter, capacity: e.target.value })}
+                onChange={(e) =>
+                  setShelter({
+                    name: shelter.name,
+                    location: shelter.location,
+                    capacity: e.target.value,
+                    occupied: shelter.occupied,
+                  })
+                }
               />
 
               <input
@@ -261,7 +301,14 @@ export default function AdminDisasterCentre() {
                 min="0"
                 placeholder="Occupied"
                 value={shelter.occupied}
-                onChange={e => setShelter({ ...shelter, occupied: e.target.value })}
+                onChange={(e) =>
+                  setShelter({
+                    name: shelter.name,
+                    location: shelter.location,
+                    capacity: shelter.capacity,
+                    occupied: e.target.value,
+                  })
+                }
               />
 
               <button className="form-save" onClick={addShelter}>
@@ -270,42 +317,28 @@ export default function AdminDisasterCentre() {
             </Form>
           )}
 
-          <div className="shelter-grid">
-            {data.shelters.map((x, i) => {
-              const cap = Number(x.capacity) || 0;
-              const occ = Number(x.occupied) || 0;
-              const available = Math.max(cap - occ, 0);
-              const percent = cap ? Math.min((occ / cap) * 100, 100) : 0;
-
-              return (
-                <div className="shelter-card" key={x._id || i}>
-                  <div className="shelter-top">
-                    <div>
-                      <h4>{x.name}</h4>
-                      <p>
-                        <i className="fa-solid fa-location-dot" /> {x.location}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="capacity-row">
-                    <span>{occ} occupied</span>
-                    <span>{available} available</span>
-                  </div>
-
-                  <div className="capacity-bar">
-                    <div style={{ width: `${percent}%` }} />
-                  </div>
-
-                  <div className="capacity-bottom">
-                    <span>Capacity: {cap}</span>
-                    <b className={available ? "open-text" : "full-text"}>
-                      {available ? "Open" : "Full"}
-                    </b>
-                  </div>
+          <div className="admin-alert-list">
+            {data.shelters.map((x, i) => (
+              <div className="admin-alert-item" key={x._id || i}>
+                <div className="alert-icon">
+                  <i className="fa-solid fa-house" />
                 </div>
-              );
-            })}
+
+                <div className="alert-details">
+                  <div className="alert-title-row">
+                    <h4>{x.name}</h4>
+                  </div>
+
+                  <p>
+                    <i className="fa-solid fa-location-dot" /> {x.location}
+                  </p>
+
+                  <small>
+                    Capacity: {x.capacity} | Occupied: {x.occupied}
+                  </small>
+                </div>
+              </div>
+            ))}
           </div>
         </Section>
       </div>

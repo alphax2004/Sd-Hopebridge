@@ -1,12 +1,21 @@
+/* ========================================
+   SIDEBAR
+======================================== */
+
 .sidebar {
   width: 250px;
   min-width: 250px;
   min-height: 100vh;
-  background: #fffaf2;
-  border-right: 1px solid #e5d8c5;
+  background: #e8dcc5;
+  border-right: 1px solid #d2c09f;
   padding: 22px 18px;
   box-sizing: border-box;
 }
+
+
+/* ========================================
+   LOGO
+======================================== */
 
 .sidebar-logo {
   display: flex;
@@ -33,16 +42,21 @@
 
 .sidebar-subtitle {
   font-size: 11px;
-  font-weight: 500;
-  color: #806e59;
-  margin-top: 2px;
+  font-weight: 700;
+  color: #66513b;
+  margin-top: 3px;
   letter-spacing: 0.1px;
 }
+
+
+/* ========================================
+   MENU
+======================================== */
 
 .sidebar-menu {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .sidebar-item {
@@ -58,38 +72,80 @@
   cursor: pointer;
   text-decoration: none;
   letter-spacing: 0.1px;
+  transition: 0.2s ease;
 }
 
 .sidebar-item span {
   color: inherit;
 }
 
+
+/* ========================================
+   COLORFUL ICONS
+======================================== */
+
 .sidebar-item i {
   width: 18px;
   text-align: center;
-  font-size: 14px;
-  color: #806e59;
+  font-size: 15px;
+  transition: 0.2s ease;
 }
 
+/* Dashboard */
+.sidebar-item:nth-child(1) i {
+  color: #c47a18;
+}
+
+/* Requests */
+.sidebar-item:nth-child(2) i {
+  color: #4f7fa8;
+}
+
+/* Disaster Centre */
+.sidebar-item:nth-child(3) i {
+  color: #d46b45;
+}
+
+/* Profile */
+.sidebar-item:nth-child(4) i {
+  color: #7b68a6;
+}
+
+/* Password */
+.sidebar-item:nth-child(5) i {
+  color: #52866a;
+}
+
+
+/* ========================================
+   HOVER
+======================================== */
+
 .sidebar-item:hover {
-  background: #f5e4c8;
-  color: #30251d;
+  background: #fff0cc;
+  color: #2f261f;
+  box-shadow: 0 4px 10px rgba(105, 76, 30, 0.16);
+  transform: translateX(3px);
 }
 
 .sidebar-item:hover span {
-  color: #30251d;
+  color: #2f261f;
 }
 
 .sidebar-item:hover i {
-  color: #b87912;
+  transform: scale(1.12);
 }
 
-/* ================= ACTIVE PAGE ================= */
+
+/* ========================================
+   ACTIVE
+======================================== */
 
 .sidebar-item.active {
   background: #30251d;
   color: #fffaf2;
   font-weight: 600;
+  box-shadow: 0 4px 11px rgba(48, 37, 29, 0.22);
 }
 
 .sidebar-item.active span {
@@ -97,12 +153,36 @@
   font-weight: 600;
 }
 
+/* Active icons remain colorful */
 .sidebar-item.active i {
-  color: #e0a126;
-  font-size: 14px;
+  font-size: 15px;
+  transform: scale(1.05);
 }
 
-/* ================= LOGOUT ================= */
+.sidebar-item.active:nth-child(1) i {
+  color: #f0b84f;
+}
+
+.sidebar-item.active:nth-child(2) i {
+  color: #78b5df;
+}
+
+.sidebar-item.active:nth-child(3) i {
+  color: #f28b61;
+}
+
+.sidebar-item.active:nth-child(4) i {
+  color: #b6a0e0;
+}
+
+.sidebar-item.active:nth-child(5) i {
+  color: #82c39b;
+}
+
+
+/* ========================================
+   LOGOUT
+======================================== */
 
 .sidebar-item.logout {
   color: #a8543d;
@@ -118,8 +198,10 @@
 }
 
 .sidebar-item.logout:hover {
-  background: #f5dfd7;
+  background: #f6dcd5;
   color: #8f4532;
+  box-shadow: 0 4px 10px rgba(168, 84, 61, 0.14);
+  transform: translateX(3px);
 }
 
 .sidebar-item.logout:hover span {
@@ -127,10 +209,14 @@
 }
 
 .sidebar-item.logout:hover i {
-  color: #a8543d;
+  color: #b34f38;
+  transform: scale(1.12);
 }
 
-/* ================= TOPBAR ================= */
+
+/* ========================================
+   TOPBAR
+======================================== */
 
 .topbar {
   display: flex;
@@ -167,7 +253,10 @@
   color: #806e59;
 }
 
-/* ================= PROFILE ================= */
+
+/* ========================================
+   PROFILE
+======================================== */
 
 .profile-dropdown-wrapper {
   position: relative;
@@ -217,6 +306,7 @@
   font-weight: 600;
   color: #403329;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
 .dropdown-item i {
@@ -226,7 +316,7 @@
 }
 
 .dropdown-item:hover {
-  background: #f5e4c8;
+  background: #fff0cc;
   color: #30251d;
 }
 
@@ -242,7 +332,19 @@
   color: #a8543d;
 }
 
-/* ================= HAMBURGER ================= */
+.dropdown-logout:hover {
+  background: #f6dcd5;
+  color: #8f4532;
+}
+
+.dropdown-logout:hover i {
+  color: #b34f38;
+}
+
+
+/* ========================================
+   HAMBURGER
+======================================== */
 
 .hamburger-btn {
   display: none;
@@ -254,15 +356,22 @@
   padding: 6px 10px;
 }
 
-/* ================= OVERLAY ================= */
+
+/* ========================================
+   OVERLAY
+======================================== */
 
 .sidebar-overlay {
   display: none;
 }
 
-/* ================= RESPONSIVE ================= */
+
+/* ========================================
+   RESPONSIVE
+======================================== */
 
 @media (max-width: 768px) {
+
   .hamburger-btn {
     display: block;
   }

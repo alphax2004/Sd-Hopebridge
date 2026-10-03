@@ -2,39 +2,27 @@ import { useEffect, useState } from "react";
 import { Sidebar, Topbar } from "../sidebar/sidebar";
 import "./DisasterCenter.css";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:4000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-const types = [
-  "All",
-  "Flood",
-  "Cyclone",
-  "Fire",
-  "Landslide",
-];
+const types = ["All", "Flood", "Cyclone", "Fire", "Landslide"];
 
 export default function DisasterCenter() {
   const [data, setData] = useState({
     disasters: [],
     shelters: [],
-    news: [],
   });
 
   const [filter, setFilter] = useState("All");
- 
+
   const [error, setError] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetch(
-          `${API_URL}/api/disaster-centre`,
-          {
-            credentials: "include",
-            cache: "no-store",
-          }
-        );
+        const response = await fetch(`${API_URL}/api/disaster-centre`, {
+          credentials: "include",
+          cache: "no-store",
+        });
 
         if (!response.ok) {
           throw new Error("Failed to load");
@@ -45,38 +33,31 @@ export default function DisasterCenter() {
         setData({
           disasters: result.disasters || [],
           shelters: result.shelters || [],
-          news: result.news || [],
         });
 
         setError("");
       } catch (err) {
         console.log("DISASTER CENTRE ERROR:", err);
         setError("Unable to load emergency information.");
-      } 
+      }
     };
 
     loadData();
-
-    const interval = setInterval(loadData, 5000);
-
     window.addEventListener("focus", loadData);
 
     return () => {
-      clearInterval(interval);
+     
       window.removeEventListener("focus", loadData);
     };
   }, []);
 
-  const activeDisasters = data.disasters.filter(
-    (item) => item.active
-  );
+  const activeDisasters = data.disasters.filter((item) => item.active);
 
   const highRisk = activeDisasters.filter(
-    (item) => item.severity === "High"
-  ).length;
+    (item) => item.severity === "High",).length;
 
   const openShelters = data.shelters.filter(
-    (item) => Number(item.occupied || 0) < Number(item.capacity || 0)
+    (item) => Number(item.occupied || 0) < Number(item.capacity || 0),
   ).length;
 
   const filteredList =
@@ -100,10 +81,11 @@ export default function DisasterCenter() {
               <span />
               LIVE UPDATES
             </span>
-            <h2>Stay informed. Stay safe.</h2>
-            <p>
-              Check current disaster alerts and emergency shelters.
-            </p>
+            <div className="hero-title">
+              <h2>Stay informed. Stay safe.</h2>
+              <i className="fa-solid fa-shield-heart hero-icon" />
+            </div>
+            <p>Check current disaster alerts and emergency shelters.</p>
           </div>
         </div>
 
@@ -115,16 +97,8 @@ export default function DisasterCenter() {
             title="Active Disasters"
             value={activeDisasters.length}
           />
-          <Stat
-            icon="fa-bolt"
-            title="High Risk Alerts"
-            value={highRisk}
-          />
-          <Stat
-            icon="fa-house"
-            title="Open Shelters"
-            value={openShelters}
-          />
+          <Stat icon="fa-bolt" title="High Risk Alerts" value={highRisk} />
+          <Stat icon="fa-house" title="Open Shelters" value={openShelters} />
         </div>
 
         <Section
@@ -135,9 +109,7 @@ export default function DisasterCenter() {
             {types.map((type) => (
               <button
                 key={type}
-                className={
-                  filter === type ? "filter-btn active" : "filter-btn"
-                }
+                className={filter === type ? "filter-btn active" : "filter-btn"}
                 onClick={() => setFilter(type)}
               >
                 {type}
@@ -170,8 +142,7 @@ export default function DisasterCenter() {
                     </div>
 
                     <p>
-                      <i className="fa-solid fa-location-dot" />{" "}
-                      {x.location}
+                      <i className="fa-solid fa-location-dot" /> {x.location}
                     </p>
 
                     <small>{x.description}</small>
@@ -182,50 +153,48 @@ export default function DisasterCenter() {
           </div>
         </Section>
 
-        <Section
-          title="Emergency Shelters"
-          sub="Available safe places"
-        >
-          <div className="shelter-grid">
+        <Section title="Emergency Shelters" sub="Available safe places">
+          <div className="admin-alert-list">
             {data.shelters.length === 0 ? (
               <div className="dc-empty">
                 <i className="fa-solid fa-house-circle-check"></i>
+
                 <h4>No shelters listed</h4>
+
                 <p>There are no shelters available right now.</p>
               </div>
             ) : (
               data.shelters.map((shelter, i) => {
                 const capacity = Number(shelter.capacity || 0);
                 const occupied = Number(shelter.occupied || 0);
-                const available = capacity - occupied;
-                const filled = capacity ? (occupied / capacity) * 100 : 0;
+                const available = Math.max(capacity - occupied, 0);
 
                 return (
-                  <div className="shelter-card" key={shelter._id || i}>
-                    <div className="shelter-top">
-                      <div>
+                  <div className="admin-alert-item" key={shelter._id || i}>
+                    <div className="alert-icon">
+                      <i className="fa-solid fa-house" />
+                    </div>
+
+                    <div className="alert-details">
+                      <div className="alert-title-row">
                         <h4>{shelter.name}</h4>
-                        <p>
-                          <i className="fa-solid fa-location-dot" />{" "}
-                          {shelter.location}
-                        </p>
+
+                        <span
+                          className={available > 0 ? "badge Low" : "badge High"}
+                        >
+                          {available > 0 ? "Open" : "Full"}
+                        </span>
                       </div>
-                    </div>
 
-                    <div className="capacity-row">
-                      <span>{occupied} occupied</span>
-                      <span>{Math.max(available, 0)} available</span>
-                    </div>
+                      <p>
+                        <i className="fa-solid fa-location-dot" />{" "}
+                        {shelter.location}
+                      </p>
 
-                    <div className="capacity-bar">
-                      <div style={{ width: `${Math.min(filled, 100)}%` }} />
-                    </div>
-
-                    <div className="capacity-bottom">
-                      <span>Capacity: {capacity}</span>
-                      <b className={available > 0 ? "open-text" : "full-text"}>
-                        {available > 0 ? "Open" : "Full"}
-                      </b>
+                      <small>
+                        Capacity: {capacity} | Occupied: {occupied} | Available:{" "}
+                        {available}
+                      </small>
                     </div>
                   </div>
                 );

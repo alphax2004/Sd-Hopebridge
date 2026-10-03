@@ -25,18 +25,75 @@ export default function App() {
       <div className="app-container">
 
         <style>{`
+          /* ========================================
+             HOPEBRIDGE GLOBAL COLOR SYSTEM
+          ======================================== */
+
           :root {
-            --text-color: #000;
-            --primary-orange: rgb(240, 160, 12);
-            --card-bg: #f6e9cc;
-            --cream-bg: #e2d1b0;
+            /* Main Text */
+            --text-color: #16110d;
+            --text-secondary: #2c261f;
+            --text-muted: #8a7b6a;
+
+            /* Brand Colors */
+            --primary-orange: #e89b24;
+            --dark-orange: #c87816;
+            --light-orange: #fff0cc;
+
+            /* Background Colors */
+            --cream-bg: #fbf7ef;
+            --card-bg: #ffffff;
+            --soft-bg: #fff9ee;
+
+            /* Sidebar */
+            --sidebar-bg: #e8dcc5;
+            --sidebar-border: #d2c09f;
+            --sidebar-active: #30251d;
+            --sidebar-hover: #fff0cc;
+
+            /* Borders */
+            --border-color: #e8dcc8;
+            --border-light: #f0e5d3;
+
+            /* Success */
+            --success: #4f8058;
+            --success-bg: #e1f1e4;
+            --success-border: #c3ddc8;
+
+            /* Danger */
+            --danger: #a8543d;
+            --danger-bg: #f6dcd5;
+            --danger-border: #e8c6c0;
+
+            /* Info */
+            --info: #527fa8;
+            --info-bg: #e3edfa;
+            --info-border: #c5d8ed;
+
+            /* Warning */
+            --warning: #a97816;
+            --warning-bg: #fff1c9;
+            --warning-border: #e9d29a;
+
+            /* Shadows */
+            --shadow-sm:
+              0 3px 12px rgba(80, 55, 25, 0.06);
+
+            --shadow-md:
+              0 6px 18px rgba(80, 55, 25, 0.09);
           }
+
+
+          /* ========================================
+             GLOBAL RESET
+          ======================================== */
 
           * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
           }
+
 
           html,
           body,
@@ -47,49 +104,162 @@ export default function App() {
             min-height: 100vh;
           }
 
+
+          /* ========================================
+             BODY
+          ======================================== */
+
           body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--cream-bg);
             color: var(--text-color);
           }
+
+
+          /* ========================================
+             HEADINGS
+          ======================================== */
 
           h1,
           h2,
           h3,
-          h4,
-          p,
-          label,
-          a,
-          span {
+          h4 {
             color: var(--text-color);
-            font-weight: bold;
+            font-weight: 700;
           }
 
+
+          /* ========================================
+             PARAGRAPH
+          ======================================== */
+
+          p {
+            color: var(--text-secondary);
+            font-weight: 600;
+          }
+
+
+          /* ========================================
+             LABEL
+          ======================================== */
+
+          label {
+            color: var(--text-color);
+            font-weight: 600;
+          }
+
+
+          /* ========================================
+             LINKS
+          ======================================== */
+
+          a {
+            color: var(--dark-orange);
+            font-weight: 600;
+            text-decoration: none;
+          }
+
+
+          /* ========================================
+             SPAN
+          ======================================== */
+
+          span {
+            color: inherit;
+          }
+
+
+          /* ========================================
+             BUTTON
+          ======================================== */
+
           button {
-            font-family: Arial, sans-serif;
-            color: black;
-            font-weight: bold;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--text-color);
+            font-weight: 700;
             cursor: pointer;
           }
+
+
+          /* ========================================
+             INPUT / SELECT / TEXTAREA
+          ======================================== */
+
+          input,
+          select,
+          textarea {
+            font-family: Arial, Helvetica, sans-serif;
+          }
+
+
+          /* ========================================
+             APP CONTAINER
+          ======================================== */
 
           .app-container {
             width: 100%;
             min-height: 100vh;
+            background: var(--cream-bg);
+          }
+
+
+          /* ========================================
+             SELECTION
+          ======================================== */
+
+          ::selection {
+            background: #f6d77f;
+            color: #30251d;
+          }
+
+
+          /* ========================================
+             RESPONSIVE
+          ======================================== */
+
+          @media (max-width: 768px) {
+            body {
+              overflow-x: hidden;
+            }
+
+            .app-container {
+              width: 100%;
+              min-height: 100vh;
+            }
           }
         `}</style>
 
         <Routes>
 
-          {/* Public Routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* ========================================
+              PUBLIC ROUTES
+          ======================================== */}
+
+          <Route
+            path="/"
+            element={<LandingPage />}
+          />
+
+          <Route
+            path="/login"
+            element={<Login />}
+          />
+
+          <Route
+            path="/register"
+            element={<Register />}
+          />
+
           <Route
             path="/verify-email"
             element={<EmailVerification />}
           />
 
 
-          {/* Protected User / Victim Routes */}
+          {/* ========================================
+              PROTECTED USER / VICTIM ROUTES
+          ======================================== */}
+
           <Route
             path="/dashboard"
             element={
@@ -145,7 +315,10 @@ export default function App() {
           />
 
 
-          {/* Protected Admin Routes */}
+          {/* ========================================
+              PROTECTED ADMIN ROUTES
+          ======================================== */}
+
           <Route
             path="/admin/dashboard"
             element={
@@ -192,7 +365,10 @@ export default function App() {
           />
 
 
-          {/* Fallback */}
+          {/* ========================================
+              FALLBACK
+          ======================================== */}
+
           <Route
             path="*"
             element={<LandingPage />}

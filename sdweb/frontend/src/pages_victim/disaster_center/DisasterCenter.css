@@ -28,7 +28,27 @@
 /* ========================================
    HERO
 ======================================== */
+.hero-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  
+}
 
+.hero-title h2 {
+  margin: 0;
+  
+}
+
+.hero-icon {
+  font-size: 52px;
+  color: #e8c69f;
+  background: linear-gradient(135deg, #593125, #835a4af7);
+  padding: 16px;
+  border-radius: 50%;
+  margin-left: 400px;
+  text-shadow:  rgba(239, 198, 171, 0.867);
+}
 .disaster-layout .disaster-admin-hero {
   display: flex;
   align-items: center;
@@ -38,7 +58,7 @@
   padding: 24px 28px;
   margin-bottom: 20px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #fff4d9, #f9e8bd);
+  background: linear-gradient(135deg, #f4d99b, #cdbd94);
   border: 1px solid #ead5a8;
   box-shadow: 0 4px 14px rgba(180, 130, 50, 0.08);
   box-sizing: border-box;
@@ -46,16 +66,18 @@
 
 .disaster-layout .disaster-admin-hero h2 {
   margin: 9px 0 6px;
-  font-size: 24px;
-  line-height: 1.2;
+  font-size: 30px;
+  line-height: 1;
   color: #222;
+  white-space: nowrap;
 }
 
 .disaster-layout .disaster-admin-hero p {
   margin: 0;
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.2;
   color: #666;
+  
 }
 
 .disaster-layout .live-label {

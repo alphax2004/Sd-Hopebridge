@@ -51,7 +51,7 @@
   --abg: #fff3c4; --abd: #e0b43c; --ash: rgba(224, 180, 60, 0.25); --atx: #713f12;
 }
 .shelter-card {
-  --bg: #83e9b9; --bd: #86efac; --tx: #166534; --ic: #15803d;
+  --bg: #83e9b9; --bd: #74e29c; --tx: #166534; --ic: #15803d;
   --hbd: #22c55e; --hsh: rgba(34, 197, 94, 0.2);
   --abg: #bbf7d0; --abd: #16a34a; --ash: rgba(22, 163, 74, 0.28); --atx: #14532d;
 }
@@ -83,12 +83,49 @@
 .input-box i { color: #888; font-size: 14px; }
 
 /* Colorful icons (.fa-xxx works for both <i> and <svg>) */
-.input-box .fa-bowl-food { color: #d97706; }
-.input-box .fa-house { color: #16a34a; }
-.input-box .fa-kit-medical { color: #dc2626; }
-.input-box .fa-droplet { color: #0284c7; }
-.input-box .fa-location-dot { color: #e11d48; }
-.input-box .fa-phone { color: #16a34a; }
+/* =========================
+   COLORFUL FORM ICONS
+========================= */
+
+.food-card i {
+  color: #d97706 !important;
+}
+
+.shelter-card i {
+  color: #16a34a !important;
+}
+
+.medical-card i {
+  color: #dc2626 !important;
+}
+
+.water-card i {
+  color: #0284c7 !important;
+}
+
+.input-box .fa-bowl-food {
+  color: #d97706 !important;
+}
+
+.input-box .fa-house {
+  color: #16a34a !important;
+}
+
+.input-box .fa-kit-medical {
+  color: #dc2626 !important;
+}
+
+.input-box .fa-droplet {
+  color: #0284c7 !important;
+}
+
+.input-box .fa-location-dot {
+  color: #e11d48 !important;
+}
+
+.input-box .fa-phone {
+  color: #16a34a !important;
+}
 
 .input-box input,
 .input-box select,
