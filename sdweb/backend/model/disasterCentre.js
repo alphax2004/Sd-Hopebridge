@@ -23,13 +23,7 @@ const schema = new Schema(
       },
     ],
 
-    news: [
-      {
-        title: String,
-        text: String,
-        icon: String,
-      },
-    ],
+   
   },
   { timestamps: true }
 );
