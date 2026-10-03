@@ -9,10 +9,7 @@ const empty = { disasters: [], shelters: [] };
 
 export default function AdminDisasterCentre() {
   const [data, setData] = useState(empty);
-  const [loading, setLoading] = useState(true);
-  const [msg, setMsg] = useState("");
   const [show, setShow] = useState("");
-
   const [form, setForm] = useState({
     title: "", type: "Flood", location: "", severity: "Medium",
     description: "", icon: "fa-droplet"
@@ -34,11 +31,8 @@ export default function AdminDisasterCentre() {
           disasters: result.disasters || [],
           shelters: result.shelters || []
         });
-      } catch (e) {
-        console.log(e);
-        setMsg("Failed to load disaster centre");
-      } finally {
-        setLoading(false);
+      } catch (error) {
+        console.error("Failed to load disaster centre:", error);
       }
     };
     loadData();
@@ -60,10 +54,8 @@ export default function AdminDisasterCentre() {
         disasters: result.data.disasters || [],
         shelters: result.data.shelters || []
       });
-      setMsg("");
-    } catch (e) {
-      console.log(e);
-      setMsg(e.message || "Save failed");
+    } catch (error) {
+      console.error("Save failed:", error);
     }
   };
 
@@ -108,23 +100,6 @@ export default function AdminDisasterCentre() {
     });
     setShow("");
   };
-
-  const remove = (key, index) => {
-    persist({
-      ...data,
-      [key]: data[key].filter((_, i) => i !== index)
-    });
-  };
-
-  const toggle = (index) => {
-    persist({
-      ...data,
-      disasters: data.disasters.map((x, i) =>
-        i === index ? { ...x, active: !x.active } : x
-      )
-    });
-  };
-
   const changeType = (e) => {
     const type = e.target.value;
     const icons = {
@@ -136,16 +111,7 @@ export default function AdminDisasterCentre() {
     setForm({ ...form, type, icon: icons[type] });
   };
 
-  if (loading) {
-    return (
-      <div className="admin-layout">
-        <Sidebar variant="admin" />
-        <div className="main-content">
-          <div className="admin-message">Loading Disaster Centre...</div>
-        </div>
-      </div>
-    );
-  }
+  
 
   const active = data.disasters.filter(x => x.active).length;
 
@@ -172,18 +138,18 @@ export default function AdminDisasterCentre() {
           </div>
         </div>
 
-        {msg && <div className="admin-error">{msg}</div>}
+       
 
         <div className="admin-stat-cards">
           <Stat icon="fa-triangle-exclamation" title="Active Alerts" value={active} />
           <Stat icon="fa-house" title="Shelters" value={data.shelters.length} />
-          <Stat
+          {/* <Stat
             icon="fa-clock"
             title="Last Checked"
             value={new Date().toLocaleTimeString([], {
               hour: "2-digit", minute: "2-digit"
             })}
-          />
+          /> */}
         </div>
 
         <Section
@@ -255,13 +221,8 @@ export default function AdminDisasterCentre() {
                   <small>{x.description}</small>
                 </div>
 
-                <button className="toggle-btn" onClick={() => toggle(i)}>
-                  {x.active ? "Active" : "Off"}
-                </button>
-
-                <button className="delete-btn" onClick={() => remove("disasters", i)}>
-                  <i className="fa-solid fa-trash" />
-                </button>
+                
+                
               </div>
             ))}
           </div>
@@ -325,13 +286,6 @@ export default function AdminDisasterCentre() {
                         <i className="fa-solid fa-location-dot" /> {x.location}
                       </p>
                     </div>
-
-                    <button
-                      className="delete-btn"
-                      onClick={() => remove("shelters", i)}
-                    >
-                      <i className="fa-solid fa-trash" />
-                    </button>
                   </div>
 
                   <div className="capacity-row">

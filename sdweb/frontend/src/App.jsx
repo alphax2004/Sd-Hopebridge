@@ -29,7 +29,7 @@ export default function App() {
             --text-color: #000;
             --primary-orange: rgb(240, 160, 12);
             --card-bg: #f6e9cc;
-            --cream-bg: #fbf3e3;
+            --cream-bg: #e2d1b0;
           }
 
           * {

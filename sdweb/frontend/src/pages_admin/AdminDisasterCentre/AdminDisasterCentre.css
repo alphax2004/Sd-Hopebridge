@@ -11,7 +11,7 @@
   padding: 24px 28px;
   margin-bottom: 20px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #fff4d9, #f9e8bd);
+  background: linear-gradient(135deg, #eeddb5, #cdbd94);
   border: 1px solid #ead5a8;
   box-shadow: 0 4px 14px rgba(180, 130, 50, 0.08);
   box-sizing: border-box;
@@ -112,7 +112,7 @@
 
 .admin-stat-cards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 15px;
   margin-bottom: 22px;
 }
@@ -135,7 +135,9 @@
 
 .admin-stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(120, 90, 40, 0.10);
+  background: #f8e5bf;
+  border-color: #d99018;
+  box-shadow: 0 8px 18px rgba(217, 144, 24, 0.22);
 }
 
 /* ACTIVE ALERTS */

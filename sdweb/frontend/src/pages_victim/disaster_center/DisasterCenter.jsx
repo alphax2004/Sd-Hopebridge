@@ -22,7 +22,7 @@ export default function DisasterCenter() {
   });
 
   const [filter, setFilter] = useState("All");
-  const [loading, setLoading] = useState(true);
+ 
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -52,9 +52,7 @@ export default function DisasterCenter() {
       } catch (err) {
         console.log("DISASTER CENTRE ERROR:", err);
         setError("Unable to load emergency information.");
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
 
     loadData();
@@ -68,20 +66,6 @@ export default function DisasterCenter() {
       window.removeEventListener("focus", loadData);
     };
   }, []);
-
-  if (loading) {
-    return (
-      <div className="disaster-layout">
-        <Sidebar />
-
-        <div className="main-content">
-          <div className="admin-message">
-            Loading emergency information...
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const activeDisasters = data.disasters.filter(
     (item) => item.active
