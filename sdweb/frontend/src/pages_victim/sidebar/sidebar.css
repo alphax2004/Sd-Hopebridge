@@ -2,8 +2,8 @@
   width: 250px;
   min-width: 250px;
   min-height: 100vh;
-  background: white;
-  border-right: 1px solid #eee;
+  background: #fffaf2;
+  border-right: 1px solid #e5d8c5;
   padding: 22px 18px;
   box-sizing: border-box;
 }
@@ -24,17 +24,19 @@
 
 .sidebar-title {
   font-size: 18px;
-  font-weight: bold;
-  color: black;
+  font-weight: 700;
+  color: #30251d;
   line-height: 1.1;
   margin-top: 25px;
+  letter-spacing: -0.2px;
 }
 
 .sidebar-subtitle {
   font-size: 11px;
-  font-weight: bold;
-  color: #555;
+  font-weight: 500;
+  color: #806e59;
   margin-top: 2px;
+  letter-spacing: 0.1px;
 }
 
 .sidebar-menu {
@@ -51,33 +53,84 @@
   padding: 0 14px;
   border-radius: 9px;
   font-size: 14px;
-  font-weight: bold;
-  color: black;
+  font-weight: 600;
+  color: #403329;
   cursor: pointer;
   text-decoration: none;
+  letter-spacing: 0.1px;
+}
+
+.sidebar-item span {
+  color: inherit;
 }
 
 .sidebar-item i {
   width: 18px;
   text-align: center;
+  font-size: 14px;
+  color: #806e59;
 }
 
 .sidebar-item:hover {
-  background: #f8b945;
+  background: #f5e4c8;
+  color: #30251d;
 }
+
+.sidebar-item:hover span {
+  color: #30251d;
+}
+
+.sidebar-item:hover i {
+  color: #b87912;
+}
+
+/* ================= ACTIVE PAGE ================= */
 
 .sidebar-item.active {
-  background: var(--primary-orange);
+  background: #30251d;
+  color: #fffaf2;
+  font-weight: 600;
 }
 
+.sidebar-item.active span {
+  color: #fffaf2;
+  font-weight: 600;
+}
+
+.sidebar-item.active i {
+  color: #e0a126;
+  font-size: 14px;
+}
+
+/* ================= LOGOUT ================= */
+
 .sidebar-item.logout {
-  color: #e05555;
+  color: #a8543d;
   margin-top: 10px;
 }
 
-.sidebar-item.logout:hover {
-  background: #fde3e3;
+.sidebar-item.logout span {
+  color: #a8543d;
 }
+
+.sidebar-item.logout i {
+  color: #a8543d;
+}
+
+.sidebar-item.logout:hover {
+  background: #f5dfd7;
+  color: #8f4532;
+}
+
+.sidebar-item.logout:hover span {
+  color: #8f4532;
+}
+
+.sidebar-item.logout:hover i {
+  color: #a8543d;
+}
+
+/* ================= TOPBAR ================= */
 
 .topbar {
   display: flex;
@@ -100,8 +153,9 @@
   padding: 0;
   text-align: left;
   font-size: 25px;
-  font-weight: bold;
-  color: black;
+  font-weight: 700;
+  color: #30251d;
+  letter-spacing: -0.3px;
 }
 
 .topbar-text p {
@@ -109,9 +163,11 @@
   padding: 0;
   text-align: left;
   font-size: 14px;
-  font-weight: bold;
-  color: #555;
+  font-weight: 500;
+  color: #806e59;
 }
+
+/* ================= PROFILE ================= */
 
 .profile-dropdown-wrapper {
   position: relative;
@@ -122,8 +178,8 @@
   align-items: center;
   gap: 9px;
   font-size: 14px;
-  font-weight: bold;
-  color: black;
+  font-weight: 600;
+  color: #30251d;
   cursor: pointer;
 }
 
@@ -131,11 +187,11 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #f1dca0;
+  background: #f2dfb7;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #d99e1f;
+  color: #b87912;
 }
 
 .profile-dropdown {
@@ -143,11 +199,11 @@
   top: 50px;
   right: 0;
   width: 180px;
-  background: white;
-  border: 1px solid #eee;
+  background: #fffaf2;
+  border: 1px solid #e5d8c5;
   border-radius: 9px;
   padding: 5px 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 8px 20px rgba(48, 37, 29, 0.12);
   z-index: 1000;
 }
 
@@ -158,48 +214,59 @@
   height: 43px;
   padding: 0 14px;
   font-size: 14px;
-  font-weight: bold;
-  color: black;
+  font-weight: 600;
+  color: #403329;
   cursor: pointer;
 }
 
 .dropdown-item i {
   width: 18px;
   text-align: center;
+  color: #806e59;
 }
 
 .dropdown-item:hover {
-  background: #f8b945;
+  background: #f5e4c8;
+  color: #30251d;
+}
+
+.dropdown-item:hover i {
+  color: #b87912;
 }
 
 .dropdown-logout {
-  color: #e05555;
+  color: #a8543d;
 }
 
-/* ================= RESPONSIVE ================= */
+.dropdown-logout i {
+  color: #a8543d;
+}
 
-/* Hamburger button - hidden on desktop, shown on mobile */
+/* ================= HAMBURGER ================= */
+
 .hamburger-btn {
   display: none;
   background: none;
   border: none;
   font-size: 22px;
   cursor: pointer;
-  color: black;
+  color: #30251d;
   padding: 6px 10px;
 }
 
-/* Overlay behind the sidebar when open on mobile */
+/* ================= OVERLAY ================= */
+
 .sidebar-overlay {
   display: none;
 }
+
+/* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {
   .hamburger-btn {
     display: block;
   }
 
-  /* Sidebar becomes a fixed slide-in panel on mobile */
   .sidebar {
     position: fixed;
     top: 0;
@@ -208,19 +275,18 @@
     transform: translateX(-100%);
     transition: transform 0.25s ease;
     z-index: 1100;
-    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 4px 0 12px rgba(48, 37, 29, 0.15);
   }
 
   .sidebar.open {
     transform: translateX(0);
   }
 
-  /* Dark overlay behind the open sidebar, closes it on click */
   .sidebar-overlay.open {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(48, 37, 29, 0.42);
     z-index: 1050;
   }
 

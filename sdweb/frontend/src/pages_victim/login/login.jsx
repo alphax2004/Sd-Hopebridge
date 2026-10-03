@@ -481,18 +481,7 @@ export default function Login() {
         </div>
 
 
-        <div className="options">
-
-          <a
-            href="#"
-            onClick={(e) =>
-              e.preventDefault()
-            }
-          >
-            Forgot Password
-          </a>
-
-        </div>
+        
 
 
         <button

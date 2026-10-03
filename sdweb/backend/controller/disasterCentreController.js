@@ -12,39 +12,60 @@ export const getDisasterCentre = async (req, res) => {
       });
     }
 
-    res.json(data);
+    res.status(200).json(data);
+
   } catch (error) {
     console.log("GET DISASTER CENTRE ERROR:", error);
 
     res.status(500).json({
-      message: "Failed to load disaster centre",
+      message: error.message,
     });
   }
 };
 
+
 export const updateDisasterCentre = async (req, res) => {
   try {
+    console.log("UPDATE BODY:");
+    console.log(JSON.stringify(req.body, null, 2));
+
     let data = await DisasterCentre.findOne();
 
     if (!data) {
-      data = new DisasterCentre();
+      data = new DisasterCentre({
+        disasters: [],
+        shelters: [],
+        news: [],
+      });
     }
 
-    data.disasters = req.body.disasters || [];
-    data.shelters = req.body.shelters || [];
-    data.news = req.body.news || [];
+    if (Array.isArray(req.body.disasters)) {
+      data.disasters = req.body.disasters;
+    }
+
+    if (Array.isArray(req.body.shelters)) {
+      data.shelters = req.body.shelters;
+    }
+
+    if (Array.isArray(req.body.news)) {
+      data.news = req.body.news;
+    }
 
     await data.save();
 
-    res.json({
+    console.log("DISASTER CENTRE SAVED SUCCESSFULLY");
+
+    res.status(200).json({
       message: "Disaster Centre updated successfully",
       data,
     });
+
   } catch (error) {
-    console.log("UPDATE DISASTER CENTRE ERROR:", error);
+    console.log("UPDATE DISASTER CENTRE ERROR:");
+    console.log(error);
 
     res.status(500).json({
-      message: "Failed to update disaster centre",
+      message: error.message,
     });
   }
 };

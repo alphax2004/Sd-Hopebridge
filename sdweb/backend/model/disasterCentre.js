@@ -5,7 +5,7 @@ const schema = new Schema(
     disasters: [
       {
         title: String,
-        type: String,
+        type: { type: String },
         location: String,
         severity: String,
         description: String,

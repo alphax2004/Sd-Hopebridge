@@ -3,9 +3,16 @@ import { Sidebar, Topbar } from "../sidebar/sidebar";
 import "./DisasterCenter.css";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:4000";
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:4000";
 
-const types = ["All", "Flood", "Cyclone", "Fire", "Landslide"];
+const types = [
+  "All",
+  "Flood",
+  "Cyclone",
+  "Fire",
+  "Landslide",
+];
 
 export default function DisasterCenter() {
   const [data, setData] = useState({
@@ -23,11 +30,15 @@ export default function DisasterCenter() {
       try {
         const response = await fetch(
           `${API_URL}/api/disaster-centre`,
-          { credentials: "include" }
+          {
+            credentials: "include",
+            cache: "no-store",
+          }
         );
 
-        if (!response.ok)
+        if (!response.ok) {
           throw new Error("Failed to load");
+        }
 
         const result = await response.json();
 
@@ -36,6 +47,8 @@ export default function DisasterCenter() {
           shelters: result.shelters || [],
           news: result.news || [],
         });
+
+        setError("");
       } catch (err) {
         console.log("DISASTER CENTRE ERROR:", err);
         setError("Unable to load emergency information.");
@@ -45,14 +58,24 @@ export default function DisasterCenter() {
     };
 
     loadData();
+
+    const interval = setInterval(loadData, 5000);
+
+    window.addEventListener("focus", loadData);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", loadData);
+    };
   }, []);
 
   if (loading) {
     return (
       <div className="disaster-layout">
         <Sidebar />
+
         <div className="main-content">
-          <div className="dc-message">
+          <div className="admin-message">
             Loading emergency information...
           </div>
         </div>
@@ -69,16 +92,13 @@ export default function DisasterCenter() {
   ).length;
 
   const openShelters = data.shelters.filter(
-    (item) =>
-      Number(item.occupied) < Number(item.capacity)
+    (item) => Number(item.occupied || 0) < Number(item.capacity || 0)
   ).length;
 
   const filteredList =
     filter === "All"
       ? activeDisasters
-      : activeDisasters.filter(
-          (item) => item.type === filter
-        );
+      : activeDisasters.filter((item) => item.type === filter);
 
   return (
     <div className="disaster-layout">
@@ -86,118 +106,53 @@ export default function DisasterCenter() {
 
       <div className="main-content">
         <Topbar
-          title="Disaster Center"
+          title="Disaster Centre"
           subtitle="Real-time emergency information"
         />
 
-        {/* HERO */}
-        <div className="dc-hero">
+        <div className="disaster-admin-hero">
           <div>
-            <span className="dc-live">
-              <span></span>
+            <span className="live-label">
+              <span />
               LIVE UPDATES
             </span>
-
             <h2>Stay informed. Stay safe.</h2>
-
             <p>
-              Check current disaster alerts, shelters
-              and important emergency news.
+              Check current disaster alerts and emergency shelters.
             </p>
           </div>
-
-          <div className="dc-hero-icon">
-            <i className="fa-solid fa-shield-heart"></i>
-          </div>
         </div>
 
-        {error && (
-          <div className="dc-error">
-            {error}
-          </div>
-        )}
+        {error && <div className="admin-error">{error}</div>}
 
-        {/* STATS */}
-        <div className="stat-cards">
-          <div className="stat-card">
-            <div className="dc-stat-icon">
-              <i className="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <div>
-              <div className="stat-value">
-                {activeDisasters.length}
-              </div>
-              <div className="stat-label">
-                Active Disasters
-              </div>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="dc-stat-icon">
-              <i className="fa-solid fa-bolt"></i>
-            </div>
-            <div>
-              <div className="stat-value">
-                {highRisk}
-              </div>
-              <div className="stat-label">
-                High Risk Alerts
-              </div>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="dc-stat-icon">
-              <i className="fa-solid fa-house"></i>
-            </div>
-            <div>
-              <div className="stat-value">
-                {openShelters}
-              </div>
-              <div className="stat-label">
-                Open Shelters
-              </div>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="dc-stat-icon">
-              <i className="fa-solid fa-newspaper"></i>
-            </div>
-            <div>
-              <div className="stat-value">
-                {data.news.length}
-              </div>
-              <div className="stat-label">
-                News Updates
-              </div>
-            </div>
-          </div>
+        <div className="admin-stat-cards">
+          <Stat
+            icon="fa-triangle-exclamation"
+            title="Active Disasters"
+            value={activeDisasters.length}
+          />
+          <Stat
+            icon="fa-bolt"
+            title="High Risk Alerts"
+            value={highRisk}
+          />
+          <Stat
+            icon="fa-house"
+            title="Open Shelters"
+            value={openShelters}
+          />
         </div>
 
-        {/* ALERTS */}
-        <div className="dc-section">
-          <div className="dc-section-header">
-            <div>
-              <h3>Emergency Alerts</h3>
-              <p>Current active disaster information</p>
-            </div>
-
-            <span className="dc-status">
-              <span></span>
-              Updated
-            </span>
-          </div>
-
+        <Section
+          title="Emergency Alerts"
+          sub="Current active disaster information"
+        >
           <div className="filter-row">
             {types.map((type) => (
               <button
                 key={type}
                 className={
-                  filter === type
-                    ? "filter-btn active"
-                    : "filter-btn"
+                  filter === type ? "filter-btn active" : "filter-btn"
                 }
                 onClick={() => setFilter(type)}
               >
@@ -206,183 +161,122 @@ export default function DisasterCenter() {
             ))}
           </div>
 
-          <div className="disaster-list">
+          <div className="admin-alert-list">
             {filteredList.length === 0 ? (
               <div className="dc-empty">
                 <i className="fa-solid fa-circle-check"></i>
                 <h4>No active alerts</h4>
-                <p>
-                  There are no active disasters in
-                  this category.
-                </p>
+                <p>There are no active disasters in this category.</p>
               </div>
             ) : (
-              filteredList.map((item, index) => (
-                <div
-                  className="disaster-card"
-                  key={item._id || index}
-                >
-                  <div className="disaster-icon">
+              filteredList.map((x, i) => (
+                <div className="admin-alert-item" key={x._id || i}>
+                  <div className="alert-icon">
                     <i
-                      className={`fa-solid ${
-                        item.icon ||
-                        "fa-triangle-exclamation"
-                      }`}
-                    ></i>
+                      className={`fa-solid ${x.icon || "fa-triangle-exclamation"}`}
+                    />
                   </div>
 
-                  <div className="disaster-info">
-                    <div className="dc-title-row">
-                      <h4>{item.title}</h4>
-
-                      <span
-                        className={`severity ${item.severity}`}
-                      >
-                        {item.severity}
+                  <div className="alert-details">
+                    <div className="alert-title-row">
+                      <h4>{x.title}</h4>
+                      <span className={`badge ${x.severity}`}>
+                        {x.severity}
                       </span>
                     </div>
 
-                    <p className="dc-location">
-                      <i className="fa-solid fa-location-dot"></i>
-                      {item.location}
+                    <p>
+                      <i className="fa-solid fa-location-dot" />{" "}
+                      {x.location}
                     </p>
 
-                    <p className="dc-description">
-                      {item.description}
-                    </p>
+                    <small>{x.description}</small>
                   </div>
                 </div>
               ))
             )}
           </div>
-        </div>
+        </Section>
 
-        {/* SHELTERS */}
-        <div className="dc-section">
-          <div className="dc-section-header">
-            <div>
-              <h3>Emergency Shelters</h3>
-              <p>Available shelters and capacity</p>
-            </div>
-          </div>
-
-          <div className="victim-shelter-grid">
+        <Section
+          title="Emergency Shelters"
+          sub="Available safe places"
+        >
+          <div className="shelter-grid">
             {data.shelters.length === 0 ? (
               <div className="dc-empty">
-                No shelter information available.
+                <i className="fa-solid fa-house-circle-check"></i>
+                <h4>No shelters listed</h4>
+                <p>There are no shelters available right now.</p>
               </div>
             ) : (
-              data.shelters.map((item, index) => {
-                const capacity =
-                  Number(item.capacity) || 0;
-
-                const occupied =
-                  Number(item.occupied) || 0;
-
-                const available = Math.max(
-                  capacity - occupied,
-                  0
-                );
-
-                const percent = capacity
-                  ? Math.min(
-                      (occupied / capacity) * 100,
-                      100
-                    )
-                  : 0;
+              data.shelters.map((shelter, i) => {
+                const capacity = Number(shelter.capacity || 0);
+                const occupied = Number(shelter.occupied || 0);
+                const available = capacity - occupied;
+                const filled = capacity ? (occupied / capacity) * 100 : 0;
 
                 return (
-                  <div
-                    className="victim-shelter-card"
-                    key={item._id || index}
-                  >
-                    <div className="shelter-heading">
-                      <div className="shelter-icon">
-                        <i className="fa-solid fa-house"></i>
-                      </div>
-
+                  <div className="shelter-card" key={shelter._id || i}>
+                    <div className="shelter-top">
                       <div>
-                        <h4>{item.name}</h4>
-
+                        <h4>{shelter.name}</h4>
                         <p>
-                          <i className="fa-solid fa-location-dot"></i>
-                          {item.location}
+                          <i className="fa-solid fa-location-dot" />{" "}
+                          {shelter.location}
                         </p>
                       </div>
                     </div>
 
-                    <div className="shelter-capacity">
-                      <span>
-                        {occupied} / {capacity}
-                      </span>
-
-                      <span>
-                        {available} spots left
-                      </span>
+                    <div className="capacity-row">
+                      <span>{occupied} occupied</span>
+                      <span>{Math.max(available, 0)} available</span>
                     </div>
 
-                    <div className="victim-progress">
-                      <div
-                        style={{
-                          width: `${percent}%`,
-                        }}
-                      ></div>
+                    <div className="capacity-bar">
+                      <div style={{ width: `${Math.min(filled, 100)}%` }} />
                     </div>
 
-                    <span
-                      className={
-                        available > 0
-                          ? "shelter-open"
-                          : "shelter-full"
-                      }
-                    >
-                      {available > 0 ? "Open" : "Full"}
-                    </span>
+                    <div className="capacity-bottom">
+                      <span>Capacity: {capacity}</span>
+                      <b className={available > 0 ? "open-text" : "full-text"}>
+                        {available > 0 ? "Open" : "Full"}
+                      </b>
+                    </div>
                   </div>
                 );
               })
             )}
           </div>
-        </div>
+        </Section>
+      </div>
+    </div>
+  );
+}
 
-        {/* NEWS */}
-        <div className="dc-section">
-          <div className="dc-section-header">
-            <div>
-              <h3>Important News</h3>
-              <p>Latest emergency updates</p>
-            </div>
-          </div>
+function Stat({ icon, title, value }) {
+  return (
+    <div className="admin-stat-card">
+      <div className="stat-icon">
+        <i className={`fa-solid ${icon}`} />
+      </div>
+      <div className="stat-label">{title}</div>
+      <div className="stat-value">{value}</div>
+    </div>
+  );
+}
 
-          <div className="victim-news-grid">
-            {data.news.length === 0 ? (
-              <div className="dc-empty">
-                No news updates available.
-              </div>
-            ) : (
-              data.news.map((item, index) => (
-                <div
-                  className="victim-news-card"
-                  key={item._id || index}
-                >
-                  <div className="news-icon">
-                    <i
-                      className={`fa-solid ${
-                        item.icon || "fa-newspaper"
-                      }`}
-                    ></i>
-                  </div>
-
-                  <div>
-                    <h4>{item.title}</h4>
-                    <p>{item.text}</p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+function Section({ title, sub, children }) {
+  return (
+    <div className="admin-card">
+      <div className="admin-card-header">
+        <div>
+          <h3>{title}</h3>
+          <p className="section-subtitle">{sub}</p>
         </div>
       </div>
+
+      {children}
     </div>
   );
 }

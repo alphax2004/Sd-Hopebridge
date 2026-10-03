@@ -1,30 +1,66 @@
+/* ========================================
+   HOPEBRIDGE LOGIN PAGE
+======================================== */
+
 .login-wrapper {
   min-height: 100vh;
   display: flex;
+  background: #f4e0ba;
 }
+
+
+/* ========================================
+   LOGIN IMAGE
+======================================== */
 
 .login-image {
   flex: 1;
-  background-image: url("/images/flood.jpeg");
+
+  background-image:
+    linear-gradient(
+      rgba(48, 37, 29, 0.22),
+      rgba(48, 37, 29, 0.22)
+    ),
+    url("/images/flood.jpeg");
+
   background-size: cover;
   background-position: center;
 }
 
+
+/* ========================================
+   LOGIN CARD
+======================================== */
+
 .login-card {
   flex: 1;
+
   padding: 60px 80px;
-  background: #ecd4a3;
+
+  background: #f4e0ba;
+
   text-align: left;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  color: #000000;
 }
+
+
+/* ========================================
+   LOGO
+======================================== */
 
 .login-logo {
   display: flex;
   align-items: center;
   gap: 8px;
+
   font-weight: 800;
+
+  color: #000000;
 }
 
 .login-logo img {
@@ -32,110 +68,284 @@
   height: 28px;
 }
 
+
+/* ========================================
+   HEADING
+======================================== */
+
 .login-card h1 {
   font-size: 36px;
+
   line-height: 1.2;
-  margin: 15px 0px 30px;
+
+  margin: 15px 0 30px;
+
+  color: #000000;
+
+  font-weight: 700;
 }
 
 .login-card .subtitle {
   margin-bottom: 20px;
+
+  color: #000000;
+
+  font-size: 16px;
 }
+
+
+/* ========================================
+   LABEL
+======================================== */
 
 .login-card label {
   display: block;
+
   margin-bottom: 8px;
+
+  color: #000000;
+
+  font-size: 15px;
+
+  font-weight: 600;
 }
+
+
+/* ========================================
+   INPUT BOX
+======================================== */
 
 .input-box {
   display: flex;
+
   align-items: center;
+
   padding: 12px 15px;
+
   margin-bottom: 20px;
-  border: 2px solid orange;
+
+  border: 2px solid #c98212;
+
   border-radius: 10px;
-  background: rgba(255, 255, 255);
+
+  background: #fffaf2;
+
+  box-sizing: border-box;
+}
+
+.input-box:focus-within {
+  border-color: #a96b0b;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(169, 107, 11, 0.15);
+}
+
+.input-box > i:first-child {
+  width: 20px;
+
+  text-align: center;
+
+  color: #000000;
 }
 
 .input-box input {
   flex: 1;
+
   border: none;
+
   outline: none;
+
   background: transparent;
-  font-weight: bold;
+
+  color: #000000;
+
+  font-size: 15px;
+
+  font-weight: 500;
 }
 
-.options {
-  text-align: right;
-  margin-bottom: 15px;
+.input-box input::placeholder {
+  color: #555555;
 }
 
-.options a:hover {
-  color: red;
+.input-box .fa-eye,
+.input-box .fa-eye-slash {
+  color: #000000;
+
+  cursor: pointer;
 }
+
+.input-box .fa-eye:hover,
+.input-box .fa-eye-slash:hover {
+  color: #c98212;
+}
+
+
+/* ========================================
+   ERROR MESSAGE
+======================================== */
 
 .error-text {
-  color: #c0392b;
-  font-weight: bold;
+  color: #9b2c20;
+
+  background: #f7dfd9;
+
+  border: 1px solid #dcaea5;
+
+  border-radius: 8px;
+
+  padding: 9px 12px;
+
+  font-weight: 600;
+
   margin-bottom: 15px;
 }
+
+
+/* ========================================
+   LOGIN BUTTON
+======================================== */
 
 .submit-login-btn {
   width: 350px;
+
   margin: 0 auto;
+
   padding: 14px;
-  background: var(--primary-orange);
+
+  background: #d08b1c !important;
+
+  color: #312424 !important;
+
+  border: 2px solid #c98212 !important;
+
   border-radius: 10px;
-  border: none;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* LOGIN BUTTON HOVER */
+
+.submit-login-btn:hover {
+  background: #30251d !important;
+
+  border-color: #30251d !important;
+
+  color: #ffffff !important;
 }
 
 .submit-login-btn:disabled {
   opacity: 0.6;
+
+  cursor: not-allowed;
 }
 
-.submit-login-btn:hover {
-  background: rgb(255, 255, 255);
-  border: 2px solid orange;
-}
+
+/* ========================================
+   CREATE ACCOUNT
+======================================== */
 
 .signup-text {
-  margin-top: 9px;
+  margin-top: 15px;
+
   text-align: center;
+
+  color: #000000;
+
+  font-size: 14px;
+
+  font-weight: 500;
+}
+
+.signup-text a {
+  color: #000000;
+
+  text-decoration: none;
+
+  font-weight: 700;
+
+  margin-left: 5px;
 }
 
 .signup-text a:hover {
-  color: red;
+  color: red !important;
 }
+
+
+/* ========================================
+   BACK BUTTON
+======================================== */
+
+/* ========================================
+   BACK BUTTON
+======================================== */
 
 .logout-back {
-  margin-top: 20px;
-  padding: 9px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  background: var(--primary-orange);
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  margin-top: 20px !important;
+
+  padding: 9px 20px !important;
+
+  border-radius: 8px !important;
+
+  border: 2px solid #c98212 !important;
+
+  background:  #d08b1c !important;
+
+  color: #000000 !important;
+
+  font-size: 16px !important;
+
+  font-weight: 600 !important;
+
+  display: block !important;
+
+  margin-left: auto !important;
+
+  margin-right: auto !important;
+
+  cursor: pointer !important;
 }
 
-.logout-back:hover {
-  background: rgb(255, 255, 255);
-  border: 2px solid orange;
+
+/* SAME HOVER AS LOGIN BUTTON */
+
+.login-card .logout-back:hover,
+.login-card button.logout-back:hover {
+  background: #30251d !important;
+
+  border-color: #30251d !important;
+
+  color: #ffffff !important;
 }
 
-/* ================= RESPONSIVE ================= */
 
-/* Tablet: image side chhoto kore rakha */
+
+
+/* ========================================
+   TABLET
+======================================== */
+
 @media (max-width: 1024px) {
+
   .login-card {
     padding: 50px 50px;
   }
+
 }
 
-/* Mobile: image side lukiye card full width kora */
+
+/* ========================================
+   MOBILE
+======================================== */
+
 @media (max-width: 768px) {
+
   .login-wrapper {
     flex-direction: column;
   }
@@ -146,21 +356,33 @@
 
   .login-card {
     padding: 40px 24px;
+
     min-height: 100vh;
   }
 
   .login-card h1 {
     font-size: 26px;
+
     margin: 12px 0 20px;
   }
 
   .submit-login-btn {
     width: 100%;
   }
+
+  .logout-back {
+    width: auto !important;
+  }
+
 }
 
-/* Small phones */
+
+/* ========================================
+   SMALL PHONE
+======================================== */
+
 @media (max-width: 400px) {
+
   .login-card {
     padding: 30px 18px;
   }
@@ -168,4 +390,5 @@
   .login-card h1 {
     font-size: 22px;
   }
+
 }

@@ -1,185 +1,503 @@
+/* ========================================
+   HOPEBRIDGE LANDING PAGE
+======================================== */
+
 .landing-page {
-  background: #efd194;
+  background: #f4ead8;
+
   width: 100%;
-  min-height: 100%;
+
+  min-height: 100vh;
+
+  color: #30251d;
 }
+
+
+/* ========================================
+   NAVBAR
+======================================== */
 
 .navbar {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
-  padding: 20px 40px;
+
+  padding: 18px 40px;
+
+  background: #30251d;
+
+  border-bottom: 1px solid #4a3a2d;
 }
+
+
+/* ========================================
+   BRAND
+======================================== */
 
 .brand-logo {
   display: flex;
+
   align-items: center;
+
   gap: 8px;
+
   font-weight: 800;
+
+  color: #fffaf2;
 }
 
 .brand-logo img {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+
+  height: 30px;
+
+  object-fit: contain;
 }
 
+
+/* ========================================
+   NAV LINKS
+======================================== */
+
 .nav-links a {
+  color: #eee3d2;
+
   text-decoration: none;
+
   margin: 0 5px;
+
   padding: 8px 14px;
-  border-radius: 6px;
+
+  border-radius: 8px;
 }
 
 .nav-links a:hover {
-  background: rgb(248, 185, 69);
+  background: #47372a;
+
+  color: #ffffff;
 }
+
+
+/* ========================================
+   NAV BUTTONS
+======================================== */
 
 .nav-right {
   display: flex;
-  gap: 12px;
+
+  gap: 10px;
 }
 
 .btn-primary {
-  background: var(--primary-orange);
-  border: none;
+  background: #d99018;
+
+  color: #21170f;
+
+  border: 2px solid #d99018;
+
   padding: 10px 20px;
-  border-radius: 5px;
+
+  border-radius: 9px;
+
+  font-weight: 700;
+
+  cursor: pointer;
 }
 
 .btn-primary:hover {
-  background: rgb(242, 241, 239);
-  border: 2px solid orange;
+  background: #fff8ed;
+
+  color: #30251d;
+
+  border-color: #fff8ed;
 }
+
+
+/* ========================================
+   HERO
+======================================== */
 
 .hero {
   text-align: center;
-  padding: 50px 20px 40px;
+
+  padding: 82px 20px 72px;
+
   background-image:
     linear-gradient(
-      rgba(251, 243, 227, 0.6),
-      rgba(251, 243, 227, 0.6)
+      rgba(42, 31, 23, 0.66),
+      rgba(42, 31, 23, 0.66)
     ),
     url("/images/flood.jpeg");
+
   background-size: cover;
+
   background-position: center;
 }
 
 .hero h1 {
-  font-size: 40px;
+  color: #fffaf2;
+
+  font-size: 44px;
+
+  max-width: 850px;
+
+  margin: auto;
+
+  line-height: 1.15;
+}
+
+.hero p {
+  color: #eee3d2;
+
+  max-width: 700px;
+
+  margin: 18px auto 0;
+
+  line-height: 1.6;
 }
 
 .hero .btn-primary {
-  margin-top: 20px;
+  margin-top: 25px;
 }
 
+
+/* ========================================
+   FEATURES SECTION
+======================================== */
+
 .features {
-  padding: 20px 20px 50px;
+  padding: 65px 20px 80px;
+
+  text-align: center;
+
+  background: #f4ead8;
 }
 
 .features h2 {
-  font-size: 30px;
+  color: #30251d;
+
+  font-size: 31px;
+
+  margin: 0;
+
+  line-height: 1.2;
+
+  font-weight: 700;
 }
+
+.features-subtitle {
+  color: #756451;
+
+  max-width: 720px;
+
+  margin: 12px auto 38px;
+
+  line-height: 1.6;
+
+  font-size: 15px;
+}
+
+
+/* ========================================
+   CARD CONTAINER
+======================================== */
 
 .card-container {
   display: grid;
+
   grid-template-columns: repeat(3, 1fr);
-  gap: 25px;
-  max-width: 1300px;
-  margin: 25px auto;
+
+  gap: 22px;
+
+  max-width: 1100px;
+
+  margin: 0 auto;
 }
 
+
+/* ========================================
+   FEATURE CARD
+======================================== */
+
 .card {
-  background: var(--card-bg);
-  padding: 20px;
-  border-radius: 14px;
+  background: #fffaf2;
+
+  color: #30251d;
+
+  padding: 25px;
+
+  border: 1px solid #e2d2bb;
+
+  border-radius: 15px;
+
   text-align: left;
-  min-height: 130px;
+
+  min-height: 185px;
+
+  box-sizing: border-box;
 }
 
 .card:hover {
-  background: var(--primary-orange);
+  background: #fdf3e4;
+
+  border-color: #d99018;
 }
+
+
+/* ========================================
+   CARD TITLE
+======================================== */
+
+.card h3 {
+  color: #30251d;
+
+  margin: 17px 0 8px;
+
+  font-size: 18px;
+
+  line-height: 1.3;
+
+  font-weight: 700;
+}
+
+
+/* ========================================
+   CARD DESCRIPTION
+======================================== */
+
+.card p {
+  color: #756451;
+
+  line-height: 1.55;
+
+  font-size: 14px;
+
+  margin: 0;
+}
+
+
+/* ========================================
+   ICON BOX
+======================================== */
 
 .icon-box {
-  width: 38px;
-  height: 38px;
+  width: 48px;
+
+  height: 48px;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
-  background: rgb(226, 197, 116);
-  border-radius: 10px;
-  font-size: 20px;
+
+  border-radius: 12px;
+
+  font-size: 21px;
+
+  border: 1px solid transparent;
 }
 
-/* ================= RESPONSIVE ================= */
 
-/* Tablet */
+/* ========================================
+   COLORFUL FEATURE ICONS
+======================================== */
+
+/* Emergency Help */
+
+.icon-help {
+  background: #f8dfd4;
+
+  color: #c95c3d;
+
+  border-color: #edc2b4;
+}
+
+
+/* Request Tracking */
+
+.icon-track {
+  background: #dceaf7;
+
+  color: #3c78a8;
+
+  border-color: #c2d9ec;
+}
+
+
+/* Relief Coordination */
+
+.icon-coordinate {
+  background: #e8ddf4;
+
+  color: #76529a;
+
+  border-color: #d6c5e8;
+}
+
+
+/* Disaster Information */
+
+.icon-disaster {
+  background: #f8e5bf;
+
+  color: #c27a12;
+
+  border-color: #ebd19b;
+}
+
+
+/* Shelter */
+
+.icon-shelter {
+  background: #dcefe1;
+
+  color: #43835a;
+
+  border-color: #c2dfca;
+}
+
+
+/* Security */
+
+.icon-security {
+  background: #dce9e8;
+
+  color: #39736f;
+
+  border-color: #c2d8d6;
+}
+
+
+/* ========================================
+   TABLET
+======================================== */
+
 @media (max-width: 1024px) {
+
   .card-container {
     grid-template-columns: repeat(2, 1fr);
+
     padding: 0 20px;
   }
+
 }
 
-/* Mobile */
+
+/* ========================================
+   MOBILE
+======================================== */
+
 @media (max-width: 768px) {
+
   .navbar {
     flex-direction: column;
+
     gap: 14px;
+
     padding: 16px 20px;
   }
 
+
   .nav-links {
     display: flex;
+
     flex-wrap: wrap;
+
     justify-content: center;
+
     gap: 4px;
   }
 
+
   .nav-right {
     width: 100%;
+
     justify-content: center;
   }
 
+
   .hero {
-    padding: 40px 16px 30px;
+    padding: 52px 16px 42px;
   }
 
+
   .hero h1 {
-    font-size: 26px;
+    font-size: 28px;
   }
+
 
   .hero p {
     font-size: 14px;
   }
 
+
+  .features {
+    padding: 50px 16px 60px;
+  }
+
+
   .features h2 {
-    font-size: 22px;
+    font-size: 24px;
+
     text-align: center;
   }
 
-  .features p {
+
+  .features-subtitle {
     text-align: center;
+
+    font-size: 14px;
+
+    margin-bottom: 28px;
   }
+
 
   .card-container {
     grid-template-columns: 1fr;
+
     gap: 16px;
+
+    padding: 0;
   }
+
+
+  .card {
+    min-height: auto;
+
+    padding: 22px;
+  }
+
 }
 
-/* Small phones */
+
+/* ========================================
+   SMALL PHONES
+======================================== */
+
 @media (max-width: 400px) {
+
   .hero h1 {
-    font-size: 22px;
+    font-size: 23px;
   }
+
 
   .brand-logo {
     font-size: 15px;
   }
 
+
   .btn-primary {
     padding: 8px 14px;
+
     font-size: 13px;
   }
+
+
+  .features h2 {
+    font-size: 22px;
+  }
+
 }

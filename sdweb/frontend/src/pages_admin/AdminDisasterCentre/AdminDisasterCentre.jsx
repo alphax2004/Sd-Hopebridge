@@ -5,12 +5,11 @@ import "./AdminDisasterCentre.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-const empty = { disasters: [], shelters: [], news: [] };
+const empty = { disasters: [], shelters: [] };
 
 export default function AdminDisasterCentre() {
   const [data, setData] = useState(empty);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [show, setShow] = useState("");
 
@@ -23,8 +22,6 @@ export default function AdminDisasterCentre() {
     name: "", location: "", capacity: "", occupied: ""
   });
 
-  const [news, setNews] = useState({ title: "", text: "" });
-
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -35,8 +32,7 @@ export default function AdminDisasterCentre() {
         const result = await res.json();
         setData({
           disasters: result.disasters || [],
-          shelters: result.shelters || [],
-          news: result.news || []
+          shelters: result.shelters || []
         });
       } catch (e) {
         console.log(e);
@@ -48,31 +44,33 @@ export default function AdminDisasterCentre() {
     loadData();
   }, []);
 
-  const saveAll = async () => {
+  // Auto-save: state update + database e save
+  const persist = async (next) => {
+    setData(next);
     try {
-      setSaving(true);
-      setMsg("");
       const res = await fetch(`${API_URL}/api/disaster-centre`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(data)
+        body: JSON.stringify(next)
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Save failed");
-      setData(result.data);
-      setMsg("All changes saved successfully");
+      setData({
+        disasters: result.data.disasters || [],
+        shelters: result.data.shelters || []
+      });
+      setMsg("");
     } catch (e) {
+      console.log(e);
       setMsg(e.message || "Save failed");
-    } finally {
-      setSaving(false);
     }
   };
 
   const addAlert = () => {
     if (!form.title.trim() || !form.location.trim()) return;
 
-    setData({
+    persist({
       ...data,
       disasters: [...data.disasters, {
         ...form,
@@ -96,7 +94,7 @@ export default function AdminDisasterCentre() {
     const capacity = Number(shelter.capacity) || 0;
     const occupied = Math.min(Number(shelter.occupied) || 0, capacity);
 
-    setData({
+    persist({
       ...data,
       shelters: [...data.shelters, {
         name: shelter.name.trim(),
@@ -111,31 +109,15 @@ export default function AdminDisasterCentre() {
     setShow("");
   };
 
-  const addNews = () => {
-    if (!news.title.trim() || !news.text.trim()) return;
-
-    setData({
-      ...data,
-      news: [...data.news, {
-        title: news.title.trim(),
-        text: news.text.trim(),
-        icon: "fa-newspaper"
-      }]
-    });
-
-    setNews({ title: "", text: "" });
-    setShow("");
-  };
-
   const remove = (key, index) => {
-    setData({
+    persist({
       ...data,
       [key]: data[key].filter((_, i) => i !== index)
     });
   };
 
   const toggle = (index) => {
-    setData({
+    persist({
       ...data,
       disasters: data.disasters.map((x, i) =>
         i === index ? { ...x, active: !x.active } : x
@@ -181,27 +163,20 @@ export default function AdminDisasterCentre() {
 
         <div className="disaster-admin-hero">
           <div>
-            <span className="live-label"><span />LIVE CENTRE</span>
-            <h2>Emergency Information</h2>
-            <p>Keep alerts, shelters and public updates up to date.</p>
+            <span className="live-label">
+              <span />
+              LIVE UPDATES
+            </span>
+            <h2>Stay informed. Stay safe.</h2>
+            <p>Check current disaster alerts and emergency shelters.</p>
           </div>
-
-          <button className="save-all-btn" onClick={saveAll} disabled={saving}>
-            <i className="fa-solid fa-cloud-arrow-up" />
-            {saving ? "Saving..." : "Save All Changes"}
-          </button>
         </div>
 
-        {msg && (
-          <div className={msg.includes("success") ? "admin-success" : "admin-error"}>
-            {msg}
-          </div>
-        )}
+        {msg && <div className="admin-error">{msg}</div>}
 
         <div className="admin-stat-cards">
           <Stat icon="fa-triangle-exclamation" title="Active Alerts" value={active} />
           <Stat icon="fa-house" title="Shelters" value={data.shelters.length} />
-          <Stat icon="fa-newspaper" title="News Updates" value={data.news.length} />
           <Stat
             icon="fa-clock"
             title="Last Checked"
@@ -377,52 +352,6 @@ export default function AdminDisasterCentre() {
                 </div>
               );
             })}
-          </div>
-        </Section>
-
-        <Section
-          title="Public News"
-          sub="Important information for victims"
-          button="Add News"
-          click={() => setShow(show === "news" ? "" : "news")}
-        >
-          {show === "news" && (
-            <Form>
-              <input
-                placeholder="News title"
-                value={news.title}
-                onChange={e => setNews({ ...news, title: e.target.value })}
-              />
-
-              <textarea
-                placeholder="News details"
-                value={news.text}
-                onChange={e => setNews({ ...news, text: e.target.value })}
-              />
-
-              <button className="form-save" onClick={addNews}>
-                Add News
-              </button>
-            </Form>
-          )}
-
-          <div className="news-grid">
-            {data.news.map((x, i) => (
-              <div className="news-card" key={x._id || i}>
-                <div className="news-icon">
-                  <i className="fa-solid fa-newspaper" />
-                </div>
-
-                <div className="news-content">
-                  <h4>{x.title}</h4>
-                  <p>{x.text}</p>
-                </div>
-
-                <button className="delete-btn" onClick={() => remove("news", i)}>
-                  <i className="fa-solid fa-trash" />
-                </button>
-              </div>
-            ))}
           </div>
         </Section>
       </div>

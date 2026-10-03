@@ -19,14 +19,18 @@ const menuItemsByVariant = {
 };
 
 const profilePathByVariant = {
-  victim: { profile: "/profile", password: "/password", logout: "/logout" },
-  admin: { profile: "/admin/profile", password: "/admin/password", logout: "/logout" },
+  victim: {
+    profile: "/profile",
+    password: "/password",
+    logout: "/logout",
+  },
+  admin: {
+    profile: "/admin/profile",
+    password: "/admin/password",
+    logout: "/logout",
+  },
 };
 
-/*
-  Chhoto shared store — Sidebar r Topbar alada component হলেও
-  ei state duijon share korte parbe, kono page file change na kore.
-*/
 let sidebarOpen = false;
 let listeners = [];
 
@@ -37,6 +41,7 @@ function setSidebarOpenGlobal(value) {
 
 function subscribe(listener) {
   listeners.push(listener);
+
   return () => {
     listeners = listeners.filter((l) => l !== listener);
   };
@@ -54,6 +59,7 @@ export function Sidebar({ variant = "victim" }) {
   const navigate = useNavigate();
   const location = useLocation();
   const isOpen = useSidebarOpen();
+
   const menuItems = menuItemsByVariant[variant];
   const paths = profilePathByVariant[variant];
 
@@ -72,7 +78,9 @@ export function Sidebar({ variant = "victim" }) {
 
           <div>
             <div className="sidebar-title">HopeBridge</div>
-            <div className="sidebar-subtitle">Together We Save Lives</div>
+            <div className="sidebar-subtitle">
+              Together We Save Lives
+            </div>
           </div>
         </div>
 
@@ -95,6 +103,7 @@ export function Sidebar({ variant = "victim" }) {
             className="sidebar-item logout"
             onClick={() => {
               closeSidebar();
+
               navigate(paths.logout, {
                 state: { from: location.pathname },
               });
@@ -109,12 +118,20 @@ export function Sidebar({ variant = "victim" }) {
   );
 }
 
-export function Topbar({ title, subtitle, variant = "victim", userName = "Sanjida Islam" }) {
+export function Topbar({
+  title,
+  subtitle,
+  variant = "victim",
+  userName = "Sanjida Islam",
+}) {
   const navigate = useNavigate();
   const location = useLocation();
   const auth = useAuth();
+
   const [showDropdown, setShowDropdown] = useState(false);
+
   const paths = profilePathByVariant[variant];
+
   const displayedName = auth?.user?.fullName || userName;
 
   return (
@@ -175,6 +192,7 @@ export function Topbar({ title, subtitle, variant = "victim", userName = "Sanjid
                 navigate(paths.logout, {
                   state: { from: location.pathname },
                 });
+
                 setShowDropdown(false);
               }}
             >

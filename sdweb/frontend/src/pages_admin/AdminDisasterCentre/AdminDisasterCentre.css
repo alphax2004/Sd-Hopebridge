@@ -112,7 +112,7 @@
 
 .admin-stat-cards {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 15px;
   margin-bottom: 22px;
 }
@@ -150,14 +150,8 @@
   border-color: #c3ddc8;
 }
 
-/* NEWS */
-.admin-stat-card:nth-child(3) {
-  background: #e3edfa;
-  border-color: #c5d8ed;
-}
-
 /* LAST CHECKED */
-.admin-stat-card:nth-child(4) {
+.admin-stat-card:nth-child(3) {
   background: #f8e4df;
   border-color: #e5c8c2;
 }
@@ -186,11 +180,6 @@
 }
 
 .admin-stat-card:nth-child(3) .stat-icon {
-  background: #bed4ee;
-  color: #527aa8;
-}
-
-.admin-stat-card:nth-child(4) .stat-icon {
   background: #e7c1b9;
   color: #a96258;
 }
