@@ -46,7 +46,6 @@ export default function DisasterCenter() {
     window.addEventListener("focus", loadData);
 
     return () => {
-     
       window.removeEventListener("focus", loadData);
     };
   }, []);
@@ -54,7 +53,8 @@ export default function DisasterCenter() {
   const activeDisasters = data.disasters.filter((item) => item.active);
 
   const highRisk = activeDisasters.filter(
-    (item) => item.severity === "High",).length;
+    (item) => item.severity === "High",
+  ).length;
 
   const openShelters = data.shelters.filter(
     (item) => Number(item.occupied || 0) < Number(item.capacity || 0),
