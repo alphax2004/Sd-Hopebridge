@@ -25,7 +25,10 @@ const schema = new Schema(
 
    
   },
-  { timestamps: true }
+  { timestamps: true,
+    versionKey:false
+   }
+  
 );
 
 const DisasterCentre = model("DisasterCentre", schema);

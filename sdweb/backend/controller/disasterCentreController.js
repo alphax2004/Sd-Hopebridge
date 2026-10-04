@@ -8,7 +8,7 @@ export const getDisasterCentre = async (req, res) => {
       data = await DisasterCentre.create({
         disasters: [],
         shelters: [],
-        news: [],
+        
       });
     }
 
@@ -35,7 +35,7 @@ export const updateDisasterCentre = async (req, res) => {
       data = new DisasterCentre({
         disasters: [],
         shelters: [],
-        news: [],
+        
       });
     }
 
@@ -47,9 +47,7 @@ export const updateDisasterCentre = async (req, res) => {
       data.shelters = req.body.shelters;
     }
 
-    if (Array.isArray(req.body.news)) {
-      data.news = req.body.news;
-    }
+    
 
     await data.save();
 
