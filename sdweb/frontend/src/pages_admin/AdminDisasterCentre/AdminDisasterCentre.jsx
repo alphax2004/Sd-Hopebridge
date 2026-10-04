@@ -70,18 +70,15 @@ export default function AdminDisasterCentre() {
     if (!form.title.trim() || !form.location.trim()) return;
 
     persist({
-      disasters: [
-        ...data.disasters,
-        {
-          title: form.title.trim(),
-          type: form.type,
-          location: form.location.trim(),
-          severity: form.severity,
-          description: form.description.trim(),
-          icon: form.icon,
-          active: true,
-        },
-      ],
+      disasters: data.disasters.concat({
+        title: form.title.trim(),
+        type: form.type,
+        location: form.location.trim(),
+        severity: form.severity,
+        description: form.description.trim(),
+        icon: form.icon,
+        active: true,
+      }),
       shelters: data.shelters,
     });
     setForm({
@@ -99,15 +96,12 @@ export default function AdminDisasterCentre() {
     if (!shelter.name.trim() || !shelter.location.trim()) return;
     persist({
       disasters: data.disasters,
-      shelters: [
-        ...data.shelters,
-        {
-          name: shelter.name.trim(),
-          location: shelter.location.trim(),
-          capacity: shelter.capacity,
-          occupied: shelter.occupied,
-        },
-      ],
+      shelters: data.shelters.concat({
+        name: shelter.name.trim(),
+        location: shelter.location.trim(),
+        capacity: shelter.capacity,
+        occupied: shelter.occupied,
+      }),
     });
     setShelter({
       name: "",
@@ -164,11 +158,7 @@ export default function AdminDisasterCentre() {
           </div>
         </div>
         <div className="admin-stat-cards">
-          <Stat
-            icon="fa-triangle-exclamation"
-            title="Active Alerts"
-            value={active}
-          />
+          <Stat icon="fa-triangle-exclamation" title="Active Alerts" value={active}/>
           <Stat icon="fa-house" title="Shelters" value={data.shelters.length} />
         </div>
 

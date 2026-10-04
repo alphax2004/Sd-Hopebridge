@@ -13,9 +13,6 @@ export default function DisasterCenter() {
   });
 
   const [filter, setFilter] = useState("All");
-
-  const [error, setError] = useState("");
-
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -35,10 +32,10 @@ export default function DisasterCenter() {
           shelters: result.shelters || [],
         });
 
-        setError("");
+        
       } catch (err) {
         console.log("DISASTER CENTRE ERROR:", err);
-        setError("Unable to load emergency information.");
+        
       }
     };
 
@@ -51,14 +48,8 @@ export default function DisasterCenter() {
   }, []);
 
   const activeDisasters = data.disasters.filter((item) => item.active);
-
-  const highRisk = activeDisasters.filter(
-    (item) => item.severity === "High",
-  ).length;
-
-  const openShelters = data.shelters.filter(
-    (item) => Number(item.occupied || 0) < Number(item.capacity || 0),
-  ).length;
+  const highRisk = activeDisasters.filter((item) => item.severity === "High",).length;
+  const openShelters = data.shelters.filter((item) => Number(item.occupied || 0) < Number(item.capacity || 0),).length;
 
   const filteredList =
     filter === "All"
@@ -88,15 +79,9 @@ export default function DisasterCenter() {
             <p>Check current disaster alerts and emergency shelters.</p>
           </div>
         </div>
-
-        {error && <div className="admin-error">{error}</div>}
-
+        
         <div className="admin-stat-cards">
-          <Stat
-            icon="fa-triangle-exclamation"
-            title="Active Disasters"
-            value={activeDisasters.length}
-          />
+          <Stat icon="fa-triangle-exclamation" title="Active Disasters" value={activeDisasters.length}/>
           <Stat icon="fa-bolt" title="High Risk Alerts" value={highRisk} />
           <Stat icon="fa-house" title="Open Shelters" value={openShelters} />
         </div>

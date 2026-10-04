@@ -6,10 +6,7 @@ export default function LandingPage() {
 
   return (
     <div className="landing-page">
-      {/* ========================================
-          NAVBAR
-      ======================================== */}
-
+      
       <div className="navbar">
         <div className="brand-logo">
           <img src="/images/logo.png" alt="HopeBridge logo" />
@@ -35,10 +32,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ========================================
-          HERO
-      ======================================== */}
-
+      
       <div className="hero">
         <h1>Together We Save Lives During Disasters</h1>
 
@@ -52,10 +46,7 @@ export default function LandingPage() {
         </button>
       </div>
 
-      {/* ========================================
-          FEATURES
-      ======================================== */}
-
+      
       <div className="features">
         <h2>Powering Faster, Smarter Disaster Response</h2>
 
@@ -157,14 +148,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ========================================
-    CONTACT SECTION
-======================================== */}
-
-      {/* ========================================
-    CONTACT SECTION
-======================================== */}
-
       <div className="contact-section">
         <div className="contact-content">
           <div className="contact-info">
@@ -193,12 +176,8 @@ export default function LandingPage() {
                 <span>Dhaka, Bangladesh</span>
               </div>
             </div>
-          </div>
-
-          
+          </div>         
         </div>
-
-        
       </div>
     </div>
   );
